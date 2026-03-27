@@ -1,0 +1,257 @@
+<div class="page fade-in">
+  @if (!selectedApp) {
+    <!-- ════════════ VIEW: LIST OF ASSIGNMENTS ════════════ -->
+    <div class="view-header">
+      <div class="title-area">
+        <h1>Assessment Center</h1>
+        <p>You have {{ applications.length }} policy applications awaiting your evaluation</p>
+      </div>
+      <a routerLink="/underwriter/dashboard" class="minimal-btn">← Back to Dashboard</a>
+    </div>
+
+    @if (notification) {
+      <div class="status-banner" [class]="notification.type">
+        <span class="icon">{{ notification.type === 'success' ? '✨' : '⚠️' }}</span>
+        <p>{{ notification.message }}</p>
+      </div>
+    }
+
+    @if (loading) {
+      <div class="p-spinner">
+        <div class="dot-loader"></div>
+        <p>Scanning Pipeline...</p>
+      </div>
+    } @else if (applications.length === 0) {
+      <div class="zero-state">
+        <div class="hero-icon">📋</div>
+        <h2>Clear Workspace</h2>
+        <p>No pending assignments currently. New requests will appear here once assigned by the admin.</p>
+      </div>
+    } @else {
+      <div class="card-grid">
+        @for (app of applications; track app.id) {
+          <div class="app-card" (click)="openQuoteModal(app)">
+            <div class="card-glow"></div>
+            <div class="card-content">
+              <div class="card-top">
+                <span class="app-id">ID: #{{ app.id }}</span>
+                <span class="p-badge" [class.gold]="app.policyTitle.includes('Gold')">{{ app.policyType }}</span>
+              </div>
+              
+              <div class="customer-info">
+                <h3>{{ app.userName }}</h3>
+                <p class="plan-subtitle">{{ app.policyTitle }}</p>
+              </div>
+
+              <div class="card-meta">
+                <div class="meta-item">
+                  <span class="label">Base Premium</span>
+                  <span class="value">₹{{ app.basePremium | number }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="label">Assigned</span>
+                  <span class="value">{{ app.assignedAt | date:'mediumDate' }}</span>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <span class="action-hint">Begin Assessment →</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <!-- ════════════ VIEW: FOCUS ASSESSMENT MODE ════════════ -->
+    <div class="focus-mode">
+      <div class="focus-header">
+        <button class="back-link" (click)="selectedApp = null">← Return to List</button>
+        <div class="focus-title">
+          <h1>Evaluation: {{ selectedApp.userName }}</h1>
+          <span class="focus-id">Application #{{ selectedApp.id }}</span>
+        </div>
+      </div>
+
+      <div class="assessment-layout">
+        <!-- ── Left Column: Data ── -->
+        <div class="assessment-data">
+          <!-- Policy Overview -->
+          <div class="data-section">
+            <h4 class="section-title">Policy Details</h4>
+            <div class="info-strip">
+              <div class="info-cell">
+                <span class="cell-label">Plan Name</span>
+                <span class="cell-val">{{ selectedApp.policyTitle }}</span>
+              </div>
+              <div class="info-cell">
+                <span class="cell-label">Price with Rewards</span>
+                <span class="cell-val">₹{{ selectedApp.finalPremium | number }}</span>
+              </div>
+              <div class="info-cell">
+                <span class="cell-label">Nominee</span>
+                <span class="cell-val">{{ selectedApp.nomineeName }} ({{ selectedApp.nomineeRelationship }})</span>
+              </div>
+            </div>
+            
+            @if (selectedApp.healthReportPath) {
+              <a [href]="getFileUrl(selectedApp.healthReportPath)" target="_blank" rel="noopener noreferrer" class="download-card">
+                <span class="icon">📄</span>
+                <div class="text">
+                  <strong>Medical Assessment Report</strong>
+                  <p>Click to open in new tab</p>
+                </div>
+              </a>
+            }
+          </div>
+
+          <!-- Insured Members -->
+          <div class="data-section">
+            <h4 class="section-title">Declared Members ({{ selectedApp.insuredMembers?.length || 0 }})</h4>
+            <div class="members-stack">
+              @for (member of selectedApp.insuredMembers; track member.id) {
+                <div class="member-item">
+                  <div class="member-avatar">{{ member.fullName.charAt(0) }}</div>
+                  <div class="member-info">
+                    <div class="m-row">
+                      <strong>{{ member.fullName }}</strong>
+                      <span class="m-tag">{{ member.relationship }}</span>
+                    </div>
+                    <p>{{ member.gender }} • Pre-existing: <span class="c-tag" [class.warn]="member.preExistingConditions !== 'None'">{{ member.preExistingConditions }}</span></p>
+                  </div>
+                </div>
+              } @empty {
+                <div class="nil-msg">No additional family members declared.</div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Right Column: Decision Form ── -->
+        <div class="assessment-form-container">
+          <div class="form-card">
+            
+            <!-- AI ASSISTANT SECTION -->
+            <div class="ai-assistant-panel" [class.analyzed]="aiResult">
+              <div class="ai-header">
+                <div class="ai-title">
+                  <span class="ai-label">🤖 AI Cognitive Assistant</span>
+                  <span class="ai-subtitle">Agentic Underwriting Engine</span>
+                </div>
+                @if (aiResult) {
+                  <div class="badge-group">
+                    <span class="ai-badge risk" [class]="aiResult.riskLevel">{{ aiResult.riskLevel }} RISK</span>
+                    <span class="ai-badge load">+{{ aiResult.loadingPercentage }}% Loading</span>
+                  </div>
+                }
+              </div>
+
+              @if (!aiResult && !analyzingAi) {
+                <div class="ai-cta">
+                  <div class="ai-icon-pulse">✨</div>
+                  <p>Request AI reasoning for this medical profile.</p>
+                  <button class="btn-ai-sparkle" (click)="runAiAnalysis()">Run Risk Analysis</button>
+                </div>
+              }
+
+              @if (analyzingAi) {
+                <div class="ai-thinking">
+                  <div class="thinking-dots"><span></span><span></span><span></span></div>
+                  <p>Assessing loss-ratio & morbidity data...</p>
+                </div>
+              }
+
+              @if (aiResult) {
+                <div class="ai-result slide-up">
+                   <div class="ai-gauges">
+                      <div class="gauge-item">
+                        <span class="g-label">Confidence</span>
+                        <div class="conf-score">
+                          <div class="p-fill" [style.width]="aiResult.confidenceScore + '%'"></div>
+                        </div>
+                      </div>
+                      <div class="gauge-item">
+                        <span class="g-label">Premium Loading (Suggested)</span>
+                        <div class="load-score">
+                          <div class="p-fill" [style.width]="(aiResult.loadingPercentage * 2) + '%'"></div>
+                        </div>
+                      </div>
+                   </div>
+
+                   <div class="ai-reasoning">
+                      <h6>AI Logic Summary:</h6>
+                      <p>"{{ aiResult.aiReasoningSummary }}"</p>
+                   </div>
+
+                   <div class="ai-memo">
+                      <h6>Underwriting Memo:</h6>
+                      <p>{{ aiResult.underwritingMemo }}</p>
+                   </div>
+                   
+                   <div class="ai-factors">
+                     @if (aiResult.keyRiskFactors.length > 0) {
+                       <div class="factor-group warn">
+                         <div class="h-row">🚨 <h6>Adverse Risk Vectors</h6></div>
+                         <ul>
+                           @for (f of aiResult.keyRiskFactors; track f) { <li>{{ f }}</li> }
+                         </ul>
+                       </div>
+                     }
+                   </div>
+
+                   <div class="price-comparison">
+                      <div class="p-col">
+                         <span>Base Premium</span>
+                         <strong>₹{{ selectedApp.finalPremium | number }}</strong>
+                      </div>
+                      <div class="p-arrow">➔</div>
+                      <div class="p-col highlighted">
+                         <span>AI Suggested</span>
+                         <strong>₹{{ aiResult.suggestedQuoteAmount | number }}</strong>
+                      </div>
+                   </div>
+
+                   <div class="ai-actions">
+                      <button class="btn-apply-suggestion" (click)="applyAiSuggestion()">
+                         ⚡ Adopt Actuarial Recommendation
+                      </button>
+                      <p class="ai-disclaimer">Decisional Support Only. Underwriter discretion required.</p>
+                   </div>
+                </div>
+              }
+            </div>
+
+            <hr class="form-divider" />
+
+            <h3>Assessment Verdict</h3>
+            <p>Calculate the final risk-adjusted premium below.</p>
+
+            <div class="v-group">
+              <label>Final Quoted Premium (₹)</label>
+              <div class="premium-input-wrap">
+                <input type="number" [(ngModel)]="quoteAmount" placeholder="0.00" />
+                <span class="currency-tag">INR</span>
+              </div>
+              <p class="input-note">Suggested starting point: ₹{{ selectedApp.finalPremium | number }}</p>
+            </div>
+
+            <div class="v-group">
+              <label>Risk Assessment Remarks</label>
+              <textarea [(ngModel)]="remarks" rows="6" placeholder="Document the factors influencing this quote..."></textarea>
+            </div>
+
+            <div class="form-footer">
+              <button class="btn-cancel" (click)="selectedApp = null">Back</button>
+              <button class="btn-reject" (click)="rejectApplication()" [disabled]="submitting">
+                 Decline 
+              </button>
+              <button class="btn-submit" (click)="submitQuote()" [disabled]="!quoteAmount || submitting">
+                {{ submitting ? 'Processing...' : 'Approve & Send Quote' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

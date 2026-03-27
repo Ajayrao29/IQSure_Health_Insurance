@@ -1,0 +1,258 @@
+<div class="page education-page">
+  <div class="header-section">
+    <div class="badge-mini">GUARDIAN ACADEMY</div>
+    <h1>The Insurance Journey</h1>
+    <p>Master the levels of financial literacy and build your digital fortress.</p>
+    
+    <div class="academy-stats" *ngIf="contents.length > 0">
+      <div class="stat-item">
+        <span class="val">{{ contents.length }}</span>
+        <span class="lbl">SESSIONS</span>
+      </div>
+      <div class="stat-item">
+        <span class="val">100+</span>
+        <span class="lbl">QUIZ PTS</span>
+      </div>
+    </div>
+
+    <div class="language-dropdown-custom" [class.open]="isLangMenuOpen">
+      <div class="lang-trigger shadow-premium" (click)="isLangMenuOpen = !isLangMenuOpen">
+        <span class="lbl">Academy Language:</span>
+        <span class="current-val">{{ currentLanguageLabel }}</span>
+        <div class="chevron-box"><span class="chevron" [class.open]="isLangMenuOpen"></span></div>
+      </div>
+      
+      <div class="lang-menu slide-up" *ngIf="isLangMenuOpen">
+        @for (lang of languages; track lang.code) {
+          <div class="lang-option" 
+               [class.active]="selectedLanguageCode === lang.code"
+               (click)="selectLanguage(lang)">
+            <span>{{ lang.label }}</span>
+            <span class="check" *ngIf="selectedLanguageCode === lang.code">✓</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    </div>
+
+  <!-- 🔮 STICKY ORACLE (AI SEARCH) -->
+  <div class="sticky-oracle-wrapper">
+    <div class="oracle-search-container">
+      <input type="text" [(ngModel)]="searchTopic" placeholder="e.g. Health insurance for seniors" (keyup.enter)="askOracle()">
+      <button class="btn-ask-oracle" (click)="askOracle()" [disabled]="isGenerating">
+        {{ isGenerating ? 'Consulting Oracle...' : 'Ask Oracle' }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Consulting the Insurance Oracle...</p>
+    </div>
+  } @else if (contents.length === 0) {
+    <div class="no-content">No academy sessions available for this region.</div>
+  } @else {
+    @if (!selectedTopic) {
+      <!-- 🗺️ THE JOURNEY MAP -->
+      <div class="journey-path">
+        @for (item of contents; track item.id; let i = $index) {
+          <div class="journey-node" 
+               [class.active]="true" 
+               [class.even]="i % 2 === 0"
+               (click)="openLesson(item)">
+            
+            <div class="node-content">
+              <div class="node-index">0{{ i + 1 }}</div>
+              <div class="node-info">
+                <h3>{{ item.title }}</h3>
+                <span class="node-topic">{{ item.topic || 'General' }}</span>
+              </div>
+              <div class="node-status">
+                <span class="btn-start">Start Mission</span>
+              </div>
+            </div>
+
+            <!-- Path connector SVG -->
+            <div class="node-connector" *ngIf="i < contents.length - 1">
+              <svg viewBox="0 0 100 50">
+                <path d="M 50 0 Q 50 25 50 50" stroke="#cbd5e1" fill="none" stroke-width="2" stroke-dasharray="5,5" />
+              </svg>
+            </div>
+          </div>
+        }
+        
+        <div class="journey-completion-gate">
+          <div class="gate-icon">🚩</div>
+          <h3>Final Certification</h3>
+          <p>Complete all modules to unlock the "Oracle" status.</p>
+        </div>
+      </div>
+    } @else {
+      <!-- 📖 SESSION DETAIL -->
+      <div class="lesson-detail slide-up">
+        
+        <!-- 🔔 ORACLE IN-APP NOTIFICATIONS -->
+        <div class="oracle-notif-bar" 
+             *ngIf="feedbackMessage" 
+             [class]="'type-' + feedbackType"
+             (click)="feedbackMessage = ''">
+           <span class="icon">
+              @if (feedbackType === 'success') { ✨ }
+              @else if (feedbackType === 'error') { ⚠️ }
+              @else { 💡 }
+           </span>
+           <span class="text">{{ feedbackMessage }}</span>
+           <button class="close-btn">×</button>
+        </div>
+
+        <div class="detail-header-nav">
+          <button class="btn-back-nav" (click)="closeLesson()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Exit Session
+          </button>
+        </div>
+        
+        <div class="detail-container glass-premium">
+          <div class="session-hero">
+            <span class="session-category">{{ selectedTopic.topic || 'Level 1' }}</span>
+            <h2>{{ selectedTopic.title }}</h2>
+          </div>
+
+          <div class="session-actions" *ngIf="!showAiQuiz">
+            <button class="btn-audio" (click)="listenToLesson(selectedTopic.content)">
+              <span>{{ isPlaying ? '⏹ Stop Audio' : '🔊 Narrate Session' }}</span>
+            </button>
+            <button class="btn-quiz-jump" (click)="generateAiQuiz()">
+               Calibrate AI Assessment
+            </button>
+          </div>
+
+          <!-- 🧠 AI GENERATED QUIZ AREA -->
+          <div class="ai-quiz-overlay" *ngIf="showAiQuiz">
+             <h3>Assessment Calibrated</h3>
+             <div class="ai-question" *ngFor="let q of aiQuizQuestions; let qi = index">
+                <p><strong>Q{{ qi+1 }}:</strong> {{ q.text }}</p>
+                <div class="ai-options">
+                   <button class="opt-btn" 
+                           *ngFor="let opt of q.options; let oi = index"
+                           [class.selected]="userAnswers[qi] === oi"
+                           (click)="selectOption(qi, oi)">
+                      {{ opt }}
+                   </button>
+                </div>
+             </div>
+             <div class="quiz-completion">
+                <button class="btn-complete-session claim-btn" 
+                        (click)="submitAiQuiz()"
+                        [disabled]="!canSubmitQuiz">
+                   Verify Assessment & Submit for Evaluation
+                </button>
+             </div>
+          </div>
+
+          <!-- 📊 PREMIUM QUIZ SCORECARD AREA -->
+          <div class="quiz-scorecard-overlay glass-premium fade-in" *ngIf="showScorecard">
+             <div class="scorecard-container">
+                <div class="score-header-visual">
+                   <div class="confetti-emoji" *ngIf="lastScore >= quizPassingScore">🎊</div>
+                   <div class="status-pill" [class.passed]="lastScore >= quizPassingScore">
+                      {{ lastScore >= quizPassingScore ? 'MISSION SUCCESS' : 'MISSION FAILED' }}
+                   </div>
+                   <h2 class="score-title">Assessment Report</h2>
+                   <p class="score-subtitle">Oracle evaluation complete for: <span>{{ selectedTopic.title }}</span></p>
+                </div>
+
+                <div class="score-main-row">
+                   <div class="score-ring-container">
+                      <div class="score-ring" [style.--percent]="lastScore" [class.passed]="lastScore >= quizPassingScore">
+                         <div class="inner-circle">
+                            <span class="score-number">{{ lastScore }}%</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div class="score-breakdown">
+                      <div class="breakdown-item">
+                         <span class="lbl">CORRECT ANSWERS</span>
+                         <span class="val">{{ correctCount }} / {{ aiQuizQuestions.length }}</span>
+                      </div>
+                      <div class="breakdown-item">
+                         <span class="lbl">POINTS SECURED</span>
+                         <span class="val" [class.points-award]="lastScore >= quizPassingScore">
+                            {{ lastScore >= quizPassingScore ? '+50 PTS' : '0 PTS' }}
+                         </span>
+                      </div>
+                      <div class="breakdown-item">
+                         <span class="lbl">ACCURACY</span>
+                         <span class="val">{{ lastScore >= quizPassingScore ? 'EXCEPTIONAL' : 'IMPROVE' }}</span>
+                      </div>
+                   </div>
+                </div>
+
+                <div class="oracle-summary-box">
+                   <div class="oracle-icon">🔮</div>
+                   <div class="oracle-text">
+                      <p *ngIf="lastScore >= quizPassingScore">
+                         <strong>THE ORACLE SAYS:</strong> 
+                         Your literacy in this complex domain is officially verified. 
+                         The fortress of your knowledge grows stronger. Claim your rewards below.
+                      </p>
+                      <p *ngIf="lastScore < quizPassingScore">
+                         <strong>RE-CALIBRATION REQUIRED:</strong> 
+                         A Guardian's shield must be without cracks. Review the fine print of 
+                         this module and retry to secure your loyalist points.
+                      </p>
+                   </div>
+                </div>
+
+                <div class="scorecard-footer">
+                   <button class="btn-primary-claret btn-lg claim-cta" 
+                           (click)="claimRewards()" 
+                           *ngIf="lastScore >= quizPassingScore">
+                      ✨ Secure 50 Points to Profile
+                   </button>
+                   <button class="btn-outline-claret btn-lg" 
+                           (click)="retryQuiz()" 
+                           *ngIf="lastScore < quizPassingScore">
+                      🔄 Retry Assessment
+                   </button>
+                </div>
+             </div>
+          </div>
+
+          <div class="session-body-text markdown-body" [innerHTML]="getMarkdown(selectedTopic.content)" *ngIf="!showAiQuiz"></div>
+
+          <!-- 🗨️ ORACLE DOUBTS -->
+          <div class="oracle-doubts-section glass-premium" *ngIf="selectedTopic && !showAiQuiz">
+            <div class="doubts-header">
+              <span class="icon">💬</span>
+              <h4>Ask a Follow-up Doubt</h4>
+            </div>
+            
+            <div class="follow-up-chat">
+              <div class="ai-response-box slide-up" *ngIf="followUpResponse">
+                <div class="ai-label">Oracle's Clarity:</div>
+                <p>{{ followUpResponse }}</p>
+              </div>
+              
+              <div class="input-group">
+                <input type="text" [(ngModel)]="followUpDoubt" placeholder="Ask a clarifying question..." (keyup.enter)="askFollowUp()">
+                <button class="btn-ask-followup" (click)="askFollowUp()" [disabled]="isAskingFollowUp || !followUpDoubt.trim()">
+                  {{ isAskingFollowUp ? 'Thinking...' : 'Clarify' }}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="session-footer">
+            <button class="btn-complete-session" (click)="closeLesson()">
+              Confirm Completion
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

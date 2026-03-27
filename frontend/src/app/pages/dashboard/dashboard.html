@@ -1,0 +1,508 @@
+<!-- ═══════════════════ LOADING STATE ═══════════════════ -->
+<div class="loading" *ngIf="loading">
+  <p>Loading dashboard…</p>
+</div>
+
+<!-- ═══════════════════ ADMIN DASHBOARD ═══════════════════ -->
+<ng-container *ngIf="!loading && auth.isAdmin()">
+<div class="page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner admin-banner">
+    <div class="banner-text">
+      <h1>Welcome back, <span>Admin</span> <svg class="icon-inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></h1>
+      <p>Manage the IQsure platform. Monitor users, quizzes, and policies from here.</p>
+    </div>
+    <div class="points-badge">
+      <div class="points-number">{{stats.totalUsers}}</div>
+      <div class="points-label">TOTAL USERS</div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card admin-stat">
+      <div class="stat-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
+      </div>
+      <div class="stat-value">{{stats.totalUsers}}</div>
+      <div class="stat-label">REGISTERED USERS</div>
+    </div>
+
+    <div class="stat-card admin-stat">
+      <div class="stat-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      </div>
+      <div class="stat-value">{{stats.totalQuizzes}}</div>
+      <div class="stat-label">TOTAL QUIZZES</div>
+    </div>
+
+    <div class="stat-card admin-stat">
+      <div class="stat-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div class="stat-value">{{stats.totalPolicies}}</div>
+      <div class="stat-label">POLICIES</div>
+    </div>
+
+    <div class="stat-card admin-stat">
+      <div class="stat-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      </div>
+      <div class="stat-value">{{stats.totalRewards}}</div>
+      <div class="stat-label">REWARDS ISSUED</div>
+    </div>
+  </div>
+
+  <!-- Two-Column: Platform Overview + Admin Actions -->
+  <div class="two-col admin-panels">
+
+    <div class="card admin-summary-card">
+      <div class="card-header">
+        <h2>Platform Overview</h2>
+      </div>
+
+      <div class="summary-list">
+        <div class="summary-row">
+          <span>Total Admins</span>
+          <strong>{{stats.totalAdmins}}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Total Customers</span>
+          <strong>{{stats.totalCustomers}}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Active Policies</span>
+          <strong>{{stats.activePolicies}}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Inactive Policies</span>
+          <strong>{{stats.inactivePolicies}}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Discount Rules</span>
+          <strong>{{stats.discountRules}}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Admin Actions</h2>
+      </div>
+
+      <div class="admin-actions-list">
+        <a routerLink="/admin/users" class="mini-action">
+          <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> Manage Users
+        </a>
+        <a routerLink="/learning-center/education-center" class="mini-action">
+          <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> Education Center
+        </a>
+        <a routerLink="/admin/policy-mgmt" class="mini-action">
+          <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Manage Policies
+        </a>
+        <a routerLink="/admin/badge-mgmt" class="mini-action">
+          <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg> Manage Badges
+        </a>
+        <a routerLink="/admin/reward-mgmt" class="mini-action">
+          <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 0H5.5A1.5 1.5 0 014 6.5v-1A1.5 1.5 0 015.5 4H12m0 4h6.5A1.5 1.5 0 0020 6.5v-1A1.5 1.5 0 0018.5 4H12" /></svg> Manage Rewards
+        </a>
+        <a routerLink="/admin/discount-rules" class="mini-action">
+          <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Discount Rules
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Users + Platform Health -->
+  <div class="two-col admin-panels">
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Recent Users</h2>
+        <a routerLink="/admin/users" class="card-link">View All →</a>
+      </div>
+
+      <div class="recent-users-list" *ngIf="recentUsers.length > 0; else noUsers">
+        <div class="recent-user-row" *ngFor="let u of recentUsers">
+          <div class="user-avatar">{{ u.name.charAt(0) || '?' }}</div>
+          <div class="user-info">
+            <div class="user-name">{{ u.name }}</div>
+            <div class="user-email">{{ u.email }}</div>
+          </div>
+          <span class="role-badge" [class.admin-role]="u.role === 'ROLE_ADMIN'">
+            {{ u.role === 'ROLE_ADMIN' ? 'Admin' : 'Customer' }}
+          </span>
+        </div>
+      </div>
+
+      <ng-template #noUsers>
+        <p class="empty-msg">No users found.</p>
+      </ng-template>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Platform Health</h2>
+      </div>
+
+      <div class="health-grid">
+        <div class="health-item">
+          <div class="health-icon good">✓</div>
+          <div class="health-text">
+            <strong>AI Academy Active</strong>
+            <span>Oracle is online</span>
+          </div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon" [class.good]="stats.activePolicies > 0" [class.warn]="stats.activePolicies === 0">
+            {{ stats.activePolicies > 0 ? '✓' : '!' }}
+          </div>
+          <div class="health-text">
+            <strong>{{stats.activePolicies}} Active Policies</strong>
+            <span>{{ stats.inactivePolicies }} inactive</span>
+          </div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon good">✓</div>
+          <div class="health-text">
+            <strong>{{stats.totalRewards}} Rewards</strong>
+            <span>Configured in system</span>
+          </div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon good">✓</div>
+          <div class="health-text">
+            <strong>{{stats.discountRules}} Discount Rules</strong>
+            <span>Active rules</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</ng-container>
+
+
+<!-- ═══════════════════ USER DASHBOARD ═══════════════════ -->
+<ng-container *ngIf="!loading && !auth.isAdmin()">
+<div class="page no-hero-mode">
+  
+  <!-- 🎨 SIMPLIFIED USER WELCOME BANNER (Reference Match) -->
+  <div class="welcome-banner-simple fade-in" *ngIf="auth.isLoggedIn()">
+    <div class="banner-text">
+      <h1>Welcome back, <span class="name">{{ auth.getUser()?.name }}</span> 👋</h1>
+      <p>Keep learning, keep earning discounts on your insurance.</p>
+    </div>
+    <div class="stats-badge-white">
+      <div class="val">{{ user?.userPoints || 0 }}</div>
+      <div class="lbl">TOTAL POINTS</div>
+    </div>
+  </div>
+
+  <!-- 🛡️ THE GUARDIAN'S FORTRESS (Expert Gamification) -->
+  <div class="guardian-fortress-grid fade-in" *ngIf="user">
+    
+    <!-- Left: Rank & Progress -->
+    <div class="card guardian-status-card glass-premium">
+      <div class="rank-header">
+        <div class="rank-icon-large" [style.border-color]="guardianRank.color">
+          <span>{{ guardianRank.icon }}</span>
+        </div>
+        <div class="rank-titles">
+          <span class="rank-label">CURRENT RANK</span>
+          <h2 [style.color]="guardianRank.color">{{ guardianRank.name }}</h2>
+          <div class="rank-level">LEVEL {{ guardianRank.level }}</div>
+        </div>
+      </div>
+      
+      <div class="rank-progress-container">
+        <div class="progress-labels">
+          <span>{{ user.userPoints }} XP</span>
+          <span>{{ guardianRank.nextThreshold }} XP for Next Rank</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" 
+               [style.width]="guardianRank.progress + '%'"
+               [style.background]="guardianRank.color"></div>
+        </div>
+      </div>
+      
+      <div class="rank-badges-preview">
+        <div class="mini-badge" *ngFor="let b of myBadges.slice(0,4)">
+          {{ b.icon || '🏅' }}
+        </div>
+        <div class="more-badges" *ngIf="myBadges.length > 4">+{{ myBadges.length - 4 }}</div>
+        <div class="no-badges-yet" *ngIf="myBadges.length === 0">Complete quizzes to earn honors</div>
+      </div>
+    </div>
+
+    <!-- Center: Digital Fortress (Visual Risk Shield) -->
+    <div class="card fortress-visual-card glass-premium">
+      <div class="card-header-simple">
+        <h3>Digital Fortress</h3>
+        <span class="status-pill active">STABLE</span>
+      </div>
+      
+      <div class="fortress-svg-container">
+        <!-- SVG Radar Chart Simulation -->
+        <svg viewBox="0 0 100 100" class="fortress-svg">
+          <!-- Background Grid -->
+          <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+          <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+          <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+          <line x1="5" y1="50" x2="95" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+          
+          <!-- Data Shape -->
+          <path [attr.d]="'M 50 ' + (50 - (fortressMetrics.knowledge * 0.45)) + 
+                         ' L ' + (50 + (fortressMetrics.protection * 0.45)) + ' 50' + 
+                         ' L 50 ' + (50 + (fortressMetrics.resilience * 0.45)) + 
+                         ' L ' + (50 - (fortressMetrics.proficiency * 0.45)) + ' 50 Z'"
+                fill="rgba(59, 130, 246, 0.3)"
+                stroke="#3b82f6"
+                stroke-width="2"
+                class="fortress-path" />
+        </svg>
+        
+        <!-- Axis Labels -->
+        <div class="axis-label top">KNOWLEDGE</div>
+        <div class="axis-label right">PROTECTION</div>
+        <div class="axis-label bottom">RESILIENCE</div>
+        <div class="axis-label left">PROFICIENCY</div>
+      </div>
+    </div>
+
+    <!-- Right: Daily Pulse & Insights -->
+    <div class="card daily-pulse-card glass-premium">
+      <div class="card-header-simple">
+        <span class="pulse-dot"></span>
+        <h3>Daily Risk Pulse</h3>
+      </div>
+      
+      <div class="pulse-content">
+        <p class="pulse-scenerio">
+          "A major leak is detected in your apartment complex. Is your current <strong>Water Damage</strong> rider active?"
+        </p>
+        <div class="pulse-actions">
+          <button class="btn-pulse-check" (click)="verifyCoverage()">Verify Coverage</button>
+          <button class="btn-pulse-skip" (click)="skipPulse()">Skip</button>
+        </div>
+      </div>
+      
+      <div class="iq-insight-box">
+        <div class="insight-header">
+           <span class="ai-sparkle">✨</span>
+           <strong>Guardian Insight</strong>
+        </div>
+        <p>{{ aiInsight }}</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon green">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+      </div>
+      <div class="metric-info">
+        <h3>{{ userStats.totalPolicies }}</h3>
+        <p>Total Policies</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon blue">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+      </div>
+      <div class="metric-info">
+        <h3>{{ userStats.activePolicies }}</h3>
+        <p>Active Policies</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon yellow">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <div class="metric-info">
+        <h3>{{ userStats.awaitingQuote }}</h3>
+        <p>Awaiting Quote / Payment</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon red">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      </div>
+      <div class="metric-info">
+        <h3>{{ userStats.pendingClaims }}</h3>
+        <p>Pending Claims</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚀 AGENTIC AI: POLICY TRACKING PIPELINE -->
+  <div class="pipeline-section" *ngIf="myPolicies.length > 0">
+    <div class="section-header-modern">
+      <h2><span class="sparkle">✨</span> Cognitive Pipeline Tracking</h2>
+      <p>Real-time status of your active insurance applications</p>
+    </div>
+
+    <div class="pipeline-grid">
+      <div class="pipeline-card fade-in" *ngFor="let p of myPolicies">
+        <div class="p-header">
+          <div class="p-title">
+            <strong>{{ p.policyTitle }}</strong>
+            <span>#{{ p.id }}</span>
+          </div>
+          <span class="status-pill" [class]="p.status">{{ p.status }}</span>
+        </div>
+
+        <div class="p-tracker">
+          <div class="track-step" [class.complete]="true" [class.active]="p.status === 'PENDING_UNDERWRITING' || p.status === 'UNDER_EVALUATION' || p.status === 'QUOTES_SENT' || p.status === 'ACTIVE'">
+            <div class="dot">📜</div>
+            <label>Signed</label>
+          </div>
+          <div class="track-line" [class.complete]="p.status === 'UNDER_EVALUATION' || p.status === 'QUOTES_SENT' || p.status === 'ACTIVE'"></div>
+          
+          <div class="track-step" [class.complete]="p.status === 'QUOTES_SENT' || p.status === 'ACTIVE'" [class.active]="p.status === 'UNDER_EVALUATION'">
+            <div class="dot">🔎</div>
+            <label>Underwriting</label>
+          </div>
+          <div class="track-line" [class.complete]="p.status === 'ACTIVE'"></div>
+
+          <div class="track-step" [class.complete]="p.status === 'ACTIVE'" [class.active]="p.status === 'QUOTES_SENT'">
+            <div class="dot">💰</div>
+            <label>Quote Ready</label>
+          </div>
+          <div class="track-line" [class.complete]="p.status === 'ACTIVE'"></div>
+
+          <div class="track-step" [class.active]="p.status === 'ACTIVE'">
+            <div class="dot">🛡️</div>
+            <label>Active</label>
+          </div>
+        </div>
+
+        @if (p.status === 'QUOTES_SENT') {
+          <div class="action-alert slide-up">
+             <span>⚡ Final Quote Available</span>
+             <button [routerLink]="['/my-policies']" class="btn-view-quote">Review & Pay</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="quick-actions-section">
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="action-grid-modern">
+      <a routerLink="/apply-policy" class="action-card-modern">
+        <div class="action-icon-wrapper">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        </div>
+        <h3>Browse Plans</h3>
+        <p>Explore insurance options</p>
+      </a>
+
+      <a routerLink="/my-policies" class="action-card-modern">
+        <div class="action-icon-wrapper">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+        </div>
+        <h3>My Policies</h3>
+        <p>View & manage policies</p>
+      </a>
+
+      <a routerLink="/my-claims" class="action-card-modern">
+        <div class="action-icon-wrapper">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01" /></svg>
+        </div>
+        <h3>My Claims</h3>
+        <p>Track claim status</p>
+      </a>
+
+      <a routerLink="/my-claims" class="action-card-modern">
+        <div class="action-icon-wrapper">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+        </div>
+        <h3>File Claim</h3>
+        <p>Submit a new claim</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Gamification & Recent Activity (Keep existing features) -->
+  <div class="two-col mt-4">
+    <!-- Recent Attempts -->
+    <div class="card academy-progress-card">
+      <div class="card-header">
+        <h2>Academy Activity</h2>
+        <a routerLink="/learning-center/education-center" class="card-link">See Oracle →</a>
+      </div>
+      <div class="academy-summary">
+        <p>Your current mastery is building through AI-powered on-demand sessions. Complete more modules to rank up!</p>
+        <div class="academy-cta">
+           <button class="btn-primary" routerLink="/learning-center/education-center">Enter Guardian Academy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Your Badges -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Your Badges</h2>
+        <a routerLink="/badges" class="card-link">View All →</a>
+      </div>
+      <ng-container *ngIf="myBadges.length > 0; else noBadges">
+        <div class="badge-grid">
+          <div class="badge-item" *ngFor="let badge of myBadges">
+            <div class="badge-icon">
+              <!-- Using a professional achievement icon as default -->
+              <svg *ngIf="!badge.icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+              <span *ngIf="badge.icon">{{badge.icon}}</span>
+            </div>
+            <div class="badge-name">{{badge.name}}</div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noBadges>
+        <p class="empty-msg">Earn points to unlock badges!</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- 📥 Savings & Rewards Overview (Restored) -->
+  <div class="card mt-4 shadow-sm">
+    <div class="card-header">
+      <h2><svg class="icon-l inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg> Savings & Rewards</h2>
+    </div>
+    <div class="savings-rewards-panels">
+      <div class="panel-item">
+        <div class="p-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <div class="p-info">
+          <div class="p-value">₹{{ totalSavings | number }}</div>
+          <div class="p-label">TOTAL MONEY SAVED</div>
+          <p class="p-subtext">Earned through Academy-based discounts</p>
+        </div>
+      </div>
+      <div class="panel-item">
+        <div class="p-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+        </div>
+        <div class="p-info">
+          <div class="p-value">{{ user?.userPoints || 0 }}</div>
+          <div class="p-label">LOYALTY POINTS</div>
+          <p class="p-subtext">Use them to redeem cashback & coupons</p>
+        </div>
+      </div>
+      <div class="panel-actions">
+        <button routerLink="/rewards" class="btn-primary-outline">Go to Rewards Shop</button>
+        <button routerLink="/savings" class="btn-secondary-outline">Analyze Savings</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</ng-container>
