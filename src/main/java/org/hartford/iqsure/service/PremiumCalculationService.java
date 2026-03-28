@@ -4,9 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.config.AppConfig;
 import org.hartford.iqsure.dto.response.PremiumBreakdownDTO;
 import org.hartford.iqsure.dto.response.PremiumCalculationLogResponseDTO;
-import org.hartford.iqsure.entity.*;
+import org.hartford.iqsure.entity.PremiumCalculationLog;
+import org.hartford.iqsure.entity.Policy;
+import org.hartford.iqsure.entity.User;
+import org.hartford.iqsure.entity.Reward;
+import org.hartford.iqsure.entity.UserReward;
 import org.hartford.iqsure.exception.ResourceNotFoundException;
-import org.hartford.iqsure.repository.*;
+import org.hartford.iqsure.repository.UserRepository;
+import org.hartford.iqsure.repository.PolicyRepository;
+import org.hartford.iqsure.repository.DiscountRuleRepository;
+import org.hartford.iqsure.repository.UserBadgeRepository;
+import org.hartford.iqsure.repository.UserRewardRepository;
+import org.hartford.iqsure.repository.PremiumCalculationLogRepository;
+import org.hartford.iqsure.dto.response.UserRewardResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +56,9 @@ public class PremiumCalculationService {
         double totalDiscount = 0.0;
 
         /*
-         * APPLY ONLY SELECTED COUPONS
-         * No automatic discount rules are used anymore
+         * ACTUARIAL DISCOUNT ENGINE:
+         * 1. Manual Coupons (Redeemed via points)
+         * 2. Automatic Rule-Based Discounts (Account status, high quiz proficiency)
          */
 
         if (selectedRewardIds != null && !selectedRewardIds.isEmpty()) {
@@ -80,6 +91,36 @@ public class PremiumCalculationService {
                 }
             }
         }
+
+        /* 
+         * 2. AUTOMATIC RULE-BASED DISCOUNTS
+         * These are earned through account status and learning proficiency
+         */
+        final double finalBestQuizScore = bestQuizScore;
+        discountRuleRepository.findByIsActiveTrue().stream()
+                .filter(rule -> {
+                    // Check if rule applies to this policy type
+                    if (rule.getApplicablePolicyType() != null && 
+                        rule.getApplicablePolicyType() != policy.getPolicyType()) {
+                        return false;
+                    }
+                    // Check criteria
+                    return userPoints >= rule.getMinUserPoints() && 
+                           badgeCount >= rule.getMinBadgesEarned() && 
+                           finalBestQuizScore >= rule.getMinQuizScorePercent();
+                })
+                .forEach(rule -> {
+                    applied.add(PremiumBreakdownDTO.AppliedDiscountDTO.builder()
+                            .ruleName(rule.getRuleName())
+                            .discountPercentage(rule.getDiscountPercentage())
+                            .reason("Automatic qualification - Account Status")
+                            .build());
+                    // We sum them for now, but cap it later
+                });
+
+        totalDiscount = applied.stream()
+                .mapToDouble(PremiumBreakdownDTO.AppliedDiscountDTO::getDiscountPercentage)
+                .sum();
 
         // Apply discount cap
         if (totalDiscount > appConfig.getMaxDiscountCap()) {
@@ -174,16 +215,28 @@ public class PremiumCalculationService {
         });
     }
 
-    // Available coupons for user
-    public List<UserReward> getAvailableRewardsForUser(Long userId) {
-
+    /**
+     * Retrieves all available (unexpired and unused) coupons for a user.
+     * Returns DTOs for the frontend to display.
+     */
+    public List<UserRewardResponseDTO> getAvailableRewardsForUser(Long userId) {
         return userRewardRepository
                 .findByUser_UserIdAndUsedFalse(userId)
                 .stream()
-                .filter(ur ->
-                        !ur.getReward().getExpiryDate()
-                                .isBefore(java.time.LocalDate.now()))
+                .filter(ur -> !ur.getReward().getExpiryDate().isBefore(java.time.LocalDate.now()))
+                .map(this::toUserRewardDTO)
                 .toList();
+    }
+
+    private UserRewardResponseDTO toUserRewardDTO(UserReward ur) {
+        return UserRewardResponseDTO.builder()
+                .userRewardId(ur.getId())
+                .rewardTitle(ur.getReward().getRewardType()) // Using reward type as title
+                .rewardType(ur.getReward().getRewardType())
+                .discountValue(ur.getReward().getDiscountValue())
+                .expiryDate(ur.getReward().getExpiryDate().atStartOfDay()) // Convert LocalDate to LocalDateTime
+                .used(ur.isUsed())
+                .build();
     }
 
     private PremiumCalculationLogResponseDTO toLogDTO(PremiumCalculationLog l) {

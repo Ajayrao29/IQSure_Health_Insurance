@@ -9,15 +9,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { UserRewardResponse } from '../../models/models';
 
 @Component({ selector: 'app-rewards', standalone: true, imports: [CommonModule], templateUrl: './rewards.html', styleUrls: ['./rewards.scss'] })
 export class RewardsComponent implements OnInit {
-  rewards: any[] = [];
+  rewards: UserRewardResponse[] = [];
   loading = true;
 
-  get availableRewards() { return this.rewards.filter(r => !r.isUsed && !r.isExpired); }
-  get usedRewards()      { return this.rewards.filter(r => r.isUsed); }
-  get expiredRewards()   { return this.rewards.filter(r => r.isExpired && !r.isUsed); }
+  get availableRewards() { return this.rewards.filter(r => !r.used && !r.isExpired); }
+  get usedRewards()      { return this.rewards.filter(r => r.used); }
+  get expiredRewards()   { return this.rewards.filter(r => r.isExpired && !r.used); }
 
   constructor(private api: ApiService, private auth: AuthService) {}
 

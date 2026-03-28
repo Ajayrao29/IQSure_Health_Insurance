@@ -5,12 +5,12 @@
  */
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserPolicy } from '../../models/models';
 
-@Component({ selector: 'app-my-policies', standalone: true, imports: [CommonModule, RouterLink, DecimalPipe], templateUrl: './my-policies.html', styleUrls: ['./my-policies.scss'] })
+@Component({ selector: 'app-my-policies', standalone: true, imports: [CommonModule, RouterLink, DecimalPipe, DatePipe], templateUrl: './my-policies.html', styleUrls: ['./my-policies.scss'] })
 export class MyPoliciesComponent implements OnInit {
   policies: UserPolicy[] = []; 
   loading = true;

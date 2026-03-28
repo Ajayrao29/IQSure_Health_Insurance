@@ -203,105 +203,15 @@
     </div>
   </div>
 
-  <!-- 🛡️ THE GUARDIAN'S FORTRESS (Expert Gamification) -->
-  <div class="guardian-fortress-grid fade-in" *ngIf="user">
+
     
-    <!-- Left: Rank & Progress -->
-    <div class="card guardian-status-card glass-premium">
-      <div class="rank-header">
-        <div class="rank-icon-large" [style.border-color]="guardianRank.color">
-          <span>{{ guardianRank.icon }}</span>
-        </div>
-        <div class="rank-titles">
-          <span class="rank-label">CURRENT RANK</span>
-          <h2 [style.color]="guardianRank.color">{{ guardianRank.name }}</h2>
-          <div class="rank-level">LEVEL {{ guardianRank.level }}</div>
-        </div>
-      </div>
-      
-      <div class="rank-progress-container">
-        <div class="progress-labels">
-          <span>{{ user.userPoints }} XP</span>
-          <span>{{ guardianRank.nextThreshold }} XP for Next Rank</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" 
-               [style.width]="guardianRank.progress + '%'"
-               [style.background]="guardianRank.color"></div>
-        </div>
-      </div>
-      
-      <div class="rank-badges-preview">
-        <div class="mini-badge" *ngFor="let b of myBadges.slice(0,4)">
-          {{ b.icon || '🏅' }}
-        </div>
-        <div class="more-badges" *ngIf="myBadges.length > 4">+{{ myBadges.length - 4 }}</div>
-        <div class="no-badges-yet" *ngIf="myBadges.length === 0">Complete quizzes to earn honors</div>
-      </div>
-    </div>
 
-    <!-- Center: Digital Fortress (Visual Risk Shield) -->
-    <div class="card fortress-visual-card glass-premium">
-      <div class="card-header-simple">
-        <h3>Digital Fortress</h3>
-        <span class="status-pill active">STABLE</span>
-      </div>
-      
-      <div class="fortress-svg-container">
-        <!-- SVG Radar Chart Simulation -->
-        <svg viewBox="0 0 100 100" class="fortress-svg">
-          <!-- Background Grid -->
-          <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-          <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-          <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-          <line x1="5" y1="50" x2="95" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
-          
-          <!-- Data Shape -->
-          <path [attr.d]="'M 50 ' + (50 - (fortressMetrics.knowledge * 0.45)) + 
-                         ' L ' + (50 + (fortressMetrics.protection * 0.45)) + ' 50' + 
-                         ' L 50 ' + (50 + (fortressMetrics.resilience * 0.45)) + 
-                         ' L ' + (50 - (fortressMetrics.proficiency * 0.45)) + ' 50 Z'"
-                fill="rgba(59, 130, 246, 0.3)"
-                stroke="#3b82f6"
-                stroke-width="2"
-                class="fortress-path" />
-        </svg>
-        
-        <!-- Axis Labels -->
-        <div class="axis-label top">KNOWLEDGE</div>
-        <div class="axis-label right">PROTECTION</div>
-        <div class="axis-label bottom">RESILIENCE</div>
-        <div class="axis-label left">PROFICIENCY</div>
-      </div>
-    </div>
 
-    <!-- Right: Daily Pulse & Insights -->
-    <div class="card daily-pulse-card glass-premium">
-      <div class="card-header-simple">
-        <span class="pulse-dot"></span>
-        <h3>Daily Risk Pulse</h3>
-      </div>
-      
-      <div class="pulse-content">
-        <p class="pulse-scenerio">
-          "A major leak is detected in your apartment complex. Is your current <strong>Water Damage</strong> rider active?"
-        </p>
-        <div class="pulse-actions">
-          <button class="btn-pulse-check" (click)="verifyCoverage()">Verify Coverage</button>
-          <button class="btn-pulse-skip" (click)="skipPulse()">Skip</button>
-        </div>
-      </div>
-      
-      <div class="iq-insight-box">
-        <div class="insight-header">
-           <span class="ai-sparkle">✨</span>
-           <strong>Guardian Insight</strong>
-        </div>
-        <p>{{ aiInsight }}</p>
-      </div>
-    </div>
 
-  </div>
+
+
+
+
   <div class="metrics-grid">
     <div class="metric-card">
       <div class="metric-icon green">

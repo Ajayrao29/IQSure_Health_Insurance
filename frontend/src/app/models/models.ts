@@ -26,7 +26,13 @@
 
 // Returned after login/register → stored in localStorage by AuthService
 export interface AuthResponse { 
-  token: string; tokenType: string; userId: number; name: string; email: string; role: string; userPoints: number;
+  token: string; 
+  tokenType: string; 
+  userId: number; 
+  name: string; 
+  email: string; 
+  role: string; 
+  userPoints: number;
   totalQuizzesTaken?: number;
   currentStreak?: number;
   licenseNumber?: string;
@@ -34,6 +40,11 @@ export interface AuthResponse {
   department?: string;
   approvalLimit?: number;
 }
+
+// Request DTOs for Auth
+export interface RegisterRequest { name: string; email: string; password: any; phone?: string; }
+export interface LoginRequest { email: string; password: any; }
+export interface ResetPasswordRequest { otp: string; newPassword: any; }
 
 // User profile data → displayed on Dashboard, Admin Users page
 export interface User { 
@@ -64,7 +75,35 @@ export interface AttemptResponse { attemptId: number; userId: number; quizId: nu
 export interface Badge { badgeId: number; name: string; description: string; reqPoints: number; icon?: string; }
 
 // Reward info → displayed on Rewards page, Admin Reward Management
-export interface Reward { rewardId: number; rewardType: string; discountValue: number; expiryDate: string; userRewardId?: number; }
+export interface Reward { 
+  rewardId: number; 
+  rewardType: string; 
+  discountValue: number; 
+  expiryDate: string; 
+  userRewardId?: number; 
+}
+
+// Redemmed reward DTO for coupon selection
+export interface UserRewardResponse {
+  userRewardId: number;
+  rewardTitle: string;
+  rewardType: string;
+  discountValue: number;
+  expiryDate: string;
+  earnedOn: string;
+  used: boolean;
+  isExpired: boolean;
+}
+
+// Underwriter Stats
+export interface UnderwriterStats {
+  pendingAssignments: number;
+  quotesSent: number;
+  activePolicies: number;
+  customersServed: number;
+  totalPremium: number;
+  commissionEarned: number;
+}
 
 // Insurance policy info → displayed on Policies page, Admin Policy Management
 export interface Policy { 
@@ -76,6 +115,9 @@ export interface Policy {
   waitingPeriod?: string;
   hasMaternityCover?: boolean;
   hasPreExistingCover?: boolean;
+  deductibleAmount?: number;
+  outOfPocketMax?: number;
+  copayPercentage?: number;
 }
 
 // A user's purchased policy with discount details → displayed on My Policies page

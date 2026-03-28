@@ -1,68 +1,110 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h1>💰 Savings Calculator</h1>
-      <p>See how much you've saved and can save with IQsure</p>
+      <h1>💎 Wealth Shield & Savings Analytics</h1>
+      <p>Precision actuarial analysis of your IQsure optimization and terminal wealth growth</p>
     </div>
   </div>
 
-  <div class="savings-hero">
+  <div class="savings-hero fade-in">
     <div class="savings-card total">
-      <div class="savings-icon">💵</div>
+      <div class="savings-icon">📉</div>
+      <div class="savings-label">Direct Premium Alpha</div>
       <div class="savings-amount">₹{{ totalSavings | number:'1.2-2' }}</div>
-      <div class="savings-label">Total Saved</div>
-      <div class="savings-desc">From {{ policies.length }} purchased policies</div>
+      <div class="savings-desc">Absolute liquidity saved through gamified underwriting</div>
     </div>
 
-    <div class="savings-card potential">
-      <div class="savings-icon">🎯</div>
-      <div class="savings-amount">₹{{ potentialSavings | number:'1.2-2' }}</div>
-      <div class="savings-label">Potential Savings</div>
-      <div class="savings-desc">Available on all policies</div>
+    <div class="savings-card wealth">
+      <div class="savings-icon">📈</div>
+      <div class="savings-label">30-Year Wealth Projection</div>
+      @if (wealthData.length > 0) {
+        <div class="savings-amount blue">₹{{ wealthData[3].wealth | number }}</div>
+      }
+      <div class="savings-desc">Future value of reinvested savings at 8% CAGR</div>
     </div>
   </div>
 
-  <div class="comparison-section">
-    <h2>📊 Your Savings Breakdown</h2>
+  <!-- Terminal Wealth Projection Table -->
+  <div class="wealth-projection-section fade-in">
+      <div class="section-header">
+          <h2><span class="sparkle">✨</span> Compound Interest Power</h2>
+          <p>By reinvesting your insurance savings into a diversified index fund (8% expected return), your "Insurance Alpha" grows exponentially.</p>
+      </div>
+      
+      <div class="projection-grid">
+          @for (d of wealthData; track d.years) {
+            <div class="projection-item">
+                <div class="year-label">{{ d.years }} YEARS</div>
+                <div class="wealth-bar-container">
+                    <div class="wealth-bar" [style.height.%]="maxWealth > 0 ? (d.wealth / maxWealth) * 100 : 0"></div>
+                </div>
+                <div class="wealth-value">₹{{ d.wealth | number }}</div>
+            </div>
+          }
+      </div>
+  </div>
+
+  <div class="comparison-section fade-in">
+    <h2>📊 Portfolio Optimization Breakdown</h2>
     <div class="comparison-grid">
       @for (p of policies; track p) {
-        <div class="comparison-item">
-          <div class="policy-name">{{ p.policyTitle }}</div>
-          <div class="price-comparison">
-            <div class="original-price">₹{{ p.basePremium }}</div>
-            <div class="arrow">→</div>
-            <div class="final-price">₹{{ p.finalPremium }}</div>
+        <div class="comparison-item expert">
+          <div class="policy-info">
+              <div class="policy-name">{{ p.policyTitle }}</div>
+              <div class="policy-type-tag">{{ p.policyType }}</div>
           </div>
-          <div class="savings-badge">Saved ₹{{ p.savedAmount | number:'1.2-2' }} ({{ p.discountApplied }}%)</div>
+          <div class="price-comparison expert">
+            <div class="price-col">
+                <span class="p-lbl">Market Premium</span>
+                <div class="original-price">₹{{ p.basePremium | number }}</div>
+            </div>
+            <div class="arrow">⇛</div>
+            <div class="price-col">
+                <span class="p-lbl">IQsure Optimized</span>
+                <div class="final-price">₹{{ p.finalPremium | number }}</div>
+            </div>
+          </div>
+          <div class="savings-metrics">
+              <div class="metric">
+                  <span class="m-val">₹{{ p.savedAmount | number }}</span>
+                  <span class="m-lbl">SAVED</span>
+              </div>
+              <div class="metric">
+                  <span class="m-val">{{ p.discountApplied }}%</span>
+                  <span class="m-lbl">DISCOUNT</span>
+              </div>
+          </div>
         </div>
       }
     </div>
 
     @if (policies.length === 0) {
-      <div class="empty-state">
-        <p>No policies purchased yet. Start taking quizzes to unlock discounts!</p>
-        <a routerLink="/quizzes" class="btn-primary">Take a Quiz</a>
+      <div class="empty-state expert">
+        <div class="empty-icon">📭</div>
+        <p>No optimization data found. Your current "Insurance Alpha" is 0.00%.</p>
+        <p class="sub">Acquire a policy through the Academy to begin capital preservation.</p>
+        <a routerLink="/policies" class="btn-primary-outline">Browse Policies</a>
       </div>
     }
   </div>
 
-  <div class="tips-section">
-    <h2>💡 Maximize Your Savings</h2>
+  <div class="actuarial-tips fade-in">
+    <h2>🧬 Risk Mitigation Strategies</h2>
     <div class="tips-grid">
-      <div class="tip-card">
-        <div class="tip-icon">📚</div>
-        <div class="tip-title">Take More Quizzes</div>
-        <div class="tip-desc">Each quiz increases your discount potential</div>
+      <div class="tip-card dark">
+        <div class="tip-icon">🧠</div>
+        <div class="tip-title">Cognitive Underwriting</div>
+        <div class="tip-desc">Decrease your risk profile by increasing your insurance literacy score.</div>
       </div>
-      <div class="tip-card">
-        <div class="tip-icon">🏆</div>
-        <div class="tip-title">Unlock Badges</div>
-        <div class="tip-desc">Badges give you access to exclusive discounts</div>
+      <div class="tip-card dark">
+        <div class="tip-icon">🛡️</div>
+        <div class="tip-title">Threshold Management</div>
+        <div class="tip-desc">Higher points unlock elite stop-loss protection rules.</div>
       </div>
-      <div class="tip-card">
-        <div class="tip-icon">⚡</div>
-        <div class="tip-title">Score High</div>
-        <div class="tip-desc">Higher scores = bigger discounts on premiums</div>
+      <div class="tip-card dark">
+        <div class="tip-icon">🏛️</div>
+        <div class="tip-title">Capital Reinvestment</div>
+        <div class="tip-desc">Automate reinvestment of savings to ensure terminal wealth growth.</div>
       </div>
     </div>
   </div>

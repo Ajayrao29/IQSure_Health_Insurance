@@ -24,6 +24,12 @@ export class SavingsCalculatorComponent implements OnInit {
   policies: any[] = [];
   userPoints = 0;
   availableRewards: any[] = [];
+  
+  // Wealth Projection
+  projectedYears = [5, 10, 20, 30];
+  expectedReturn = 0.08; // 8% realistic index fund return
+  wealthData: { years: number, wealth: number }[] = [];
+  maxWealth = 0;
 
   constructor(private api: ApiService, private auth: AuthService) {}
 
@@ -43,6 +49,16 @@ export class SavingsCalculatorComponent implements OnInit {
         this.calculatePotentialSavings(userId);
       });
     });
+  }
+
+  generateWealthProjection(): void {
+    const annualSavings = this.totalSavings > 0 ? this.totalSavings : 5000; // Fallback for demo
+    this.wealthData = this.projectedYears.map(year => {
+      // Future Value of an Annuity formula: P * [((1 + r)^n - 1) / r]
+      const wealth = annualSavings * ((Math.pow(1 + this.expectedReturn, year) - 1) / this.expectedReturn);
+      return { years: year, wealth: Math.round(wealth) };
+    });
+    this.maxWealth = Math.max(...this.wealthData.map(d => d.wealth));
   }
 
   calculatePotentialSavings(userId: number): void {
@@ -70,6 +86,7 @@ export class SavingsCalculatorComponent implements OnInit {
 
             if (completed === policies.length) {
               this.potentialSavings = Number(potential.toFixed(2));
+              this.generateWealthProjection();
             }
           },
           error: () => {
@@ -77,6 +94,7 @@ export class SavingsCalculatorComponent implements OnInit {
 
             if (completed === policies.length) {
               this.potentialSavings = Number(potential.toFixed(2));
+              this.generateWealthProjection();
             }
           }
         });

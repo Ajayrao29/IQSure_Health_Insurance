@@ -47,4 +47,8 @@ public class PolicyRequestDTO {
     private String waitingPeriod;
     private Boolean hasMaternityCover;
     private Boolean hasPreExistingCover;
+    
+    private Double deductibleAmount;
+    private Double outOfPocketMax;
+    private Double copayPercentage;
 }

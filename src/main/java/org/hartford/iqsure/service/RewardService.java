@@ -10,10 +10,18 @@ package org.hartford.iqsure.service;
 import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.dto.request.RewardRequestDTO;
 import org.hartford.iqsure.dto.response.RewardResponseDTO;
-import org.hartford.iqsure.entity.*;
+import org.hartford.iqsure.dto.response.UserRewardResponseDTO;
+import org.hartford.iqsure.entity.User;
+import org.hartford.iqsure.entity.Reward;
+import org.hartford.iqsure.entity.UserReward;
+import org.hartford.iqsure.entity.DiscountRule;
 import org.hartford.iqsure.exception.BadRequestException;
 import org.hartford.iqsure.exception.ResourceNotFoundException;
-import org.hartford.iqsure.repository.*;
+import org.hartford.iqsure.repository.RewardRepository;
+import org.hartford.iqsure.repository.UserRepository;
+import org.hartford.iqsure.repository.UserRewardRepository;
+import org.hartford.iqsure.repository.UserBadgeRepository;
+import org.hartford.iqsure.repository.DiscountRuleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,41 +65,32 @@ public class RewardService {
 
     /**
      * Called when the Rewards page loads.
-     * Inlines the check-and-grant logic (no internal method delegation)
-     * so Spring @Transactional works correctly.
+     * Checks all active discount rules and grants rewards to the user if they qualify.
+     * Returns the list of all rewards earned by the user.
      */
     @Transactional
-    public List<Map<String, Object>> getEarnedRewardsForUser(Long userId) {
-        // ── Step 1: Load user stats ──────────────────────────────────────────
+    public List<UserRewardResponseDTO> getEarnedRewardsForUser(Long userId) {
+        // Load user stats
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
         int userPoints = user.getUserPoints();
         int badgeCount = userBadgeRepository.findByUser_UserId(userId).size();
-        double bestScore = 0.0;
 
-        // ── Step 2: Check every active discount rule ────────────────────────
+        // Check active discount rules
         List<DiscountRule> rules = discountRuleRepository.findByIsActiveTrue();
 
         for (DiscountRule rule : rules) {
             if (rule.getDiscountPercentage() == null) continue;
 
-            boolean qualifies =
-                (rule.getMinUserPoints() <= 0 || userPoints >= rule.getMinUserPoints()) &&
-                (rule.getMinBadgesEarned() <= 0 || badgeCount >= rule.getMinBadgesEarned());
-
-            System.out.println("[RewardGrant] Rule '" + rule.getRuleName()
-                    + "' qualifies=" + qualifies
-                    + " (needPts=" + rule.getMinUserPoints()
-                    + " needScore=" + rule.getMinQuizScorePercent()
-                    + " needBadges=" + rule.getMinBadgesEarned() + ")");
+            boolean qualifies = (rule.getMinUserPoints() <= 0 || userPoints >= rule.getMinUserPoints()) &&
+                               (rule.getMinBadgesEarned() <= 0 || badgeCount >= rule.getMinBadgesEarned());
 
             if (!qualifies) continue;
 
-            // ── Step 3: Grant the reward if not already owned ──────────────
+            // Grant the reward if not already owned
             String label = "Discount: " + rule.getRuleName();
 
-            // Re-fetch each iteration so we see newly saved records
             List<UserReward> currentOwned = userRewardRepository.findByUser_UserId(userId);
             boolean alreadyHas = currentOwned.stream()
                     .anyMatch(ur -> ur.getReward().getRewardType().equals(label));
@@ -108,26 +107,22 @@ public class RewardService {
                         .reward(reward)
                         .redeemedDate(LocalDateTime.now())
                         .build());
-
-                System.out.println("[RewardGrant] ✅ Granted '" + label + "' to user " + userId);
             }
         }
 
-        // ── Step 4: Return the full (now up-to-date) list ──────────────────
+        // Return up-to-date list
         return userRewardRepository.findByUser_UserId(userId)
                 .stream()
-                .map(ur -> {
-                    Reward r = ur.getReward();
-                    return Map.<String, Object>of(
-                        "userRewardId",  ur.getId(),
-                        "rewardType",    r.getRewardType(),
-                        "discountValue", r.getDiscountValue(),
-                        "expiryDate",    r.getExpiryDate().toString(),
-                        "earnedOn",      ur.getRedeemedDate().toLocalDate().toString(),
-                        "isUsed",        ur.isUsed(),
-                        "isExpired",     r.getExpiryDate().isBefore(LocalDate.now())
-                    );
-                })
+                .map(ur -> UserRewardResponseDTO.builder()
+                        .userRewardId(ur.getId())
+                        .rewardTitle(ur.getReward().getRewardType())
+                        .rewardType(ur.getReward().getRewardType())
+                        .discountValue(ur.getReward().getDiscountValue())
+                        .expiryDate(ur.getReward().getExpiryDate().atStartOfDay())
+                        .earnedOn(ur.getRedeemedDate())
+                        .used(ur.isUsed())
+                        .isExpired(ur.getReward().getExpiryDate().isBefore(LocalDate.now()))
+                        .build())
                 .toList();
     }
 

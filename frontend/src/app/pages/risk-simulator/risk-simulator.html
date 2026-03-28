@@ -107,17 +107,33 @@
         <div class="scenario-header-icon">{{ getPolicyIcon(result.policy.policyType) }}</div>
         <div>
           <h2>{{ result.scenarioName }}</h2>
-          <p>Tested against: <strong>{{ result.policy.title }}</strong></p>
+          <p>Actuarial Analysis against: <strong>{{ result.policy.title }}</strong></p>
         </div>
-        <div class="cost-tag">
-          Disaster Cost: {{ formatCurrency(result.eventCost) }}
+        <div class="cost-tag actuarial">
+          Baseline Loss: {{ formatCurrency(result.eventCost) }}
         </div>
       </div>
 
-      <!-- Question Banner -->
-      <div class="question-banner">
-        <span class="question-icon">❓</span>
-        <span>What happens if you <strong>don't</strong> have this policy when disaster strikes?</span>
+      <!-- Advanced Technical Insights Row -->
+      <div class="technical-insights-row fade-in">
+        <div class="tech-card">
+          <div class="tech-icon">🧘</div>
+          <div class="tech-label">Peace of Mind Score</div>
+          <div class="tech-value">{{ result.peaceOfMindScore }}%</div>
+          <div class="tech-progress"><div class="tech-fill" [style.width]="result.peaceOfMindScore + '%'"></div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">💸</div>
+          <div class="tech-label">Financial Ruin Probability</div>
+          <div class="tech-value">{{ result.financialRuinProb }}%</div>
+          <div class="tech-progress"><div class="tech-fill danger" [style.width]="result.financialRuinProb + '%'"></div></div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-icon">🛡️</div>
+          <div class="tech-label">Risk Shield Effect</div>
+          <div class="tech-value">+{{ result.savingsPercent.toFixed(1) }}%</div>
+          <p style="font-size: 0.6rem; color: #64748b; margin: 0;">Net Liquidity Saved</p>
+        </div>
       </div>
 
       <!-- Side-by-Side Comparison -->
@@ -126,25 +142,24 @@
         <div class="panel panel-danger" [class.animate]="animateNumbers">
           <div class="panel-header danger">
             <span class="panel-emoji">🚫</span>
-            <span class="panel-title">WITHOUT Insurance</span>
+            <span class="panel-title">UNPROTECTED Exposure</span>
           </div>
           <div class="panel-body">
             <div class="single-cost-block danger">
-              <div class="cost-block-label">Event Cost</div>
+              <div class="cost-block-label">Full Catastrophic Loss</div>
               <div class="cost-block-amount">{{ formatCurrency(result.eventCost) }}</div>
             </div>
             
+            <div class="actuarial-notes">
+              <p>⚠️ No stop-loss mechanism active.</p>
+              <p>⚠️ 100% liability on personal assets.</p>
+            </div>
+
             <div class="panel-divider"></div>
 
             <div class="panel-total">
-              <span class="total-label">Your Out-of-Pocket</span>
+              <span class="total-label">Personal Liability</span>
               <span class="total-amount danger">{{ formatCurrency(result.eventCost) }}</span>
-            </div>
-            <div class="pain-indicator">
-              <div class="pain-bar">
-                <div class="pain-fill danger" [style.width]="animateNumbers ? '100%' : '0%'"></div>
-              </div>
-              <span class="pain-text">💸 Your savings are destroyed</span>
             </div>
           </div>
         </div>
@@ -154,108 +169,75 @@
           <div class="vs-circle">VS</div>
         </div>
 
-        <!-- WITH Insurance -->
+        <!-- WITH IQsure Protection -->
         <div class="panel panel-success" [class.animate]="animateNumbers">
           <div class="panel-header success">
-            <span class="panel-emoji">✅</span>
-            <span class="panel-title">WITH Insurance</span>
+            <span class="panel-emoji">🛸</span>
+            <span class="panel-title">IQsure Risk Mitigation</span>
           </div>
           <div class="panel-body">
             
-            <!-- Coverage highlight -->
-            @if (result.insuranceCovers > 0) {
-              <div class="coverage-highlight">
-                <div class="coverage-icon">🛡️</div>
-                <div class="coverage-details">
-                  <span class="coverage-label">Insurance Pays</span>
-                  <span class="coverage-amount">{{ formatCurrency(result.insuranceCovers) }}</span>
+            <div class="technical-breakdown">
+                <div class="breakdown-row">
+                    <span>Initial Deductible</span>
+                    <strong>{{ formatCurrency(result.deductiblePaid) }}</strong>
                 </div>
-              </div>
-            } @else {
-              <div class="coverage-highlight warning">
-                <div class="coverage-icon">⚠️</div>
-                <div class="coverage-details">
-                  <span class="coverage-label">Not Covered</span>
-                  <span class="coverage-amount">Cost below deductible</span>
+                <div class="breakdown-row sub">
+                    <span>Copay ({{ (result.policy.copayPercentage * 100).toFixed(0) }}%)</span>
+                    <strong>{{ formatCurrency(result.copayPaid) }}</strong>
                 </div>
-              </div>
-            }
-
-            <div class="breakdown-list">
-              <div class="breakdown-item">
-                <div class="breakdown-left">
-                  <span class="breakdown-label">Annual Premium</span>
-                  <span class="breakdown-explain">What you pay for the policy</span>
+                @if (result.oopMaxReached) {
+                    <div class="oop-alert">
+                       ✨ OOP Maximum Reached (Stop-Loss Active)
+                    </div>
+                }
+                <div class="breakdown-divider"></div>
+                <div class="breakdown-row highlight">
+                    <span>Total Insurance Coverage</span>
+                    <strong class="green">{{ formatCurrency(result.insuranceCovers) }}</strong>
                 </div>
-                <span class="breakdown-amount">{{ formatCurrency(result.annualPremium) }}</span>
-              </div>
-              <div class="breakdown-item no-border">
-                <div class="breakdown-left">
-                  <span class="breakdown-label">Event Cost Overage</span>
-                  <span class="breakdown-explain">Amount exceeding the {{ formatCurrency(result.policy.coverageAmount) }} max coverage</span>
-                </div>
-                <span class="breakdown-amount">{{ formatCurrency(result.outOfPocket) }}</span>
-              </div>
             </div>
 
             <div class="panel-divider"></div>
             
             <div class="panel-total">
-              <span class="total-label">Your Total Cost</span>
-              <span class="total-amount success">{{ formatCurrency(result.totalWithInsurance) }}</span>
+              <span class="total-label">Effective Risk Cost</span>
+              <span class="total-amount success">{{ formatCurrency(result.outOfPocket) }}</span>
             </div>
-            <div class="pain-indicator">
-              <div class="pain-bar">
-                <div class="pain-fill success" [style.width]="animateNumbers ? (100 - result.savingsPercent) + '%' : '0%'"></div>
-              </div>
-              <span class="pain-text">🎉 You save <strong>{{ result.savingsPercent }}%</strong> of the disaster cost!</span>
+            <div class="annual-premium-note">
+                Annual Membership: {{ formatCurrency(result.annualPremium) }}
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Savings Summary Flow -->
-      <div class="savings-summary" [class.animate]="animateNumbers">
-        <div class="summary-item total-bill">
-          <div class="summary-icon">📋</div>
-          <div class="summary-label">Disaster Cost</div>
-          <div class="summary-value">{{ formatCurrency(result.eventCost) }}</div>
-        </div>
-        <div class="summary-arrow">→</div>
-        <div class="summary-item you-save">
-          <div class="summary-icon">💰</div>
-          <div class="summary-label">Net Savings</div>
-          <div class="summary-value green">{{ formatCurrency(result.savings) }}</div>
-        </div>
-        <div class="summary-arrow">→</div>
-        <div class="summary-item you-pay">
-          <div class="summary-icon">🏷️</div>
-          <div class="summary-label">Your Total Cost</div>
-          <div class="summary-value highlight">{{ formatCurrency(result.totalWithInsurance) }}</div>
-          <div style="font-size: 0.75rem; color: var(--text-gray); margin-top: 0.25rem;">(Premium + Extra)</div>
-        </div>
-      </div>
-
-      <!-- Impact Message -->
-      <div class="impact-message" [class.animate]="animateNumbers">
-        <div class="impact-icon">💡</div>
-        <div class="impact-text">
-          @if (result.savings > 0) {
-            Because you paid <strong>{{ formatCurrency(result.annualPremium) }}</strong> for this policy, 
-            insurance covered <strong>{{ formatCurrency(result.insuranceCovers) }}</strong> of the disaster.
-            You've avoided a massive financial hit, saving <strong>{{ result.savingsPercent }}%</strong> of what you would have paid without insurance.
-          } @else {
-            In this scenario, the cost of the event ({{ formatCurrency(result.eventCost) }}) was less than what you paid for the annual premium ({{ formatCurrency(result.annualPremium) }}). But insurance protects you against catastrophic losses that you couldn't afford out of pocket!
-          }
-        </div>
+      <!-- Monte Carlo / Expert Insight Box -->
+      <div class="expert-mathematician-box fade-in">
+          <div class="expert-header">
+              <span class="math-icon">∑</span>
+              <h3>Actuarial & Monte Carlo Insights</h3>
+          </div>
+          <div class="expert-content">
+              <div class="math-p">
+                  Our simulator ran <strong>1,000 Monte Carlo trials</strong> varying the disaster cost by <strong>±40%</strong>. 
+                  Without this policy, you face a <strong>{{ result.financialRuinProb }}%</strong> probability of a "Ruinous Event" 
+                  (costing > ₹50,000).
+              </div>
+              <div class="math-p">
+                  With <strong>{{ result.policy.title }}</strong>, your effective exposure is mathematically capped. 
+                  This results in a <strong>{{ result.peaceOfMindScore }}% Peace of Mind Rank</strong>, moving you from 
+                  <em>Fragile</em> to <em>Antifragile</em>.
+              </div>
+          </div>
       </div>
 
       <!-- CTA -->
       <div class="simulator-cta" [class.animate]="animateNumbers">
-        <h3>Ready to secure this safety net?</h3>
-        <p>Buy this policy today, or explore other coverage options to protect your future.</p>
+        <h3>Antifragility is just a click away.</h3>
+        <p>Transition from risk exposure to controlled security. Our algorithms suggest immediate enrollment.</p>
         <div class="cta-buttons">
-          <a routerLink="/policies" class="btn-primary">🛒 View Policies</a>
+          <a routerLink="/policies" class="btn-primary">🛡️ Activate This Shield</a>
+          <button class="btn-secondary" (click)="resetSimulation()">🔄 Simulate New Risk</button>
         </div>
       </div>
     </div>

@@ -36,6 +36,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hartford.iqsure.entity.User;
+import org.hartford.iqsure.enums.UserStatus;
 import org.hartford.iqsure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -81,7 +82,7 @@ public class DataSeeder {
                     .licenseNumber("UW-88990")
                     .specialization("HEALTH")
                     .commissionPercentage(new java.math.BigDecimal("5.5"))
-                    .status("ACTIVE")
+                    .status(UserStatus.ACTIVE)
                     .build());
             log.info("Underwriter created: underwriter@iqsure.com / underwriter123");
         }
@@ -96,7 +97,7 @@ public class DataSeeder {
                     .employeeId("EMP-1234")
                     .department("CLAIMS")
                     .approvalLimit(new java.math.BigDecimal("750000.00"))
-                    .status("ACTIVE")
+                    .status(UserStatus.ACTIVE)
                     .build());
             log.info("Claims Officer created: bob@iqsure.com / claims123");
         }
@@ -112,7 +113,7 @@ public class DataSeeder {
                     .userPoints(500)
                     .city("New York")
                     .state("NY")
-                    .status("ACTIVE")
+                    .status(UserStatus.ACTIVE)
                     .build());
             userRepository.flush(); // Ensure user is in DB
             log.info("Default user created: user@iqsure.com / user123");
@@ -224,19 +225,19 @@ public class DataSeeder {
         }
     }
     private void seedPolicies() {
-        savePolicy("Basic Health Plan", "Essential health coverage for individuals with basic hospitalization, day-care procedures, and ambulance charges.", 5000.0, 300000.0, 12, "18-65", "INDIVIDUAL", "1 month", false, false);
-        savePolicy("Silver Health Plan", "Enhanced coverage with higher sum insured, cashless treatment at 5000+ network hospitals, and pre/post hospitalization coverage.", 8500.0, 500000.0, 12, "18-65", "INDIVIDUAL", "2 months", false, false);
-        savePolicy("Gold Health Plan", "Premium comprehensive coverage including maternity benefits, pre-existing disease cover after waiting period.", 15000.0, 1000000.0, 12, "18-65", "INDIVIDUAL", "3 months", true, true);
-        savePolicy("Family Health Plan", "Comprehensive family floater plan covering spouse and up to 3 children. Includes maternity and restoration benefit.", 20000.0, 1500000.0, 12, "18-65", "FAMILY", "2 months", true, false);
-        savePolicy("Senior Citizen Plan", "Tailored plan for senior citizens aged 60-80 years. Covers pre-existing diseases after 2-year waiting period.", 25000.0, 800000.0, 12, "60-80", "SENIOR_CITIZEN", "24 months", false, true);
-        savePolicy("Platinum Health Plan", "Ultimate individual plan with maximum ₹20 Lakh coverage, air ambulance, and personal accident cover.", 30000.0, 2000000.0, 12, "18-55", "INDIVIDUAL", "1 month", true, true);
-        savePolicy("Cyber Shield Protection", "Modern digital protection against identity theft, online fraud, and social media hacking. Includes 24/7 expert support.", 1200.0, 500000.0, 12, "13-75", "INDIVIDUAL", "Instant", false, false);
+        savePolicy("Basic Health Plan", "Essential health coverage for individuals with basic hospitalization, day-care procedures, and ambulance charges.", 5000.0, 300000.0, 12, "18-65", "INDIVIDUAL", "1 month", false, false, 2500.0, 50000.0, 0.2);
+        savePolicy("Silver Health Plan", "Enhanced coverage with higher sum insured, cashless treatment at 5000+ network hospitals, and pre/post hospitalization coverage.", 8500.0, 500000.0, 12, "18-65", "INDIVIDUAL", "2 months", false, false, 5000.0, 75000.0, 0.15);
+        savePolicy("Gold Health Plan", "Premium comprehensive coverage including maternity benefits, pre-existing disease cover after waiting period.", 15000.0, 1000000.0, 12, "18-65", "INDIVIDUAL", "3 months", true, true, 7500.0, 100000.0, 0.1);
+        savePolicy("Family Health Plan", "Comprehensive family floater plan covering spouse and up to 3 children. Includes maternity and restoration benefit.", 20000.0, 1500000.0, 12, "18-65", "FAMILY", "2 months", true, false, 10000.0, 150000.0, 0.1);
+        savePolicy("Senior Citizen Plan", "Tailored plan for senior citizens aged 60-80 years. Covers pre-existing diseases after 2-year waiting period.", 25000.0, 800000.0, 12, "60-80", "SENIOR_CITIZEN", "24 months", false, true, 5000.0, 80000.0, 0.2);
+        savePolicy("Platinum Health Plan", "Ultimate individual plan with maximum ₹20 Lakh coverage, air ambulance, and personal accident cover.", 30000.0, 2000000.0, 12, "18-55", "INDIVIDUAL", "1 month", true, true, 10000.0, 200000.0, 0.05);
+        savePolicy("Cyber Shield Protection", "Modern digital protection against identity theft, online fraud, and social media hacking. Includes 24/7 expert support.", 1200.0, 500000.0, 12, "13-75", "INDIVIDUAL", "Instant", false, false, 1000.0, 25000.0, 0.1);
 
         policyRepository.flush();
         log.info("Health Insurance Policies seeded.");
     }
 
-    private void savePolicy(String title, String desc, Double premium, Double coverage, Integer duration, String age, String type, String waiting, Boolean maternity, Boolean preExisting) {
+    private void savePolicy(String title, String desc, Double premium, Double coverage, Integer duration, String age, String type, String waiting, Boolean maternity, Boolean preExisting, Double deductible, Double oopMax, Double copay) {
         policyRepository.save(org.hartford.iqsure.entity.Policy.builder()
                 .title(title)
                 .description(desc)
@@ -249,6 +250,9 @@ public class DataSeeder {
                 .waitingPeriod(waiting)
                 .hasMaternityCover(maternity)
                 .hasPreExistingCover(preExisting)
+                .deductibleAmount(deductible)
+                .outOfPocketMax(oopMax)
+                .copayPercentage(copay)
                 .isActive(true)
                 .build());
     }

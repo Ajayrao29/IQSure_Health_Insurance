@@ -15,6 +15,7 @@ import org.hartford.iqsure.exception.ResourceNotFoundException;
 import org.hartford.iqsure.repository.PasswordResetTokenRepository;
 import org.hartford.iqsure.repository.UserRepository;
 import org.hartford.iqsure.security.JwtUtil;
+import org.hartford.iqsure.enums.UserStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -169,7 +170,13 @@ public class UserService {
         log.info("Updating status for user ID: {} to {}", userId, status);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-        user.setStatus(status);
+        
+        try {
+            user.setStatus(UserStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid status: " + status);
+        }
+        
         return toDTO(userRepository.save(user));
     }
 
@@ -195,7 +202,7 @@ public class UserService {
                 .licenseNumber(dto.getLicenseNumber())
                 .specialization(dto.getSpecialization())
                 .commissionPercentage(dto.getCommissionPercentage())
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .build();
         return toDTO(userRepository.save(user));
     }
@@ -214,7 +221,7 @@ public class UserService {
                 .employeeId(dto.getEmployeeId())
                 .department(dto.getDepartment())
                 .approvalLimit(dto.getApprovalLimit() != null ? dto.getApprovalLimit() : DEFAULT_APPROVAL_LIMIT)
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .build();
         return toDTO(userRepository.save(user));
     }
@@ -253,7 +260,7 @@ public class UserService {
                 .city(user.getCity())
                 .state(user.getState())
                 .zipCode(user.getZipCode())
-                .status(user.getStatus())
+                .status(user.getStatus() != null ? user.getStatus().name() : null)
                 .totalQuizzesTaken(user.getTotalQuizzesTaken())
                 .currentStreak(user.getCurrentStreak())
                 .build();

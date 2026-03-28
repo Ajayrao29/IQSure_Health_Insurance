@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.hartford.iqsure.dto.response.UnderwriterStatsDTO;
+import org.hartford.iqsure.dto.response.ClaimsOfficerStatsDTO;
 
 @RestController
 @RequestMapping("/api/v1/admin/pipeline")
@@ -30,7 +32,7 @@ public class AdminPipelineController {
     }
 
     @GetMapping("/underwriter/stats")
-    public ResponseEntity<java.util.Map<String, Object>> getUnderwriterStats(@RequestParam Long underwriterId) {
+    public ResponseEntity<UnderwriterStatsDTO> getUnderwriterStats(@RequestParam Long underwriterId) {
         return ResponseEntity.ok(userPolicyService.getUnderwriterStats(underwriterId));
     }
 
@@ -70,7 +72,7 @@ public class AdminPipelineController {
     }
 
     @GetMapping("/officer/stats")
-    public ResponseEntity<java.util.Map<String, Object>> getClaimsOfficerStats(@RequestParam Long officerId) {
+    public ResponseEntity<ClaimsOfficerStatsDTO> getClaimsOfficerStats(@RequestParam Long officerId) {
         return ResponseEntity.ok(claimService.getClaimsOfficerStats(officerId));
     }
 }

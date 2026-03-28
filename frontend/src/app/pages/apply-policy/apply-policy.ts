@@ -6,7 +6,7 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { 
   Policy, InsuredMember, User, UserPolicy, 
-  Reward, DiscountRule, PremiumBreakdown 
+  Reward, DiscountRule, PremiumBreakdown, UserRewardResponse 
 } from '../../models/models';
 
 /**
@@ -46,7 +46,7 @@ export class ApplyPolicyComponent implements OnInit {
     }
   };
 
-  availableRewards: Reward[] = [];
+  availableRewards: UserRewardResponse[] = [];
   discountRules: DiscountRule[] = [];
   userProfile: User | null = null;
   preview: PremiumBreakdown | null = null;

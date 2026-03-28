@@ -28,6 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.hartford.iqsure.dto.response.UnderwriterStatsDTO;
+import org.hartford.iqsure.entity.Notification.NotificationType;
+import org.hartford.iqsure.entity.UserPolicy.PolicyStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -202,22 +208,26 @@ public class UserPolicyService {
         return toDTO(saved);
     }
 
-    public java.util.Map<String, Object> getUnderwriterStats(Long underwriterId) {
+    /**
+     * Calculates performance statistics for an underwriter.
+     * Returns a structured DTO for the dashboard.
+     */
+    public UnderwriterStatsDTO getUnderwriterStats(Long underwriterId) {
         User underwriter = userRepository.findById(underwriterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Underwriter not found: " + underwriterId));
 
         List<UserPolicy> myPolicies = userPolicyRepository.findByAssignedUnderwriter_UserId(underwriterId);
 
         long pendingAssignments = myPolicies.stream()
-                .filter(p -> p.getStatus() == UserPolicy.PolicyStatus.UNDER_EVALUATION)
+                .filter(p -> p.getStatus() == PolicyStatus.UNDER_EVALUATION)
                 .count();
 
         long quotesSentCount = myPolicies.stream()
-                .filter(p -> p.getStatus() == UserPolicy.PolicyStatus.QUOTES_SENT || p.getStatus() == UserPolicy.PolicyStatus.ACTIVE)
+                .filter(p -> p.getStatus() == PolicyStatus.QUOTES_SENT || p.getStatus() == PolicyStatus.ACTIVE)
                 .count();
 
         long activePoliciesCount = myPolicies.stream()
-                .filter(p -> p.getStatus() == UserPolicy.PolicyStatus.ACTIVE)
+                .filter(p -> p.getStatus() == PolicyStatus.ACTIVE)
                 .count();
 
         long customersServed = myPolicies.stream()
@@ -226,7 +236,7 @@ public class UserPolicyService {
                 .count();
 
         double totalPremium = myPolicies.stream()
-                .filter(p -> p.getStatus() == UserPolicy.PolicyStatus.ACTIVE)
+                .filter(p -> p.getStatus() == PolicyStatus.ACTIVE)
                 .mapToDouble(UserPolicy::getFinalPremium)
                 .sum();
 
@@ -234,15 +244,14 @@ public class UserPolicyService {
                 underwriter.getCommissionPercentage().doubleValue() : 0.0;
         double commissionEarned = (totalPremium * commissionPercentage) / 100.0;
 
-        java.util.Map<String, Object> stats = new java.util.HashMap<>();
-        stats.put("pendingAssignments", pendingAssignments);
-        stats.put("quotesSent", quotesSentCount);
-        stats.put("activePolicies", activePoliciesCount);
-        stats.put("customersServed", customersServed);
-        stats.put("totalPremium", Math.round(totalPremium * 100.0) / 100.0);
-        stats.put("commissionEarned", Math.round(commissionEarned * 100.0) / 100.0);
-
-        return stats;
+        return UnderwriterStatsDTO.builder()
+                .pendingAssignments(pendingAssignments)
+                .quotesSent(quotesSentCount)
+                .activePolicies(activePoliciesCount)
+                .customersServed(customersServed)
+                .totalPremium(Math.round(totalPremium * 100.0) / 100.0)
+                .commissionEarned(Math.round(commissionEarned * 100.0) / 100.0)
+                .build();
     }
 
 

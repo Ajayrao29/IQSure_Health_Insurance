@@ -35,7 +35,10 @@ package org.hartford.iqsure.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hartford.iqsure.enums.UserStatus;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +80,7 @@ public class User {
     // Underwriter fields
     private String licenseNumber;
     private String specialization;
-    private java.math.BigDecimal commissionPercentage;
+    private BigDecimal commissionPercentage;
 
     @Builder.Default
     private Integer totalQuotesSent = 0;
@@ -87,7 +90,7 @@ public class User {
     private String department;
 
     @Builder.Default
-    private java.math.BigDecimal approvalLimit = new java.math.BigDecimal("500000.00");
+    private BigDecimal approvalLimit = new BigDecimal("500000.00");
 
     @Builder.Default
     private Integer totalClaimsProcessed = 0;
@@ -103,9 +106,13 @@ public class User {
     private String state;
     private String zipCode;
 
-    // Status field (ACTIVE/INACTIVE)
+    /**
+     * Account status (ACTIVE, INACTIVE, etc.)
+     * Best Practice: Use Enums for predefined status values.
+     */
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private String status = "ACTIVE";
+    private UserStatus status = UserStatus.ACTIVE;
 
     // Gamification Tracking (AI-first progression)
     @Builder.Default
@@ -114,7 +121,7 @@ public class User {
     @Builder.Default
     private Integer currentStreak = 0;
 
-    private java.time.LocalDate lastQuizDate;
+    private LocalDate lastQuizDate;
 
 
     // ONE user can have MANY badges
@@ -145,4 +152,3 @@ public class User {
         ROLE_CLAIMS_OFFICER  // Claims Officer — reviews and settles claims
     }
 }
-

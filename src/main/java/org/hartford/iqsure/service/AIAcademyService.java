@@ -1,29 +1,40 @@
 package org.hartford.iqsure.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hartford.iqsure.dto.response.EducationContentDTO;
 import org.hartford.iqsure.dto.response.QuestionResponseDTO;
+import org.hartford.iqsure.entity.Attempt;
+import org.hartford.iqsure.entity.User;
+import org.hartford.iqsure.exception.ResourceNotFoundException;
+import org.hartford.iqsure.repository.AttemptRepository;
+import org.hartford.iqsure.repository.UserRepository;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service for AI-powered insurance education system.
+ * Handles lesson generation, quiz generation, and reward mechanics.
+ */
 @Service
 @Slf4j
 public class AIAcademyService {
 
     private final ChatClient chatClient;
-    private final org.hartford.iqsure.repository.UserRepository userRepository;
-    private final org.hartford.iqsure.repository.AttemptRepository attemptRepository;
-    private final org.hartford.iqsure.service.BadgeService badgeService;
+    private final UserRepository userRepository;
+    private final AttemptRepository attemptRepository;
+    private final BadgeService badgeService;
 
     public AIAcademyService(ChatClient.Builder chatClientBuilder, 
-                            org.hartford.iqsure.repository.UserRepository userRepository,
-                            org.hartford.iqsure.service.BadgeService badgeService,
-                            org.hartford.iqsure.repository.AttemptRepository attemptRepository) {
+                            UserRepository userRepository,
+                            BadgeService badgeService,
+                            AttemptRepository attemptRepository) {
         this.chatClient = chatClientBuilder.build();
         this.userRepository = userRepository;
         this.badgeService = badgeService;
@@ -32,23 +43,24 @@ public class AIAcademyService {
 
     /**
      * Awards loyalty points for completing an academy session.
+     * Logic: Awards points, updates streak, and checks for badges.
      */
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void rewardCompletion(Long userId, String topic, int score, int total) {
-        org.hartford.iqsure.entity.User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         
-        // 1. Basic Reward
-        int bonus = (score * 10); // Example: 5 correct * 10 = 50 points
+        // 1. Basic Reward Logic (10 points per correct answer)
+        int bonus = (score * 10); 
         user.setUserPoints(user.getUserPoints() + bonus); 
         user.setTotalQuizzesTaken(user.getTotalQuizzesTaken() + 1);
 
-        // 2. Streak Calculation
-        java.time.LocalDate today = java.time.LocalDate.now();
+        // 2. Daily Streak Calculation
+        LocalDate today = LocalDate.now();
         if (user.getLastQuizDate() == null) {
             user.setCurrentStreak(1);
         } else {
-            long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(user.getLastQuizDate(), today);
+            long daysBetween = ChronoUnit.DAYS.between(user.getLastQuizDate(), today);
             if (daysBetween == 1) {
                 user.setCurrentStreak(user.getCurrentStreak() + 1);
             } else if (daysBetween > 1) {
@@ -58,8 +70,8 @@ public class AIAcademyService {
         user.setLastQuizDate(today);
         userRepository.save(user);
 
-        // 3. Record History (Attempt)
-        org.hartford.iqsure.entity.Attempt attempt = org.hartford.iqsure.entity.Attempt.builder()
+        // 3. Record History (Attempt) for auditing and analytics
+        Attempt attempt = Attempt.builder()
                 .user(user)
                 .quizTitle(topic)
                 .score(score)
@@ -69,14 +81,14 @@ public class AIAcademyService {
                 .build();
         attemptRepository.save(attempt);
 
-        // 4. Badge Progression
+        // 4. Trigger Badge Progression Check
         badgeService.checkAndAwardBadges(userId);
         
-        log.info("Recorded attempt for {}: Score {}/{} -> {} points", userId, score, total, bonus);
+        log.info("Recorded academy completion for user {}: {} points earned", userId, bonus);
     }
 
     /**
-     * Generates a professional insurance lesson based on a topic and language.
+     * Generates a professional insurance lesson based on a topic and language using AI.
      */
     public EducationContentDTO generateLesson(String topic, String language) {
         String prompt = String.format(
@@ -97,7 +109,7 @@ public class AIAcademyService {
     }
 
     /**
-     * Answers follow-up doubts about a specific lesson context.
+     * Answers follow-up doubts about a specific lesson context using AI.
      */
     public String generateFollowUp(String context, String doubt, String language) {
         String prompt = String.format(
@@ -118,7 +130,7 @@ public class AIAcademyService {
     }
 
     /**
-     * Generates a quiz based on the provided session content.
+     * Generates a quiz based on the lesson content using AI.
      */
     public List<QuestionResponseDTO> generateQuiz(String context, String language) {
         String prompt = String.format(
@@ -130,12 +142,12 @@ public class AIAcademyService {
             language, context
         );
 
-        log.info("Generating AI quiz for context in {}", language);
+        log.info("Generating AI quiz in {}", language);
 
         List<AICalibratedQuestion> aiQuestions = chatClient.prompt()
                 .user(prompt)
                 .call()
-                .entity(new org.springframework.core.ParameterizedTypeReference<List<AICalibratedQuestion>>() {});
+                .entity(new ParameterizedTypeReference<List<AICalibratedQuestion>>() {});
 
         if (aiQuestions == null) return List.of();
 

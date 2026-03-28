@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { 
   AuthResponse, User, LeaderboardEntry, Quiz, Question, 
   AttemptResponse, Badge, Reward, Policy, UserPolicy, 
-  PremiumBreakdown, DiscountRule, EducationContent, Claim 
+  PremiumBreakdown, DiscountRule, EducationContent, Claim, UnderwriterStats, UserRewardResponse,
+  RegisterRequest, LoginRequest, ResetPasswordRequest
 } from '../models/models';
 
 /**
@@ -21,12 +22,12 @@ export class ApiService {
   // ─── Authentication ───────────────────────────────────────────────────
 
   /** Register a new user account */
-  register(data: any): Observable<AuthResponse> {
+  register(data: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${API}/api/auth/register`, data);
   }
 
   /** Authenticate user and get session token */
-  login(data: any): Observable<AuthResponse> {
+  login(data: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${API}/api/auth/login`, data);
   }
 
@@ -36,7 +37,7 @@ export class ApiService {
   }
 
   /** Reset password using OTP */
-  resetPassword(data: { otp: string, newPassword: any }): Observable<void> {
+  resetPassword(data: ResetPasswordRequest): Observable<void> {
     return this.http.post<void>(`${API}/api/auth/reset-password`, data);
   }
 
@@ -163,8 +164,8 @@ export class ApiService {
   }
 
   /** Get performance stats for an underwriter */
-  getUnderwriterStats(underwriterId: number): Observable<any> {
-    return this.http.get<any>(`${API}/api/v1/admin/pipeline/underwriter/stats?underwriterId=${underwriterId}`);
+  getUnderwriterStats(underwriterId: number): Observable<UnderwriterStats> {
+    return this.http.get<UnderwriterStats>(`${API}/api/v1/admin/pipeline/underwriter/stats?underwriterId=${underwriterId}`);
   }
 
   /** Get stats for a claims officer */
@@ -220,8 +221,8 @@ export class ApiService {
   }
 
   /** Get rewards earned by a user */
-  getEarnedRewardsByUser(userId: number): Observable<Reward[]> {
-    return this.http.get<Reward[]>(`${API}/api/v1/rewards/user/${userId}/earned`);
+  getEarnedRewardsByUser(userId: number): Observable<UserRewardResponse[]> {
+    return this.http.get<UserRewardResponse[]>(`${API}/api/v1/rewards/user/${userId}/earned`);
   }
 
   /** Redeem points for a reward */
@@ -254,8 +255,8 @@ export class ApiService {
   }
 
   /** Get rewards available for a user to apply to a policy */
-  getAvailableRewardsForUser(userId: number): Observable<Reward[]> {
-    return this.http.get<Reward[]>(`${API}/api/v1/users/${userId}/premium/available-rewards`);
+  getAvailableRewardsForUser(userId: number): Observable<UserRewardResponse[]> {
+    return this.http.get<UserRewardResponse[]>(`${API}/api/v1/users/${userId}/premium/available-rewards`);
   }
 
   // ─── Policy Management (Admin) ───────────────────────────────────────

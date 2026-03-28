@@ -27,7 +27,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Map;
+import org.hartford.iqsure.dto.response.UserRewardResponseDTO;
 
 /**
  * User Policy & Premium endpoints.
@@ -57,13 +59,13 @@ public class UserPolicyController {
             @Valid @RequestBody UserPolicyRequestDTO dto,
             @RequestParam(required = false) List<Long> queryRewardIds) {
         
-        // Combine rewards from both sources if necessary
-        List<Long> finalRewards = queryRewardIds != null ? new java.util.ArrayList<>(queryRewardIds) : new java.util.ArrayList<>();
-        if (dto.getRewardIds() != null) {
-            for (Long id : dto.getRewardIds()) {
-                if (!finalRewards.contains(id)) finalRewards.add(id);
-            }
-        }
+        // Use rewards from both request body and query parameters if present
+        List<Long> combinedRewards = new ArrayList<>();
+        if (dto.getRewardIds() != null) combinedRewards.addAll(dto.getRewardIds());
+        if (queryRewardIds != null) combinedRewards.addAll(queryRewardIds);
+        
+        // Deduplicate
+        List<Long> finalRewards = combinedRewards.stream().distinct().toList();
         
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userPolicyService.purchasePolicy(userId, dto, finalRewards));
@@ -98,18 +100,8 @@ public class UserPolicyController {
 
     @GetMapping("/premium/available-rewards")
     @Operation(summary = "Get user's available (unused) redeemed rewards for coupon selection")
-    public ResponseEntity<List<java.util.Map<String, Object>>> getAvailableRewards(@PathVariable Long userId) {
-        return ResponseEntity.ok(
-            premiumCalculationService.getAvailableRewardsForUser(userId)
-                .stream()
-                .map(ur -> java.util.Map.<String, Object>of(
-                        "userRewardId", ur.getId(),
-                        "rewardType", ur.getReward().getRewardType(),
-                        "discountValue", ur.getReward().getDiscountValue(),
-                        "expiryDate", ur.getReward().getExpiryDate().toString()
-                ))
-                .toList()
-        );
+    public ResponseEntity<List<UserRewardResponseDTO>> getAvailableRewards(@PathVariable Long userId) {
+        return ResponseEntity.ok(premiumCalculationService.getAvailableRewardsForUser(userId));
     }
 
     @GetMapping("/premium/logs")

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.dto.request.RewardRequestDTO;
 import org.hartford.iqsure.dto.response.RewardResponseDTO;
+import org.hartford.iqsure.dto.response.UserRewardResponseDTO;
 import org.hartford.iqsure.service.RewardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/rewards")
 @RequiredArgsConstructor
-@Tag(name = "Rewards", description = "Reward management and redemption")
+@Tag(name = "Rewards", description = "Points redemption and discount coupons")
 public class RewardController {
 
     private final RewardService rewardService;
@@ -34,7 +35,7 @@ public class RewardController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all rewards")
+    @Operation(summary = "Get all rewards (Admin/Customer view)")
     public ResponseEntity<List<RewardResponseDTO>> getAll(
             @RequestParam(required = false, defaultValue = "false") boolean activeOnly) {
         if (activeOnly) {
@@ -43,15 +44,10 @@ public class RewardController {
         return ResponseEntity.ok(rewardService.getAllRewards());
     }
 
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "Get rewards redeemed by a user")
-    public ResponseEntity<List<RewardResponseDTO>> getByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(rewardService.getRewardsByUser(userId));
-    }
-
     @GetMapping("/user/{userId}/earned")
-    @Operation(summary = "Get all earned rewards for a user (auto-awarded from discount rules)")
-    public ResponseEntity<List<java.util.Map<String, Object>>> getEarnedByUser(@PathVariable Long userId) {
+    @Operation(summary = "Get rewards earned/redeemed by a user", 
+               description = "Checks and awards rewards based on discount rules then returns owned coupons.")
+    public ResponseEntity<List<UserRewardResponseDTO>> getEarned(@PathVariable Long userId) {
         return ResponseEntity.ok(rewardService.getEarnedRewardsForUser(userId));
     }
 

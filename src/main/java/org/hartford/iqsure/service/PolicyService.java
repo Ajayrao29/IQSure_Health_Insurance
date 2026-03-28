@@ -43,6 +43,9 @@ public class PolicyService {
                 .waitingPeriod(dto.getWaitingPeriod())
                 .hasMaternityCover(dto.getHasMaternityCover())
                 .hasPreExistingCover(dto.getHasPreExistingCover())
+                .deductibleAmount(dto.getDeductibleAmount())
+                .outOfPocketMax(dto.getOutOfPocketMax())
+                .copayPercentage(dto.getCopayPercentage())
                 .build();
 
         return toDTO(policyRepository.save(policy));
@@ -82,6 +85,9 @@ public class PolicyService {
         policy.setWaitingPeriod(dto.getWaitingPeriod());
         policy.setHasMaternityCover(dto.getHasMaternityCover());
         policy.setHasPreExistingCover(dto.getHasPreExistingCover());
+        policy.setDeductibleAmount(dto.getDeductibleAmount());
+        policy.setOutOfPocketMax(dto.getOutOfPocketMax());
+        policy.setCopayPercentage(dto.getCopayPercentage());
 
         return toDTO(policyRepository.save(policy));
     }
@@ -114,6 +120,9 @@ public class PolicyService {
                 .waitingPeriod(p.getWaitingPeriod())
                 .hasMaternityCover(p.getHasMaternityCover())
                 .hasPreExistingCover(p.getHasPreExistingCover())
+                .deductibleAmount(p.getDeductibleAmount())
+                .outOfPocketMax(p.getOutOfPocketMax())
+                .copayPercentage(p.getCopayPercentage())
                 .build();
     }
 }

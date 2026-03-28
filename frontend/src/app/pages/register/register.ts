@@ -58,7 +58,7 @@ export class RegisterComponent {
       name: this.name.trim(),
       email: this.email.trim().toLowerCase(),
       password: this.password,
-      phone: this.phone ? this.phone.trim() : null
+      phone: this.phone ? this.phone.trim() : undefined
     }).subscribe({
       next: (res) => {
         this.loading = false;

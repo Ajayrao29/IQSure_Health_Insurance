@@ -100,6 +100,11 @@ public class Policy {
     private String waitingPeriod; // e.g., "1 month", "3 months"
     private Boolean hasMaternityCover;
     private Boolean hasPreExistingCover;
+    
+    // Actuarial details for realism
+    private Double deductibleAmount; // Amount user pays before insurance kicks in
+    private Double outOfPocketMax;     // Maximum amount user pays for covered events in a period
+    private Double copayPercentage;    // Percentage user pays after deductible (e.g., 0.20 for 20%)
 
     // ONE policy can be purchased by MANY users
     @OneToMany(mappedBy = "policy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.hartford.iqsure.dto.response.ClaimsOfficerStatsDTO;
 
 /**
  * Service for managing insurance claims and processing.
@@ -222,35 +223,44 @@ public class ClaimService {
         return saved;
     }
 
-    public Map<String, Object> getClaimsOfficerStats(Long officerId) {
+    /**
+     * Retrieves statistics for a claims officer's dashboard.
+     */
+    public ClaimsOfficerStatsDTO getClaimsOfficerStats(Long officerId) {
         User officer = userRepository.findById(officerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Officer not found with id: " + officerId));
+                .orElseThrow(() -> new ResourceNotFoundException("Officer not found: " + officerId));
         
         List<Claim> myClaims = claimRepository.findByAssignedOfficer_UserId(officerId);
         List<Claim> allSubmitted = claimRepository.findByStatus(Claim.ClaimStatus.SUBMITTED);
 
-        long underReview = myClaims.stream().filter(c -> c.getStatus() == Claim.ClaimStatus.UNDER_REVIEW).count();
+        long underReview = myClaims.stream()
+                .filter(c -> c.getStatus() == Claim.ClaimStatus.UNDER_REVIEW)
+                .count();
+
         long approved = myClaims.stream().filter(c -> 
             c.getStatus() == Claim.ClaimStatus.APPROVED || 
             c.getStatus() == Claim.ClaimStatus.PARTIAL_APPROVED || 
             c.getStatus() == Claim.ClaimStatus.SETTLED
         ).count();
-        long rejected = myClaims.stream().filter(c -> c.getStatus() == Claim.ClaimStatus.REJECTED).count();
+
+        long rejected = myClaims.stream()
+                .filter(c -> c.getStatus() == Claim.ClaimStatus.REJECTED)
+                .count();
+
         long totalProcessed = approved + rejected;
 
         String approvalRate = totalProcessed > 0 ? (Math.round((double) approved / totalProcessed * 100)) + "%" : "0%";
 
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("claimsInQueue", allSubmitted.size());
-        stats.put("underReview", underReview);
-        stats.put("totalProcessed", totalProcessed);
-        stats.put("approved", approved);
-        stats.put("rejected", rejected);
-        stats.put("approvalRate", approvalRate);
-        stats.put("department", officer.getDepartment() != null ? officer.getDepartment() : "General Claims");
-        stats.put("approvalLimit", officer.getApprovalLimit() != null ? officer.getApprovalLimit() : 500000.0);
-
-        return stats;
+        return ClaimsOfficerStatsDTO.builder()
+                .claimsInQueue(allSubmitted.size())
+                .underReview(underReview)
+                .totalProcessed(totalProcessed)
+                .approved(approved)
+                .rejected(rejected)
+                .approvalRate(approvalRate)
+                .department(officer.getDepartment() != null ? officer.getDepartment() : "General Claims")
+                .approvalLimit(officer.getApprovalLimit() != null ? officer.getApprovalLimit() : new BigDecimal("500000.00"))
+                .build();
     }
 }
 

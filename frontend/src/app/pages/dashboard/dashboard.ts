@@ -38,25 +38,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     pendingClaims: 0
   };
 
-  aiInsight: string = '';
-  cognitiveLevel: 'STANDARD' | 'PRO' | 'ELITE' = 'STANDARD';
 
-  /* ───── Guardian System (Expert Mode) ───── */
-  guardianRank = {
-    name: 'Risk Observer',
-    level: 1,
-    icon: '🛡️',
-    color: '#64748b',
-    nextThreshold: 100,
-    progress: 0
-  };
 
-  fortressMetrics = {
-    knowledge: 0,    // Based on Quizzes Attempted
-    proficiency: 0,  // Based on Avg Score
-    protection: 0,   // Based on Active Policies
-    resilience: 0    // Based on Badges
-  };
+
+
+
 
   /* ───── Admin-specific ───── */
   recentUsers: User[] = [];
@@ -97,8 +83,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.user.currentStreak = user.currentStreak || 0;
             
             // Re-run calculations that depend on points
-            this.generateAiInsights(this.user);
-            this.calculateGuardianRank(this.user, this.myAttempts, this.myBadges, this.myPolicies);
+
           }
         }
       });
@@ -160,8 +145,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.totalSavings = policies.reduce((sum, p) => sum + (p.totalClaimedAmount || 0), 0);
           
           this.updateMetrics(policies, claims);
-          this.generateAiInsights(profile);
-          this.calculateGuardianRank(profile, attempts, badges, policies);
+
           
           this.loading = false;
         },
@@ -179,73 +163,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userStats.pendingClaims = claims.filter(c => c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW').length;
   }
 
-  /**
-   * SIMULATED AI AGENT: Predictive risk analysis based on user quiz performance.
-   */
-  private generateAiInsights(profile: User): void {
-    const points = profile.userPoints || 0;
-    this.cognitiveLevel = points >= 500 ? 'ELITE' : points >= 200 ? 'PRO' : 'STANDARD';
-    
-    // Actuarial hazard mitigation calculation
-    const riskMitigationValue = points * 150; 
 
-    if (points >= 500) {
-      this.aiInsight = `Superior Cognitive Status! Your projected liability mitigation is ₹${riskMitigationValue.toLocaleString()}. You've reached a 98th-percentile safety quotient.`;
-    } else {
-      const remaining = 500 - points;
-      this.aiInsight = `Hazard Alert: You've identified ₹${riskMitigationValue.toLocaleString()} in potential risks. Earning ${remaining} more points will unlock the 'ELITE' priority settlement status.`;
-    }
-  }
 
   get recentAttempts(): AttemptResponse[] {
     return this.myAttempts;
   }
 
 
-  private calculateGuardianRank(user: User, attempts: AttemptResponse[], badges: Badge[], policies: UserPolicy[]): void {
-    const points = user.userPoints || 0;
-    
-    // 1. Calculate Rank
-    if (points >= 5000) {
-      this.guardianRank = { name: 'Insurance Oracle', level: 5, icon: '💎', color: '#7c3aed', nextThreshold: 10000, progress: 100 };
-    } else if (points >= 2001) {
-      this.guardianRank = { name: 'Wealth Sentinel', level: 4, icon: '🥇', color: '#fbbf24', nextThreshold: 5000, progress: ((points - 2001) / 2999) * 100 };
-    } else if (points >= 501) {
-      this.guardianRank = { name: 'Risk Strategist', level: 3, icon: '🌟', color: '#10b981', nextThreshold: 2000, progress: ((points - 501) / 1499) * 100 };
-    } else if (points >= 101) {
-      this.guardianRank = { name: 'Asset Protector', level: 2, icon: '⚔️', color: '#3b82f6', nextThreshold: 500, progress: ((points - 101) / 399) * 100 };
-    } else {
-      this.guardianRank = { name: 'Risk Observer', level: 1, icon: '🛡️', color: '#64748b', nextThreshold: 100, progress: (points / 100) * 100 };
-    }
 
-    // 2. Calculate Fortress Metrics (0-100 scale)
-    this.fortressMetrics.knowledge = Math.min(100, (attempts.length / 10) * 100);
-    
-    const avgScore = attempts.length > 0 ? attempts.reduce((acc, cr) => acc + cr.score, 0) / attempts.length : 0;
-    this.fortressMetrics.proficiency = avgScore;
-    
-    this.fortressMetrics.protection = Math.min(100, (policies.filter(p => p.status === 'ACTIVE').length / 3) * 100);
-    this.fortressMetrics.resilience = Math.min(100, (badges.length / 5) * 100);
-  }
 
-  shareAchievement(): void {
-    if (!this.user) return;
-    
-    const text = `I've earned ${this.user.userPoints} points and reached the rank of ${this.guardianRank.name} on IQsure! Join me in maximizing health savings.`;
-    if (navigator.share) {
-      navigator.share({ title: 'IQsure Achievement', text });
-    } else {
-      navigator.clipboard.writeText(text);
-      alert('Achievement link copied!');
-    }
-  }
 
-  /* ───── Expert Gamification Actions ───── */
-  verifyCoverage(): void {
-    alert('Scanning your active policies for Water Damage riders... \n\nOracle Result: Verification successful. You are currently protected under Section 4.2 of your Home Policy.');
-  }
-
-  skipPulse(): void {
-    alert('Scenario dismissed. Staying vigilant is key to maintaining your Resilience score!');
-  }
 }
