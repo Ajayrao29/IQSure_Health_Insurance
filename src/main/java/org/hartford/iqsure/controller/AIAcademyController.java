@@ -63,7 +63,7 @@ public class AIAcademyController {
             @RequestParam int score,
             @RequestParam int total) {
         aiAcademyService.rewardCompletion(userId, topic, score, total);
-        return ResponseEntity.ok(userService.toDTO(userId));
+        return ResponseEntity.ok(userService.getProfile(userId));
     }
 
     @GetMapping("/tts")

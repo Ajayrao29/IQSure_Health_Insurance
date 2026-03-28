@@ -125,7 +125,8 @@ public class UserService {
 
         String otp = String.format("%06d", new Random().nextInt(999999));
         
-        tokenRepository.findByUser(user).ifPresent(tokenRepository::delete);
+        tokenRepository.deleteByUser(user);
+        tokenRepository.flush(); // Mandatory to prevent Unique Constraint violation on user_id
 
         PasswordResetToken token = PasswordResetToken.builder()
                 .token(otp)
