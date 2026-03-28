@@ -1,11 +1,6 @@
-/*
- * FILE: RewardController.java | LOCATION: controller/
- * PURPOSE: Reward management and redemption API. Admin creates rewards; users redeem them.
- * ENDPOINTS: POST/GET/DELETE /api/v1/rewards, POST /api/v1/rewards/{id}/redeem?userId=X
- * FLOW: RewardMgmtComponent / RewardsComponent → api.service.ts → THIS → RewardService
- */
-package org.hartford.iqsure.controller;
+// Controller handling RewardController related API endpoints
 
+package org.hartford.iqsure.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -17,23 +12,18 @@ import org.hartford.iqsure.service.RewardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/rewards")
 @RequiredArgsConstructor
 @Tag(name = "Rewards", description = "Points redemption and discount coupons")
 public class RewardController {
-
     private final RewardService rewardService;
-
     @PostMapping
     @Operation(summary = "Create a reward (Admin)")
     public ResponseEntity<RewardResponseDTO> create(@Valid @RequestBody RewardRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(rewardService.createReward(dto));
     }
-
     @GetMapping
     @Operation(summary = "Get all rewards (Admin/Customer view)")
     public ResponseEntity<List<RewardResponseDTO>> getAll(
@@ -43,14 +33,12 @@ public class RewardController {
         }
         return ResponseEntity.ok(rewardService.getAllRewards());
     }
-
     @GetMapping("/user/{userId}/earned")
-    @Operation(summary = "Get rewards earned/redeemed by a user", 
+    @Operation(summary = "Get rewards earned/redeemed by a user",
                description = "Checks and awards rewards based on discount rules then returns owned coupons.")
     public ResponseEntity<List<UserRewardResponseDTO>> getEarned(@PathVariable Long userId) {
         return ResponseEntity.ok(rewardService.getEarnedRewardsForUser(userId));
     }
-
     @PostMapping("/{rewardId}/redeem")
     @Operation(summary = "Redeem a reward for a user")
     public ResponseEntity<RewardResponseDTO> redeem(
@@ -58,7 +46,6 @@ public class RewardController {
             @RequestParam Long userId) {
         return ResponseEntity.ok(rewardService.redeemReward(userId, rewardId));
     }
-
     @DeleteMapping("/{rewardId}")
     @Operation(summary = "Delete a reward (Admin)")
     public ResponseEntity<Void> delete(@PathVariable Long rewardId) {

@@ -1,10 +1,10 @@
+// Angular component for the my-claims page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { Claim } from '../../models/models';
-
 @Component({
   selector: 'app-my-claims',
   standalone: true,
@@ -15,9 +15,7 @@ import { Claim } from '../../models/models';
 export class MyClaimsComponent implements OnInit {
   claims: Claim[] = [];
   loading = true;
-
   constructor(private api: ApiService, private auth: AuthService) {}
-
   ngOnInit(): void {
     const userId = this.auth.getUserId();
     if (userId) {
@@ -30,7 +28,6 @@ export class MyClaimsComponent implements OnInit {
       });
     }
   }
-
   getStatusClass(status: string): string {
     switch(status) {
       case 'APPROVED': return 'status-approved';

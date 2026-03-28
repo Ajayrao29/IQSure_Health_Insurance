@@ -1,9 +1,9 @@
+// Angular component for the underwriters page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { User } from '../../../models/models';
-
 @Component({
   selector: 'app-manage-underwriters',
   standalone: true,
@@ -15,8 +15,6 @@ export class ManageUnderwritersComponent implements OnInit {
   underwriters: User[] = [];
   loading = true;
   showForm = false;
-
-  // Form model
   newUW = {
     name: '',
     email: '',
@@ -25,16 +23,12 @@ export class ManageUnderwritersComponent implements OnInit {
     specialization: 'HEALTH',
     commissionPercentage: 5.0
   };
-
   error = '';
   success = '';
-
   constructor(private api: ApiService) {}
-
   ngOnInit(): void {
     this.loadUnderwriters();
   }
-
   loadUnderwriters(): void {
     this.loading = true;
     this.api.getUsersByRole('ROLE_UNDERWRITER').subscribe(users => {
@@ -42,16 +36,13 @@ export class ManageUnderwritersComponent implements OnInit {
       this.loading = false;
     });
   }
-
   addUnderwriter(): void {
     this.error = '';
     this.success = '';
-    
     if(!this.newUW.name || !this.newUW.email || !this.newUW.password || !this.newUW.licenseNumber) {
         this.error = 'Please fill all required fields';
         return;
     }
-
     this.api.createUnderwriter(this.newUW).subscribe({
       next: (res) => {
         this.underwriters.push(res);
@@ -64,7 +55,6 @@ export class ManageUnderwritersComponent implements OnInit {
       }
     });
   }
-
   resetForm(): void {
     this.newUW = {
       name: '',
@@ -75,7 +65,6 @@ export class ManageUnderwritersComponent implements OnInit {
       commissionPercentage: 5.0
     };
   }
-
   deleteUnderwriter(id: number): void {
     if(confirm('Delete this underwriter?')) {
       this.api.deleteUser(id).subscribe(() => {

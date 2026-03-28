@@ -1,17 +1,6 @@
-/*
- * FILE: UserPolicyController.java | LOCATION: controller/
- * PURPOSE: Policy purchase and dynamic premium calculation API.
- *          Users can preview their personalized premium (with gamification discounts)
- *          and then purchase policies.
- * ENDPOINTS:
- *   POST /api/v1/users/{userId}/policies                    → Purchase a policy
- *   GET  /api/v1/users/{userId}/policies                    → User's purchased policies
- *   GET  /api/v1/users/{userId}/premium/calculate/{policyId}→ Preview premium before purchase
- *   GET  /api/v1/users/{userId}/premium/logs                → Premium calculation history
- * FLOW: PoliciesComponent / MyPoliciesComponent → api.service.ts → THIS → UserPolicyService / PremiumCalculationService
- */
-package org.hartford.iqsure.controller;
+// Controller handling UserPolicyController related API endpoints
 
+package org.hartford.iqsure.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,58 +14,35 @@ import org.hartford.iqsure.service.UserPolicyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import org.hartford.iqsure.dto.response.UserRewardResponseDTO;
-
-/**
- * User Policy & Premium endpoints.
- *
- * POST /api/v1/users/{userId}/policies                            - purchase a policy
- * GET  /api/v1/users/{userId}/policies                            - get user's purchased policies
- * GET  /api/v1/users/{userId}/policies/{id}                       - get specific purchased policy
- * GET  /api/v1/users/{userId}/premium/calculate/{policyId}        - preview premium before purchase
- * GET  /api/v1/users/{userId}/premium/logs                        - all premium calculation history
- * GET  /api/v1/users/{userId}/premium/logs/{policyId}             - history for specific policy
- */
 @RestController
 @RequestMapping("/api/v1/users/{userId}")
 @RequiredArgsConstructor
 @Tag(name = "User Policies & Premium", description = "Policy purchase and dynamic premium calculation")
 public class UserPolicyController {
-
     private final UserPolicyService userPolicyService;
     private final PremiumCalculationService premiumCalculationService;
-
-    // ── Policy Purchase ───────────────────────────────────────────────────
-
     @PostMapping("/policies")
     @Operation(summary = "Purchase a policy (applies gamification discounts automatically)")
     public ResponseEntity<UserPolicyResponseDTO> purchasePolicy(
             @PathVariable Long userId,
             @Valid @RequestBody UserPolicyRequestDTO dto,
             @RequestParam(required = false) List<Long> queryRewardIds) {
-        
-        // Use rewards from both request body and query parameters if present
         List<Long> combinedRewards = new ArrayList<>();
         if (dto.getRewardIds() != null) combinedRewards.addAll(dto.getRewardIds());
         if (queryRewardIds != null) combinedRewards.addAll(queryRewardIds);
-        
-        // Deduplicate
         List<Long> finalRewards = combinedRewards.stream().distinct().toList();
-        
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userPolicyService.purchasePolicy(userId, dto, finalRewards));
     }
-
     @GetMapping("/policies")
     @Operation(summary = "Get all policies purchased by a user")
     public ResponseEntity<List<UserPolicyResponseDTO>> getUserPolicies(@PathVariable Long userId) {
         return ResponseEntity.ok(userPolicyService.getUserPolicies(userId));
     }
-
     @GetMapping("/policies/{userPolicyId}")
     @Operation(summary = "Get a specific purchased policy by ID")
     public ResponseEntity<UserPolicyResponseDTO> getUserPolicyById(
@@ -84,9 +50,6 @@ public class UserPolicyController {
             @PathVariable Long userPolicyId) {
         return ResponseEntity.ok(userPolicyService.getUserPolicyById(userId, userPolicyId));
     }
-
-    // ── Premium Calculation ───────────────────────────────────────────────
-
     @GetMapping("/premium/calculate/{policyId}")
     @Operation(summary = "Preview dynamic premium for a policy before purchasing",
                description = "Evaluates all discount rules based on user's gamification data " +
@@ -97,19 +60,16 @@ public class UserPolicyController {
             @RequestParam(required = false) List<Long> selectedRewardIds) {
         return ResponseEntity.ok(premiumCalculationService.calculatePremium(userId, policyId, selectedRewardIds));
     }
-
     @GetMapping("/premium/available-rewards")
     @Operation(summary = "Get user's available (unused) redeemed rewards for coupon selection")
     public ResponseEntity<List<UserRewardResponseDTO>> getAvailableRewards(@PathVariable Long userId) {
         return ResponseEntity.ok(premiumCalculationService.getAvailableRewardsForUser(userId));
     }
-
     @GetMapping("/premium/logs")
     @Operation(summary = "Get all premium calculation history for a user")
     public ResponseEntity<List<PremiumCalculationLogResponseDTO>> getPremiumLogs(@PathVariable Long userId) {
         return ResponseEntity.ok(premiumCalculationService.getLogsForUser(userId));
     }
-
     @GetMapping("/premium/logs/{policyId}")
     @Operation(summary = "Get premium calculation history for a user on a specific policy")
     public ResponseEntity<List<PremiumCalculationLogResponseDTO>> getPremiumLogsByPolicy(
@@ -117,7 +77,6 @@ public class UserPolicyController {
             @PathVariable Long policyId) {
         return ResponseEntity.ok(premiumCalculationService.getLogsForUserAndPolicy(userId, policyId));
     }
-
     @PutMapping("/policies/{userPolicyId}/pay")
     @Operation(summary = "Pay for a policy quote and activate it")
     public ResponseEntity<UserPolicyResponseDTO> payPolicy(

@@ -1,51 +1,9 @@
-/*
- * ============================================================================
- * FILE: app.routes.ts | LOCATION: frontend/src/app/
- * PURPOSE: Defines ALL URL routes in the application.
- *          Maps each URL path to a page component.
- *          Also applies route guards to protect pages.
- *
- * ROUTE GUARDS:
- *   - AuthGuard (guards/auth.guard.ts) → Requires user to be logged in
- *   - AdminGuard (guards/admin.guard.ts) → Requires user to be an admin
- *
- * PUBLIC ROUTES (no guard):
- *   /              → LandingComponent (pages/landing/)
- *   /about         → AboutComponent (pages/about/)
- *   /login         → LoginComponent (pages/login/)
- *   /register      → RegisterComponent (pages/register/)
- *
- * USER ROUTES (AuthGuard — must be logged in):
- *   /dashboard     → DashboardComponent (pages/dashboard/)
- *   /quizzes       → QuizzesComponent (pages/quizzes/)
- *   /take-quiz/:id → TakeQuizComponent (pages/take-quiz/)
- *   /quiz-result   → QuizResultComponent (pages/quiz-result/)
- *   /policies      → PoliciesComponent (pages/policies/)
- *   /my-policies   → MyPoliciesComponent (pages/my-policies/)
- *   /badges        → BadgesComponent (pages/badges/)
- *   /rewards       → RewardsComponent (pages/rewards/)
- *   /leaderboard   → LeaderboardComponent (pages/leaderboard/)
- *   /achievements  → AchievementsComponent (pages/achievements/)
- *   /savings          → SavingsCalculatorComponent (pages/savings-calculator/)
- *   /risk-simulator   → RiskSimulatorComponent (pages/risk-simulator/)
- *
- * ADMIN ROUTES (AuthGuard + AdminGuard — must be logged in AND be admin):
- *   /admin/users          → AdminUsersComponent (pages/admin/users/)
- *   /admin/quiz-mgmt      → QuizMgmtComponent (pages/admin/quiz-mgmt/)
- *   /admin/policy-mgmt    → PolicyMgmtComponent (pages/admin/policy-mgmt/)
- *   /admin/badge-mgmt     → BadgeMgmtComponent (pages/admin/badge-mgmt/)
- *   /admin/reward-mgmt    → RewardMgmtComponent (pages/admin/reward-mgmt/)
- *   /admin/discount-rules → DiscountRulesComponent (pages/admin/discount-rules/)
- *
- * WILDCARD: /** → redirects unknown URLs to /login
- * ============================================================================
- */
+
 import { Routes } from '@angular/router';
 import { AuthGuard }  from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { UnderwriterGuard } from './guards/underwriter.guard';
 import { ClaimsOfficerGuard } from './guards/claims-officer.guard';
-
 import { LandingComponent }       from './pages/landing/landing';
 import { AboutComponent }         from './pages/about/about';
 import { LoginComponent }         from './pages/login/login';
@@ -75,18 +33,15 @@ import { ManageUnderwritersComponent } from './pages/admin/underwriters/underwri
 import { ManageClaimsOfficersComponent } from './pages/admin/claims-officers/claims-officers';
 import { AssignUnderwriterComponent } from './pages/admin/assign-underwriter/assign-underwriter';
 import { AssignClaimsOfficerComponent } from './pages/admin/assign-claims-officer/assign-claims-officer';
-
 import { UnderwriterDashboardComponent } from './pages/underwriter/dashboard/dashboard';
 import { UnderwriterPendingComponent } from './pages/underwriter/pending/pending';
 import { UnderwriterPlansComponent } from './pages/underwriter/plans/plans';
 import { UnderwriterMyPoliciesComponent } from './pages/underwriter/my-policies/my-policies';
-
 import { ClaimsOfficerDashboardComponent } from './pages/claims-officer/dashboard/dashboard';
 import { ClaimsOfficerClaimsComponent } from './pages/claims-officer/claims/claims';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password';
 import { ProfileComponent } from './pages/profile/profile';
-
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'about', component: AboutComponent },
@@ -120,15 +75,11 @@ export const routes: Routes = [
   { path: 'admin/claims-officers', component: ManageClaimsOfficersComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'admin/assign-uw',      component: AssignUnderwriterComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'admin/assign-officer', component: AssignClaimsOfficerComponent, canActivate: [AuthGuard, AdminGuard] },
-  
   { path: 'underwriter/dashboard',   component: UnderwriterDashboardComponent, canActivate: [AuthGuard, UnderwriterGuard] },
   { path: 'underwriter/pending',     component: UnderwriterPendingComponent,   canActivate: [AuthGuard, UnderwriterGuard] },
   { path: 'underwriter/plans',       component: UnderwriterPlansComponent,     canActivate: [AuthGuard, UnderwriterGuard] },
   { path: 'underwriter/my-policies', component: UnderwriterMyPoliciesComponent, canActivate: [AuthGuard, UnderwriterGuard] },
-
   { path: 'claims-officer/dashboard', component: ClaimsOfficerDashboardComponent, canActivate: [AuthGuard, ClaimsOfficerGuard] },
   { path: 'claims-officer/claims',    component: ClaimsOfficerClaimsComponent,    canActivate: [AuthGuard, ClaimsOfficerGuard] },
-
   { path: '**', redirectTo: 'login' }
 ];
-

@@ -1,3 +1,4 @@
+<!-- Template for the quizzes page -->
 <div class="page">
   <div class="page-header">
     <div>
@@ -5,11 +6,9 @@
       <p>Test your knowledge and earn points to unlock premium discounts</p>
     </div>
   </div>
-
   @if (loading) {
     <div class="loading">Loading quizzes…</div>
   }
-
   @if (!loading) {
     <div class="quiz-grid">
       @for (q of quizzes; track q) {
@@ -32,4 +31,3 @@
     </div>
   }
 </div>
-

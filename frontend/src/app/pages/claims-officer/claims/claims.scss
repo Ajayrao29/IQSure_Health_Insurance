@@ -1,27 +1,22 @@
-/* ─── Page Layout ─── */
+
 .control-center-header {
   display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem;
   h1 { font-size: 2.5rem; font-weight: 800; color: #8B003F; margin: 0; letter-spacing: -1px; }
   p { color: #8A4B6B; font-weight: 600; font-size: 1rem; margin-top: 0.5rem; }
 }
-
 .btn-dash {
   background: white; color: #8B003F; border: 2px solid rgba(139, 0, 63, 0.1);
   padding: 0.8rem 1.75rem; border-radius: 14px; text-decoration: none; font-weight: 700;
   transition: all 0.3s;
   &:hover { background: #8B003F; color: white; transform: translateY(-3px); }
 }
-
-/* ─── Focus Mode Assessment ─── */
 .focus-mode {
   animation: slideInUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-
 @keyframes slideInUp {
   from { opacity: 0; transform: translateY(40px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 .focus-header {
   margin-bottom: 3rem;
   .back-link { background: none; border: none; color: #8A4B6B; font-weight: 700; cursor: pointer; margin-bottom: 1rem; &:hover { color: #E91E63; } }
@@ -31,15 +26,12 @@
     .focus-id { font-size: 1.25rem; font-weight: 600; }
   }
 }
-
 .assessment-layout {
   display: grid; grid-template-columns: 1fr 420px; gap: 4rem; align-items: flex-start;
 }
-
 .assessment-data {
   display: flex; flex-direction: column; gap: 3.5rem;
 }
-
 .data-section {
   .section-title {
     font-size: 0.85rem; text-transform: uppercase; font-weight: 800; color: #E91E63;
@@ -47,12 +39,10 @@
     &::after { content: ''; flex: 1; height: 1px; background: rgba(233, 30, 99, 0.1); }
   }
 }
-
 .info-strip {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
   background: white; padding: 2rem 2.5rem; border-radius: 24px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid rgba(139, 0, 63, 0.05);
-  
   .info-cell {
     display: flex; flex-direction: column;
     .cell-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #94a3b8; }
@@ -60,14 +50,12 @@
     .pink { color: #E91E63; }
   }
 }
-
 .diagnosis-card {
   margin-top: 1.5rem; background: #fdfcfd; padding: 2rem; border-radius: 24px;
   border-left: 6px solid #8B003F;
   .label { display: block; font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #8A4B6B; margin-bottom: 1rem; }
   p { font-size: 1.15rem; color: #4A154B; font-weight: 600; line-height: 1.6; margin: 0; }
 }
-
 .policy-link-card {
   display: flex; align-items: center; gap: 1.5rem; background: linear-gradient(135deg, #8B003F, #4A154B);
   padding: 1.75rem 2.5rem; border-radius: 28px; color: white;
@@ -75,7 +63,6 @@
   strong { font-size: 1.35rem; font-weight: 800; display: block; }
   p { margin: 0.35rem 0 0; opacity: 0.85; font-weight: 500; }
 }
-
 .settlement-success {
   display: flex; align-items: center; gap: 1.5rem; background: #ecfdf5; border: 2px solid #10b981;
   padding: 1.5rem 2.5rem; border-radius: 24px; color: #065f46;
@@ -83,18 +70,14 @@
   strong { font-size: 1.25rem; font-weight: 800; display: block; }
   p { margin: 0.25rem 0 0; font-weight: 600; opacity: 0.8; }
 }
-
-/* ─── Decision Engine ─── */
 .assessment-form-container {
   position: sticky; top: 100px;
 }
-
 .form-card {
   background: white; padding: 2.5rem; border-radius: 32px;
   border: 1px solid rgba(139, 0, 63, 0.1); box-shadow: 0 40px 80px rgba(74, 21, 75, 0.1);
   h3 { font-size: 1.6rem; font-weight: 800; color: #8B003F; margin: 0; letter-spacing: -0.5px; }
   p { color: #8A4B6B; font-weight: 600; margin-top: 0.75rem; margin-bottom: 2rem; font-size: 1rem; }
-
   &.settlement {
     border-color: #10b981;
     h3 { color: #065f46; }
@@ -104,21 +87,18 @@
     }
   }
 }
-
 .v-group {
   margin-bottom: 2rem;
   label { display: block; font-weight: 800; color: #4A154B; margin-bottom: 1rem; font-size: 0.95rem; }
-  
   .st-select {
     width: 100%; border: 2px solid #f1f5f9; border-radius: 16px; padding: 1rem 1.25rem;
     font-size: 1rem; font-weight: 700; color: #4A154B; background: #f8fafc; cursor: pointer;
     &:focus { outline: none; border-color: #8B003F; background: white; }
   }
-
   .premium-input-wrap {
     position: relative;
-    input { 
-      width: 100%; border: 2px solid #f1f5f9; border-radius: 18px; padding: 1.25rem 1.5rem; 
+    input {
+      width: 100%; border: 2px solid #f1f5f9; border-radius: 18px; padding: 1.25rem 1.5rem;
       font-size: 1.75rem; font-weight: 800; color: #8B003F; background: #f8fafc; transition: all 0.2s;
       &:focus { outline: none; border-color: #E91E63; background: white; }
     }
@@ -126,20 +106,16 @@
     &.pink input { color: #E91E63; }
     &.success-green input { color: #10b981; text-align: center; font-size: 2.25rem; border-color: #10b981; }
   }
-  
   textarea {
     width: 100%; border: 2px solid #f1f5f9; border-radius: 18px; padding: 1.25rem;
     font-size: 1.05rem; color: #4A154B; background: #f8fafc; font-family: inherit; resize: none;
     transition: all 0.2s; font-weight: 500;
     &:focus { outline: none; border-color: #8B003F; background: white; }
   }
-  
   .input-note { font-size: 0.85rem; color: #8A4B6B; margin-top: 0.75rem; font-weight: 500; }
 }
-
 .form-footer {
   display: grid; grid-template-columns: 120px 1fr; gap: 1.25rem; margin-top: 2.5rem;
-  
   .btn-submit {
     background: linear-gradient(135deg, #8B003F, #E91E63); color: white; border: none;
     font-weight: 800; font-size: 1.1rem; height: 65px; border-radius: 18px;
@@ -148,27 +124,22 @@
     &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     &.settle { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
   }
-  
   .btn-cancel {
     background: #f1f5f9; color: #64748b; border: none; font-weight: 700; border-radius: 18px; cursor: pointer;
     &:hover { background: #e2e8f0; color: #475569; }
   }
 }
-
-/* ─── List View Refinements ─── */
 .inline-notification {
   padding: 1.25rem 2rem; border-radius: 16px; display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2.5rem;
   box-shadow: 0 4px 15px rgba(0,0,0,0.05); p { margin: 0; font-weight: 700; }
   &.success { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; }
   &.error { background: #fef2f2; color: #991b1b; border: 1px solid #f87171; }
 }
-
 .filter-wrapper {
   display: flex; gap: 0.75rem; margin-bottom: 2.5rem; overflow-x: auto; padding-bottom: 0.5rem;
   &::-webkit-scrollbar { height: 4px; }
   &::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 }
-
 .filter-pill {
   padding: 0.8rem 1.5rem; border-radius: 100px; background: white; color: #4A154B;
   font-weight: 800; font-size: 0.95rem; cursor: pointer; border: 1px solid rgba(139, 0, 63, 0.1);
@@ -177,22 +148,18 @@
   &:hover { background: #fdf2f8; transform: translateY(-2px); border-color: #E91E63; }
   &.active { background: #8B003F; color: white; border-color: #8B003F; box-shadow: 0 8px 15px rgba(139, 0, 63, 0.2); }
 }
-
 .table-card {
   background: white; border-radius: 32px; overflow: hidden; border: 1px solid rgba(139, 0, 63, 0.08);
   box-shadow: 0 20px 60px rgba(74, 21, 75, 0.06);
 }
-
 .modern-table {
   width: 100%; border-collapse: collapse;
   th { text-align: left; padding: 1.5rem 2rem; background: #fafafb; font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #8A4B6B; letter-spacing: 0.1em; border-bottom: 1px solid #f1f5f9; }
   td { padding: 1.5rem 2rem; border-bottom: 1px solid #f8fafc; font-weight: 600; color: #4A154B; font-size: 0.95rem; }
   tr:last-child td { border-bottom: none; }
 }
-
 .claim-id { font-weight: 800; color: #E91E63; }
 .type-tag { background: #f1f5f9; padding: 0.4rem 1rem; border-radius: 30px; font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase; }
-
 .status-indicator {
   padding: 0.5rem 1.25rem; border-radius: 100px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block;
   &.status-approved { background: #ecfdf5; color: #065f46; }
@@ -201,36 +168,29 @@
   &.status-review { background: #eff6ff; color: #1e40af; }
   &.status-settled { background: #f0fdf4; color: #15803d; border: 1px solid #10b981; }
 }
-
 .btn-sm {
   border: none; padding: 0.65rem 1.25rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
   &.btn-primary { background: #8B003F; color: white; &:hover { background: #E91E63; } }
   &.btn-success { background: #10b981; color: white; &:hover { background: #059669; } }
 }
-
-/* 🤖 AGENTIC AI: AUDIT PORTAL */
 .ai-audit-portal {
   background: #fdf2f8; border: 1.5px solid rgba(139, 0, 63, 0.15); border-radius: 20px;
   padding: 1.5rem; margin-bottom: 2rem;
-  .audit-header { 
+  .audit-header {
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;
     h4 { margin: 0; font-size: 0.85rem; color: #4A154B; font-weight: 800; letter-spacing: 0.1em; }
     .ai-chip { background: #8B003F; color: white; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.6rem; font-weight: 900; letter-spacing: 0.05em; }
   }
 }
-
 .audit-thinking {
   display: flex; align-items: center; gap: 1rem; color: #8B003F; font-weight: 700; font-size: 0.85rem; padding: 0.5rem 0;
   .pulse-ring { width: 14px; height: 14px; background: #8B003F; border-radius: 50%; animation: auditPulse 1.2s infinite; }
 }
-
 .audit-result {
   background: white; border-radius: 12px; padding: 1rem; border: 1px solid rgba(139, 0, 63, 0.1);
   pre { margin: 0; white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #4A154B; line-height: 1.6; font-weight: 500; }
   .confidence-tag { margin-top: 1rem; font-size: 0.65rem; color: #10B981; font-weight: 800; text-transform: uppercase; border-top: 1px dashed #E2E8F0; padding-top: 0.75rem; display: block; text-align: right; }
 }
-
 @keyframes auditPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
 @media (max-width: 1200px) { .assessment-layout { grid-template-columns: 1fr; } .assessment-form-container { position: static; } }

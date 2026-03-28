@@ -1,3 +1,4 @@
+// Angular component for the file-claim page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -5,7 +6,6 @@ import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserPolicy } from '../../models/models';
-
 @Component({
   selector: 'app-file-claim',
   standalone: true,
@@ -17,9 +17,7 @@ export class FileClaimComponent implements OnInit {
   policies: UserPolicy[] = [];
   loading = true;
   today: string = new Date().toISOString().split('T')[0];
-  
-  claimStep: number = 1; // 1: Incident, 2: Medical, 3: Evidence, 4: Settlement
-  
+  claimStep: number = 1;
   formData = {
     userPolicyId: null as number | null,
     type: 'CASHLESS',
@@ -32,16 +30,13 @@ export class FileClaimComponent implements OnInit {
     bankIFSC: '',
     billsUploaded: false
   };
-
   successMessage = '';
   errorMessage = '';
-
   constructor(
     private api: ApiService,
     private auth: AuthService,
     private router: Router
   ) {}
-
   ngOnInit(): void {
     const userId = this.auth.getUserId();
     if (userId) {
@@ -54,21 +49,18 @@ export class FileClaimComponent implements OnInit {
       });
     }
   }
-
   nextStep(): void {
     if (this.validateStep()) {
       this.claimStep++;
       window.scrollTo(0, 0);
     }
   }
-
   prevStep(): void {
     if (this.claimStep > 1) {
       this.claimStep--;
       window.scrollTo(0, 0);
     }
   }
-
   validateStep(): boolean {
     if (this.claimStep === 1) {
       if (!this.formData.userPolicyId || !this.formData.amount || !this.formData.incidentDate) {
@@ -85,13 +77,11 @@ export class FileClaimComponent implements OnInit {
     this.errorMessage = '';
     return true;
   }
-
   submitClaim(): void {
     if (!this.formData.userPolicyId || !this.formData.amount || !this.formData.incidentDate || !this.formData.diagnosis) {
       this.errorMessage = 'Incomplete application. Please go back and fill details.';
       return;
     }
-
     const userId = this.auth.getUserId()!;
     this.api.fileClaim(userId, this.formData.userPolicyId, this.formData).subscribe({
       next: () => {

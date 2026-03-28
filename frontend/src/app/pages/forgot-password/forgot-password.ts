@@ -1,9 +1,9 @@
+// Angular component for the forgot-password page
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { CommonModule } from '@angular/common';
-
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
@@ -17,18 +17,14 @@ export class ForgotPasswordComponent {
   error = '';
   loading = false;
   success = false;
-
   constructor(private api: ApiService, private router: Router) {}
-
   onSubmit(): void {
     this.error = '';
     this.message = '';
-    
     if (!this.email) {
       this.error = 'Please enter your email address';
       return;
     }
-
     this.loading = true;
     this.api.forgotPassword(this.email).subscribe({
       next: () => {

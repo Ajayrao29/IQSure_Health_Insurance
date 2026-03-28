@@ -1,8 +1,7 @@
+// Data Transfer Object for InsuredMemberRequestDTO
 package org.hartford.iqsure.dto.request;
-
 import lombok.*;
 import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

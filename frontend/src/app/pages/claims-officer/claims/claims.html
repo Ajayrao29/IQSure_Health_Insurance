@@ -1,6 +1,6 @@
+<!-- Template for the claims page -->
 <div class="page fade-in">
   @if (!selectedClaim) {
-    <!-- ── VIEW 1: RECONNAISSANCE (LIST VIEW) ── -->
     <div class="control-center-header">
       <div class="title-area">
         <h1>Claims Control Center</h1>
@@ -10,14 +10,12 @@
         <a routerLink="/claims-officer/dashboard" class="btn-dash">Dashboard Overview</a>
       </div>
     </div>
-
     @if (notification) {
       <div class="inline-notification" [ngClass]="notification.type">
         <span class="icon">{{ notification.type === 'success' ? '✅' : '❌' }}</span>
         <p>{{ notification.message }}</p>
       </div>
     }
-
     <div class="filter-wrapper">
       <div class="filter-pill" [class.active]="activeFilter === 'ALL'" (click)="applyFilter('ALL')">
         <span>📁</span> All Claims
@@ -35,7 +33,6 @@
         <span>💰</span> Settled
       </div>
     </div>
-
     @if (loading) {
       <div class="loading-state">
         <div class="dot-loader"></div>
@@ -91,7 +88,6 @@
       </div>
     }
   } @else {
-    <!-- ── VIEW 2: FOCUS ASSESSMENT MODE (DETAIL VIEW) ── -->
     <div class="focus-mode">
       <div class="focus-header">
         <button class="back-link" (click)="selectedClaim = null; showSettlementModal = false">← Return to Tactical Queue</button>
@@ -100,11 +96,8 @@
           <span class="focus-id">Status: <strong [ngClass]="getStatusClass(selectedClaim.status)">{{ selectedClaim.status }}</strong></span>
         </div>
       </div>
-
       <div class="assessment-layout">
-        <!-- ── Left Column: Data Intelligence ── -->
         <div class="assessment-data">
-          <!-- Claim Core -->
           <div class="data-section">
             <h4 class="section-title">Incident Intelligence</h4>
             <div class="info-strip">
@@ -121,7 +114,6 @@
                 <span class="cell-val pink">₹{{ selectedClaim.amount | number }}</span>
               </div>
             </div>
-
             <div class="info-strip" style="margin-top: 1rem;">
               <div class="info-cell" style="grid-column: span 2;">
                 <span class="cell-label">Hospital Facility</span>
@@ -132,14 +124,11 @@
                 <span class="cell-val">#{{ selectedClaim.userId }}</span>
               </div>
             </div>
-            
             <div class="diagnosis-card">
               <span class="label">Clinical Diagnosis / Event Summary</span>
               <p>{{ selectedClaim.diagnosis }}</p>
             </div>
           </div>
-
-          <!-- Policy Links -->
           <div class="data-section">
             <h4 class="section-title">Policy Relationship</h4>
             <div class="policy-link-card">
@@ -150,8 +139,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Settlement History (If applicable) -->
           @if (selectedClaim.status === 'SETTLED') {
             <div class="data-section">
               <h4 class="section-title">Settlement Intelligence</h4>
@@ -165,18 +152,14 @@
             </div>
           }
         </div>
-
-        <!-- ── Right Column: Decision Engine ── -->
         <div class="assessment-form-container">
           @if (!showSettlementModal) {
             <div class="form-card">
-              <!-- 🤖 AGENTIC AI AUDIT PORTAL -->
               <div class="ai-audit-portal">
                 <div class="audit-header">
                   <span class="ai-chip">AGENTIC AI AUDITOR</span>
                   <h4>Cognitive Audit Assessment</h4>
                 </div>
-                
                 @if (aiGenerating) {
                   <div class="audit-thinking">
                     <div class="pulse-ring"></div>
@@ -189,10 +172,8 @@
                   </div>
                 }
               </div>
-
               <h3>Adjudication Verdict</h3>
               <p>Execute the final decision and record regulatory remarks.</p>
-
               <div class="v-group">
                 <label>Actionable Status</label>
                 <select [(ngModel)]="processingStatus" class="st-select">
@@ -202,7 +183,6 @@
                   <option value="REJECTED">REJECT CLAIM</option>
                 </select>
               </div>
-
               @if (processingStatus === 'APPROVED' || processingStatus === 'PARTIAL_APPROVED') {
                 <div class="v-group">
                   <label>Authorized Amount (₹)</label>
@@ -213,12 +193,10 @@
                   <p class="input-note">Customer requested: ₹{{ selectedClaim.amount | number }}</p>
                 </div>
               }
-
               <div class="v-group">
                 <label>Professional Remarks (Internal)</label>
                 <textarea [(ngModel)]="remarks" rows="6" placeholder="Document the rationale for this adjudication..."></textarea>
               </div>
-
               <div class="form-footer">
                 <button class="btn-cancel" (click)="selectedClaim = null">Defer</button>
                 <button class="btn-submit" (click)="submitProcess()" [disabled]="isProcessing">
@@ -230,14 +208,12 @@
             <div class="form-card settlement">
               <h3>Financial Settlement</h3>
               <p>Authorize the definitive payout to the customer's account.</p>
-
               <div class="settlement-overview">
                 <div class="ov-item">
                   <span class="l">Verified Payload</span>
                   <span class="v">₹{{ selectedClaim.approvedAmount | number }}</span>
                 </div>
               </div>
-
               <div class="v-group">
                 <label>Final Disbursed Amount (₹)</label>
                 <div class="premium-input-wrap success-green">
@@ -246,7 +222,6 @@
                 </div>
                 <p class="input-note">This amount will be deducted from policy coverage.</p>
               </div>
-
               <div class="form-footer">
                 <button class="btn-cancel" (click)="selectedClaim = null; showSettlementModal = false">Cancel</button>
                 <button class="btn-submit settle" (click)="confirmSettlement()" [disabled]="isProcessing">

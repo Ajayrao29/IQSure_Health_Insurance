@@ -1,3 +1,4 @@
+<!-- Template for the savings-calculator page -->
 <div class="page">
   <div class="page-header">
     <div>
@@ -5,7 +6,6 @@
       <p>Precision actuarial analysis of your IQsure optimization and terminal wealth growth</p>
     </div>
   </div>
-
   <div class="savings-hero fade-in">
     <div class="savings-card total">
       <div class="savings-icon">📉</div>
@@ -13,7 +13,6 @@
       <div class="savings-amount">₹{{ totalSavings | number:'1.2-2' }}</div>
       <div class="savings-desc">Absolute liquidity saved through gamified underwriting</div>
     </div>
-
     <div class="savings-card wealth">
       <div class="savings-icon">📈</div>
       <div class="savings-label">30-Year Wealth Projection</div>
@@ -23,14 +22,11 @@
       <div class="savings-desc">Future value of reinvested savings at 8% CAGR</div>
     </div>
   </div>
-
-  <!-- Terminal Wealth Projection Table -->
   <div class="wealth-projection-section fade-in">
       <div class="section-header">
           <h2><span class="sparkle">✨</span> Compound Interest Power</h2>
           <p>By reinvesting your insurance savings into a diversified index fund (8% expected return), your "Insurance Alpha" grows exponentially.</p>
       </div>
-      
       <div class="projection-grid">
           @for (d of wealthData; track d.years) {
             <div class="projection-item">
@@ -43,7 +39,6 @@
           }
       </div>
   </div>
-
   <div class="comparison-section fade-in">
     <h2>📊 Portfolio Optimization Breakdown</h2>
     <div class="comparison-grid">
@@ -77,7 +72,6 @@
         </div>
       }
     </div>
-
     @if (policies.length === 0) {
       <div class="empty-state expert">
         <div class="empty-icon">📭</div>
@@ -87,7 +81,6 @@
       </div>
     }
   </div>
-
   <div class="actuarial-tips fade-in">
     <h2>🧬 Risk Mitigation Strategies</h2>
     <div class="tips-grid">

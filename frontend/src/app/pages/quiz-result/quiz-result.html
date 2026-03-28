@@ -1,13 +1,11 @@
+<!-- Template for the quiz-result page -->
 @if (result) {
   <div class="page result-page">
-    <!-- Confetti layer for high scores -->
     @if (result.percentage >= 80) {
       <div class="confetti-container">
         @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) { <div class="confetti"></div> }
       </div>
     }
-
-    <!-- Score Card -->
     <div class="score-card slide-up">
       <div class="score-message">{{ scoreMessage }}</div>
       <div class="score-circle" [style.border-color]="scoreColor">
@@ -31,7 +29,6 @@
         </div>
       }
     </div>
-    <!-- New Badges Unlocked -->
     @if (result.newBadgesUnlocked?.length > 0) {
       <div class="badges-section">
         <h2>🏅 New Badges Unlocked!</h2>
@@ -46,10 +43,8 @@
         </div>
       </div>
     }
-    <!-- Actions -->
     <div class="result-actions" style="display: flex; flex-direction: column; align-items: center; gap: 1.25rem;">
       <a routerLink="/quizzes" class="btn-primary" style="padding: 0.8rem 2.5rem; font-size: 1.1rem;">Take Another Quiz</a>
-      
       <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
         <a routerLink="/dashboard" class="btn-secondary">Back to Dashboard</a>
         <a routerLink="/learning-center/education-center" class="btn-secondary">Go to Education Center</a>
@@ -58,4 +53,3 @@
     </div>
   </div>
 }
-

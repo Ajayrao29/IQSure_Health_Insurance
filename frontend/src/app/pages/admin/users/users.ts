@@ -1,15 +1,7 @@
-/*
- * FILE: users.ts | LOCATION: pages/admin/users/
- * PURPOSE: Admin Users page (URL: /admin/users). Shows all registered users (except admins).
- *          Admin can delete users from here.
- * TEMPLATE: users.html | STYLES: users.scss
- * CALLS: api.service.ts → getAllUsers(), deleteUser() → UserController
- * GUARD: AdminGuard — only accessible by admin users
- */
+// Angular component for the users page
+
 import { Component, OnInit } from '@angular/core';
-
 import { ApiService } from '../../../services/api.service';
-
 @Component({ selector: 'app-admin-users', standalone: true, imports: [], templateUrl: './users.html', styleUrls: ['./users.scss'] })
 export class AdminUsersComponent implements OnInit {
   users: any[] = []; loading = true;

@@ -1,11 +1,7 @@
+// Data Transfer Object for UnderwriterStatsDTO
 package org.hartford.iqsure.dto.response;
-
 import lombok.Builder;
 import lombok.Data;
-
-/**
- * DTO for sending underwriter performance statistics to the dashboard.
- */
 @Data
 @Builder
 public class UnderwriterStatsDTO {

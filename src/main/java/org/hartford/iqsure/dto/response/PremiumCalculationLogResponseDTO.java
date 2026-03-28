@@ -1,23 +1,13 @@
-/*
- * FILE: PremiumCalculationLogResponseDTO.java | LOCATION: dto/response/
- * PURPOSE: DTO for premium calculation history/audit logs.
- * RETURNED BY: UserPolicyController → getPremiumLogs() → PremiumCalculationService
- */
+// Data Transfer Object for PremiumCalculationLogResponseDTO
+
 package org.hartford.iqsure.dto.response;
-
 import lombok.*;
-
 import java.time.LocalDateTime;
-
-/**
- * Response DTO for a PremiumCalculationLog entry.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PremiumCalculationLogResponseDTO {
-
     private Long logId;
     private Long userId;
     private Long policyId;

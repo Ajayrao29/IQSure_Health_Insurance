@@ -1,16 +1,9 @@
-/*
- * FILE: savings-calculator.ts | LOCATION: pages/savings-calculator/
- * PURPOSE: Savings Calculator page (URL: /savings). Shows total savings from purchased policies
- *          and potential future savings based on current gamification data.
- * TEMPLATE: savings-calculator.html | STYLES: savings-calculator.scss
- * CALLS: api.service.ts → getUserPolicies(), getProfile(), getActivePolicies(), calculatePremium()
- * BACKEND: UserPolicyController, UserController, PolicyController, PremiumCalculationService
- */
+// Angular component for the savings-calculator page
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-
 @Component({
   selector: 'app-savings',
   standalone: true,
@@ -24,66 +17,51 @@ export class SavingsCalculatorComponent implements OnInit {
   policies: any[] = [];
   userPoints = 0;
   availableRewards: any[] = [];
-  
-  // Wealth Projection
   projectedYears = [5, 10, 20, 30];
-  expectedReturn = 0.08; // 8% realistic index fund return
+  expectedReturn = 0.08;
   wealthData: { years: number, wealth: number }[] = [];
   maxWealth = 0;
-
   constructor(private api: ApiService, private auth: AuthService) {}
-
   ngOnInit(): void {
     const userId = this.auth.getUserId()!;
-
     this.api.getUserPolicies(userId).subscribe(policies => {
       this.policies = policies;
       this.totalSavings = policies.reduce((sum, p) => sum + (p.savedAmount || 0), 0);
     });
-
     this.api.getProfile(userId).subscribe(u => {
       this.userPoints = u.userPoints || 0;
-
       this.api.getAvailableRewardsForUser(userId).subscribe(rewards => {
         this.availableRewards = rewards || [];
         this.calculatePotentialSavings(userId);
       });
     });
   }
-
   generateWealthProjection(): void {
-    const annualSavings = this.totalSavings > 0 ? this.totalSavings : 5000; // Fallback for demo
+    const annualSavings = this.totalSavings > 0 ? this.totalSavings : 5000;
     this.wealthData = this.projectedYears.map(year => {
-      // Future Value of an Annuity formula: P * [((1 + r)^n - 1) / r]
       const wealth = annualSavings * ((Math.pow(1 + this.expectedReturn, year) - 1) / this.expectedReturn);
       return { years: year, wealth: Math.round(wealth) };
     });
     this.maxWealth = Math.max(...this.wealthData.map(d => d.wealth));
   }
-
   calculatePotentialSavings(userId: number): void {
     this.api.getActivePolicies().subscribe(policies => {
       if (!policies || policies.length === 0) {
         this.potentialSavings = 0;
         return;
       }
-
       const selectedRewardIds = this.availableRewards.map(r => r.userRewardId);
-
       if (selectedRewardIds.length === 0) {
         this.potentialSavings = 0;
         return;
       }
-
       let potential = 0;
       let completed = 0;
-
       policies.forEach(p => {
         this.api.calculatePremium(userId, p.policyId, selectedRewardIds).subscribe({
           next: calc => {
             potential += calc.discountedAmount || 0;
             completed++;
-
             if (completed === policies.length) {
               this.potentialSavings = Number(potential.toFixed(2));
               this.generateWealthProjection();
@@ -91,7 +69,6 @@ export class SavingsCalculatorComponent implements OnInit {
           },
           error: () => {
             completed++;
-
             if (completed === policies.length) {
               this.potentialSavings = Number(potential.toFixed(2));
               this.generateWealthProjection();

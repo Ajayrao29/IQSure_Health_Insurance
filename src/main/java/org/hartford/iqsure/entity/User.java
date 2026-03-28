@@ -1,154 +1,78 @@
-/*
- * ============================================================================
- * FILE: User.java
- * LOCATION: src/main/java/org/hartford/iqsure/entity/
- * PURPOSE: Represents the "users" table in the database.
- *          Each instance of this class = one row in the "users" table.
- *          Stores user profile info: name, email, password, points, role.
- *
- * DATABASE TABLE: users
- *   - userId (auto-generated ID, primary key)
- *   - name, email (unique), password (hashed), phone
- *   - userPoints (gamification points earned from quizzes)
- *   - role (ROLE_USER or ROLE_ADMIN)
- *
- * RELATIONSHIPS (this user has many...):
- *   - UserBadges → see entity/UserBadge.java (badges the user earned)
- *   - UserRewards → see entity/UserReward.java (rewards the user redeemed)
- *
- * USED BY:
- *   - AuthController.java (controller/) → for login/register
- *   - UserController.java (controller/) → for profile/leaderboard
- *   - UserService.java (service/) → business logic for user operations
- *   - UserRepository.java (repository/) → database queries
- *   - DataSeeder.java (config/) → creates default admin
- *
- * ANNOTATIONS EXPLAINED:
- *   - @Entity → Tells JPA: "this class maps to a database table"
- *   - @Table(name = "users") → The actual table name in the database
- *   - @Data (Lombok) → Auto-generates getters, setters, toString, equals
- *   - @Builder → Allows creating objects like: User.builder().name("John").build()
- *   - @NoArgsConstructor / @AllArgsConstructor → Empty and full constructors
- * ============================================================================
- */
-package org.hartford.iqsure.entity;
+// Entity class representing User in the database
 
+package org.hartford.iqsure.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hartford.iqsure.enums.UserStatus;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-@Entity                        // JPA: This class is a database entity (maps to a table)
-@Table(name = "users")         // The database table is called "users"
-@Data                          // Lombok: auto-generates getters, setters, toString
-@NoArgsConstructor             // Lombok: creates empty constructor → new User()
-@AllArgsConstructor            // Lombok: creates full constructor → new User(id, name, ...)
-@Builder                       // Lombok: allows User.builder().name("John").email("...").build()
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
-
-    @Id                                              // This field is the PRIMARY KEY
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment: DB generates the ID
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-
-    @Column(nullable = false)   // This column CANNOT be null in the database
+    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false, unique = true) // Cannot be null AND must be unique (no duplicate emails)
+    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)   // Password is stored as a BCrypt hash (see SecurityConfig.java)
+    @Column(nullable = false)
     private String password;
-
-    private String phone;       // Optional field — can be null
-
-    @Builder.Default            // When using Builder pattern, default to 0 points
-    private Integer userPoints = 0;  // Total gamification points earned from quizzes
-
-    @Enumerated(EnumType.STRING)  // Store the role as a STRING in DB (not a number)
+    private String phone;
+    @Builder.Default
+    private Integer userPoints = 0;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private Role role = Role.ROLE_USER;  // Default role is regular user
-
-    // ============================================================
-    // EXTENDED FIELDS FOR UNDERWRITERS & CLAIMS OFFICERS
-    // ============================================================
-
-    // Underwriter fields
+    private Role role = Role.ROLE_USER;
     private String licenseNumber;
     private String specialization;
     private BigDecimal commissionPercentage;
-
     @Builder.Default
     private Integer totalQuotesSent = 0;
-
-    // Claims Officer fields
     private String employeeId;
     private String department;
-
     @Builder.Default
     private BigDecimal approvalLimit = new BigDecimal("500000.00");
-
     @Builder.Default
     private Integer totalClaimsProcessed = 0;
-
     @Builder.Default
     private Integer totalClaimsApproved = 0;
-
     @Builder.Default
     private Integer totalClaimsRejected = 0;
-
-    // Address fields (shown in Manage Customers image)
     private String city;
     private String state;
     private String zipCode;
-
-    /**
-     * Account status (ACTIVE, INACTIVE, etc.)
-     * Best Practice: Use Enums for predefined status values.
-     */
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
-
-    // Gamification Tracking (AI-first progression)
     @Builder.Default
     private Integer totalQuizzesTaken = 0;
-
     @Builder.Default
     private Integer currentStreak = 0;
-
     private LocalDate lastQuizDate;
-
-
-    // ONE user can have MANY badges
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<UserBadge> userBadges = new ArrayList<>();      // → entity/UserBadge.java
-
-    // ONE user can have MANY redeemed rewards
+    private List<UserBadge> userBadges = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<UserReward> userRewards = new ArrayList<>();    // → entity/UserReward.java
-
-    // ONE user can have MANY purchased policies
+    private List<UserReward> userRewards = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<UserPolicy> userPolicies = new ArrayList<>();   // → entity/UserPolicy.java
-
-    // ONE user can have MANY premium calculation logs
+    private List<UserPolicy> userPolicies = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<PremiumCalculationLog> premiumLogs = new ArrayList<>(); // → entity/PremiumCalculationLog.java
-
-    // Enum defining the two possible roles in the system
+    private List<PremiumCalculationLog> premiumLogs = new ArrayList<>();
     public enum Role {
-        ROLE_USER,           // Regular user — can take quizzes, buy policies
-        ROLE_ADMIN,          // Admin — can manage everything
-        ROLE_UNDERWRITER,    // Underwriter — reviews applications, sends quotes
-        ROLE_CLAIMS_OFFICER  // Claims Officer — reviews and settles claims
+        ROLE_USER,
+        ROLE_ADMIN,
+        ROLE_UNDERWRITER,
+        ROLE_CLAIMS_OFFICER
     }
 }

@@ -1,3 +1,4 @@
+// Angular component for the pending page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -5,7 +6,6 @@ import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
 import { UserPolicy } from '../../../models/models';
-
 @Component({
   selector: 'app-underwriter-pending',
   standalone: true,
@@ -23,13 +23,10 @@ export class UnderwriterPendingComponent implements OnInit {
   analyzingAi = false;
   aiResult: any = null;
   notification: { message: string, type: 'success' | 'error' } | null = null;
-
   constructor(private api: ApiService, private auth: AuthService) {}
-
   ngOnInit(): void {
     this.loadPending();
   }
-
   loadPending(): void {
     this.loading = true;
     this.notification = null;
@@ -43,14 +40,12 @@ export class UnderwriterPendingComponent implements OnInit {
       this.loading = false;
     }
   }
-
   openQuoteModal(app: any): void {
     this.selectedApp = app;
-    this.quoteAmount = app.finalPremium; 
+    this.quoteAmount = app.finalPremium;
     this.remarks = '';
-    this.aiResult = null; // Clear previous AI results
+    this.aiResult = null;
   }
-
   runAiAnalysis(): void {
     if (!this.selectedApp) return;
     this.analyzingAi = true;
@@ -58,7 +53,6 @@ export class UnderwriterPendingComponent implements OnInit {
       next: (res) => {
         this.aiResult = res;
         this.analyzingAi = false;
-        // Optionally prepend reasoning to remarks
         if (!this.remarks) {
           this.remarks = `[AI Analysis]: ${res.aiReasoningSummary}\n\n[Action]: ${res.personalRecommendation}`;
         }
@@ -69,19 +63,16 @@ export class UnderwriterPendingComponent implements OnInit {
       }
     });
   }
-
   applyAiSuggestion(): void {
     if (!this.aiResult) return;
     this.quoteAmount = this.aiResult.suggestedQuoteAmount;
     this.remarks = `${this.aiResult.underwritingMemo}\n\n[Verdict]: Adopted AI recommendation at ₹${this.aiResult.suggestedQuoteAmount}`;
     this.showNotification('Actuarial recommendation adopted.', 'success');
   }
-
   submitQuote(): void {
     if (!this.quoteAmount || !this.selectedApp) return;
     this.submitting = true;
     this.notification = null;
-
     this.api.sendQuote(this.selectedApp.id, this.quoteAmount, this.remarks).subscribe({
       next: () => {
         this.submitting = false;
@@ -95,14 +86,12 @@ export class UnderwriterPendingComponent implements OnInit {
       }
     });
   }
-
   rejectApplication(): void {
     if (!this.selectedApp) return;
     if (!this.remarks || this.remarks.length < 10) {
       this.showNotification('Please provide a detailed rejection reason (min 10 chars).', 'error');
       return;
     }
-
     this.submitting = true;
     this.api.rejectPolicy(this.selectedApp.id, this.remarks).subscribe({
       next: () => {
@@ -117,23 +106,18 @@ export class UnderwriterPendingComponent implements OnInit {
       }
     });
   }
-
   showNotification(message: string, type: 'success' | 'error'): void {
     this.notification = { message, type };
     setTimeout(() => {
       this.notification = null;
     }, 4000);
   }
-
   getFileUrl(path: string): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
-    
-    // Clean the path - remove any leading / or /uploads/ prefix we might have saved
     let cleanPath = path;
     if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
     if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.substring(8);
-    
     return `http://localhost:8080/api/v1/files/view/${cleanPath}`;
   }
 }

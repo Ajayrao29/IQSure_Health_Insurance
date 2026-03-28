@@ -1,3 +1,4 @@
+<!-- Template for the assign-claims-officer page -->
 <div class="page fade-in">
   <div class="page-header">
     <div>
@@ -5,14 +6,12 @@
       <p>Assign submitted claims to the claims processing team</p>
     </div>
   </div>
-
   @if (notification) {
     <div class="alert-banner" [class]="notification.type">
       <span class="icon">{{ notification.type === 'success' ? '✅' : '❌' }}</span>
       <span class="message">{{ notification.message }}</span>
     </div>
   }
-
   @if (loading) {
     <div class="loading">Loading submitted claims...</div>
   } @else {
@@ -48,8 +47,8 @@
                 </select>
               </td>
               <td>
-                <button class="btn-primary btn-sm" 
-                        (click)="assign(c.id, officerSelect.value)" 
+                <button class="btn-primary btn-sm"
+                        (click)="assign(c.id, officerSelect.value)"
                         [disabled]="!officerSelect.value || processing">
                   {{ processing ? 'Assigning...' : 'Assign' }}
                 </button>

@@ -1,10 +1,10 @@
+// Angular component for the quiz-reports.component page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
 import { AttemptResponse } from '../../../models/models';
-
 @Component({
   selector: 'app-quiz-reports',
   standalone: true,
@@ -15,9 +15,7 @@ import { AttemptResponse } from '../../../models/models';
 export class QuizReportsComponent implements OnInit {
   attempts: AttemptResponse[] = [];
   loading = true;
-
   constructor(private api: ApiService, private auth: AuthService) {}
-
   ngOnInit() {
     const userId = this.auth.getUserId();
     if (userId) {

@@ -1,10 +1,9 @@
+// Repository for database operations on PasswordResetTokenRepository
 package org.hartford.iqsure.repository;
-
 import org.hartford.iqsure.entity.PasswordResetToken;
 import org.hartford.iqsure.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
-
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
     Optional<PasswordResetToken> findByToken(String token);
     Optional<PasswordResetToken> findByUser(User user);

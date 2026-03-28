@@ -1,3 +1,4 @@
+<!-- Template for the assign-underwriter page -->
 <div class="page fade-in">
   <div class="page-header">
     <div>
@@ -5,14 +6,12 @@
       <p>Assign pending policy applications to the underwriting team</p>
     </div>
   </div>
-
   @if (notification) {
     <div class="alert-banner" [class]="notification.type">
       <span class="icon">{{ notification.type === 'success' ? '✅' : '❌' }}</span>
       <span class="message">{{ notification.message }}</span>
     </div>
   }
-
   @if (loading) {
     <div class="loading">Loading pending applications...</div>
   } @else {
@@ -48,8 +47,8 @@
                 </select>
               </td>
               <td>
-                <button class="btn-primary btn-sm" 
-                        (click)="assign(p.id, uwSelect.value)" 
+                <button class="btn-primary btn-sm"
+                        (click)="assign(p.id, uwSelect.value)"
                         [disabled]="!uwSelect.value || processing">
                   {{ processing ? 'Assigning...' : 'Assign' }}
                 </button>

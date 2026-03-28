@@ -1,3 +1,4 @@
+<!-- Template for the badges page -->
 <div class="page">
   <div class="page-header">
     <div>
@@ -9,11 +10,9 @@
       <small>Earned</small>
     </div>
   </div>
-
   @if (loading) {
     <div class="loading">Loading badges…</div>
   }
-
   @if (!loading) {
     <div class="badges-grid">
       @for (b of allBadges; track b) {
@@ -30,4 +29,3 @@
     </div>
   }
 </div>
-

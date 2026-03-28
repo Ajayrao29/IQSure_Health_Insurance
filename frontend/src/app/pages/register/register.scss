@@ -7,7 +7,6 @@
   z-index: 10;
   padding: 2rem;
 }
-
 .auth-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(16px);
@@ -17,11 +16,10 @@
   box-shadow: 0 20px 40px rgba(233, 30, 99, 0.1);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   width: 100%;
-  max-width: 520px; /* Slightly wider for registration */
+  max-width: 520px;
   padding: 4rem;
   border-top: 6px solid #E91E63;
   animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-
   .auth-logo {
     font-size: 2.8rem;
     font-weight: 800;
@@ -31,7 +29,6 @@
     letter-spacing: -1.5px;
     span { color: #E91E63; }
   }
-
   h1 {
     font-size: 2.2rem;
     font-weight: 800;
@@ -39,7 +36,6 @@
     text-align: center;
     margin-bottom: 0.75rem;
   }
-
   .subtitle {
     text-align: center;
     color: #8A4B6B;
@@ -47,8 +43,6 @@
     font-size: 1.1rem;
     font-weight: 500;
   }
-
-  /* 🤖 AGENTIC AI: ONBOARDING BUBBLE */
   .ai-onboarding-bubble {
     background: linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 100%);
     border: 2px solid rgba(139, 0, 63, 0.2);
@@ -60,7 +54,6 @@
     gap: 1.5rem;
     position: relative;
     box-shadow: 0 10px 25px rgba(139, 0, 63, 0.05);
-
     &::after {
       content: '';
       position: absolute;
@@ -73,7 +66,6 @@
       border-bottom: 2px solid rgba(139, 0, 63, 0.2);
       transform: rotate(45deg);
     }
-
     .ai-avatar {
       width: 45px;
       height: 45px;
@@ -87,7 +79,6 @@
       box-shadow: 0 5px 15px rgba(139, 0, 63, 0.1);
       animation: bounceSoft 2s infinite;
     }
-
     .ai-bubble-text {
       font-size: 0.95rem;
       font-weight: 700;
@@ -95,12 +86,10 @@
       line-height: 1.4;
     }
   }
-
   @keyframes bounceSoft {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
   }
-
   .error-msg {
     background: #FEF2F2;
     border: 1px solid #FCA5A5;
@@ -115,7 +104,6 @@
     gap: 0.75rem;
     &::before { content: '⚠️'; }
   }
-
   .btn-primary {
     width: 100%;
     padding: 1.15rem;
@@ -124,14 +112,12 @@
     text-align: center;
     justify-content: center;
   }
-
   .switch-link {
     text-align: center;
     margin-top: 2rem;
     color: #8A4B6B;
     font-size: 1rem;
     font-weight: 500;
-
     a {
       color: #E91E63;
       font-weight: 800;
@@ -140,7 +126,6 @@
       &:hover { color: #8B003F; text-decoration: underline; }
     }
   }
-
   .form-group label {
     font-size: 0.95rem;
     color: #4A154B;

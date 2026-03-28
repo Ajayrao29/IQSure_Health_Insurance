@@ -1,12 +1,6 @@
-/*
- * FILE: DiscountRuleService.java | LOCATION: service/
- * PURPOSE: Discount rule CRUD logic. Admin creates rules that define how gamification
- *          data (points, badges, quiz scores) translates into premium discounts.
- * CALLED BY: DiscountRuleController.java
- * USES: DiscountRuleRepository
- */
-package org.hartford.iqsure.service;
+// Service containing business logic for DiscountRuleService
 
+package org.hartford.iqsure.service;
 import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.dto.request.DiscountRuleRequestDTO;
 import org.hartford.iqsure.dto.response.DiscountRuleResponseDTO;
@@ -16,21 +10,16 @@ import org.hartford.iqsure.exception.ResourceNotFoundException;
 import org.hartford.iqsure.repository.DiscountRuleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class DiscountRuleService {
-
     private final DiscountRuleRepository discountRuleRepository;
-
     @Transactional
     public DiscountRuleResponseDTO createRule(DiscountRuleRequestDTO dto) {
         if (discountRuleRepository.existsByRuleName(dto.getRuleName())) {
             throw new BadRequestException("A discount rule with this name already exists: " + dto.getRuleName());
         }
-
         DiscountRule rule = DiscountRule.builder()
                 .ruleName(dto.getRuleName())
                 .description(dto.getDescription())
@@ -41,30 +30,23 @@ public class DiscountRuleService {
                 .applicablePolicyType(dto.getApplicablePolicyType())
                 .isActive(dto.getIsActive() != null ? dto.getIsActive() : true)
                 .build();
-
         return toDTO(discountRuleRepository.save(rule));
     }
-
     public DiscountRuleResponseDTO getRuleById(Long ruleId) {
         return toDTO(findOrThrow(ruleId));
     }
-
     public List<DiscountRuleResponseDTO> getAllRules() {
         return discountRuleRepository.findAll().stream().map(this::toDTO).toList();
     }
-
     public List<DiscountRuleResponseDTO> getActiveRules() {
         return discountRuleRepository.findByIsActiveTrue().stream().map(this::toDTO).toList();
     }
-
     @Transactional
     public DiscountRuleResponseDTO updateRule(Long ruleId, DiscountRuleRequestDTO dto) {
         DiscountRule rule = findOrThrow(ruleId);
-
         if (!rule.getRuleName().equals(dto.getRuleName()) && discountRuleRepository.existsByRuleName(dto.getRuleName())) {
             throw new BadRequestException("A discount rule with this name already exists: " + dto.getRuleName());
         }
-
         rule.setRuleName(dto.getRuleName());
         rule.setDescription(dto.getDescription());
         rule.setMinQuizScorePercent(dto.getMinQuizScorePercent() != null ? dto.getMinQuizScorePercent() : 0.0);
@@ -75,10 +57,8 @@ public class DiscountRuleService {
         if (dto.getIsActive() != null) {
             rule.setIsActive(dto.getIsActive());
         }
-
         return toDTO(discountRuleRepository.save(rule));
     }
-
     @Transactional
     public void deleteRule(Long ruleId) {
         if (!discountRuleRepository.existsById(ruleId)) {
@@ -86,12 +66,10 @@ public class DiscountRuleService {
         }
         discountRuleRepository.deleteById(ruleId);
     }
-
     private DiscountRule findOrThrow(Long ruleId) {
         return discountRuleRepository.findById(ruleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Discount rule not found with id: " + ruleId));
     }
-
     private DiscountRuleResponseDTO toDTO(DiscountRule r) {
         return DiscountRuleResponseDTO.builder()
                 .ruleId(r.getRuleId())

@@ -1,9 +1,9 @@
+// Angular component for the assign-underwriter page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { UserPolicy, User } from '../../../models/models';
-
 @Component({
   selector: 'app-assign-underwriter',
   standalone: true,
@@ -17,13 +17,10 @@ export class AssignUnderwriterComponent implements OnInit {
   loading = true;
   processing = false;
   notification: { message: string, type: 'success' | 'error' } | null = null;
-
   constructor(private api: ApiService) {}
-
   ngOnInit(): void {
     this.loadData();
   }
-
   loadData(): void {
     this.loading = true;
     this.notification = null;
@@ -34,18 +31,14 @@ export class AssignUnderwriterComponent implements OnInit {
       },
       error: () => this.loading = false
     });
-
     this.api.getUsersByRole('ROLE_UNDERWRITER').subscribe(users => {
       this.underwriters = users;
     });
   }
-
   assign(policyId: number, underwriterId: string): void {
     if (!underwriterId || this.processing) return;
-
     this.processing = true;
     this.notification = null;
-
     this.api.assignUnderwriter(policyId, parseInt(underwriterId)).subscribe({
       next: () => {
         this.pendingPolicies = this.pendingPolicies.filter(p => p.id !== policyId);
@@ -58,7 +51,6 @@ export class AssignUnderwriterComponent implements OnInit {
       }
     });
   }
-
   showNotification(message: string, type: 'success' | 'error'): void {
     this.notification = { message, type };
     setTimeout(() => {

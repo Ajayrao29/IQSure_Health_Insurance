@@ -1,12 +1,8 @@
+// Data Transfer Object for ClaimsOfficerStatsDTO
 package org.hartford.iqsure.dto.response;
-
 import lombok.Builder;
 import lombok.Data;
 import java.math.BigDecimal;
-
-/**
- * DTO for claims officer performance and queue statistics.
- */
 @Data
 @Builder
 public class ClaimsOfficerStatsDTO {

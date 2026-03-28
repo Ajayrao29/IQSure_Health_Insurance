@@ -1,3 +1,4 @@
+<!-- Template for the plans page -->
 <div class="page fade-in">
   <div class="page-header">
     <div class="header-content">
@@ -6,7 +7,6 @@
     </div>
     <a routerLink="/underwriter/dashboard" class="btn-secondary">← Dashboard</a>
   </div>
-
   @if (loading) {
     <div class="loading-state">
       <div class="spinner"></div>
@@ -22,7 +22,6 @@
           <div class="plan-card-body">
             <h3>{{ p.title }}</h3>
             <p class="plan-desc">{{ p.description }}</p>
-            
             <div class="plan-details-grid">
               <div class="detail-item">
                 <span class="label">BASE PREMIUM</span>
@@ -41,7 +40,6 @@
                 <span class="value">{{ p.waitingPeriod }}</span>
               </div>
             </div>
-
             <ul class="features-list">
               <li>
                 <span class="feature-icon" [class.no]="!p.hasMaternityCover">{{ p.hasMaternityCover ? '✅' : '❌' }}</span>

@@ -1,30 +1,21 @@
-/* ─── Premium Vibrant Pink Light Fintech Theme ──────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 :root {
-  /* Colors */
   --primary-neon:    #E91E63;
   --claret:          #8B003F;
   --fuchsia:         #FF1493;
-  --bg-main:         #FFF0F5; /* Soft lavender blush */
-  --bg-panel:        rgba(255, 240, 245, 0.85); /* Glass base */
-  --text-main:       #4A154B; /* Deep plum */
+  --bg-main:         #FFF0F5;
+  --bg-panel:        rgba(255, 240, 245, 0.85);
+  --text-main:       #4A154B;
   --text-muted:      #8A4B6B;
   --border-pink:     rgba(233, 30, 99, 0.15);
   --pink-glow:       rgba(233, 30, 99, 0.25);
-  
-  /* Gradients */
   --primary-gradient: linear-gradient(135deg, #E91E63 0%, #FF758C 100%);
   --claret-gradient:  linear-gradient(135deg, #8B003F 0%, #E91E63 100%);
-  
-  /* Shadows */
   --card-shadow:     0 20px 40px rgba(233, 30, 99, 0.1);
   --btn-shadow:      0 8px 15px rgba(233, 30, 99, 0.2);
 }
-
-/* ─── Reset & Base ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html, body {
   height: 100%;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -32,12 +23,9 @@ html, body {
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   position: relative;
-  overflow: hidden; // Critical: Body fixed to viewport
+  overflow: hidden;
 }
-
 p { font-family: 'Inter', sans-serif; line-height: 1.6; }
-
-/* ─── Global Background Elements ────────────────────────────────────────────── */
 .app-abstract-bg {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -46,12 +34,11 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
   pointer-events: none;
   background: radial-gradient(circle at 10% 40%, rgba(255, 105, 180, 0.15), transparent 40%),
               radial-gradient(circle at 90% 60%, rgba(233, 30, 99, 0.15), transparent 40%);
-  
   &::before {
     content: '';
     position: absolute;
     inset: -50%;
-    background-image: 
+    background-image:
       linear-gradient(rgba(233, 30, 99, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(233, 30, 99, 0.03) 1px, transparent 1px);
     background-size: 60px 60px;
@@ -60,27 +47,21 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
     transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
   }
 }
-
-/* ─── Page Layout ───────────────────────────────────────────────────────────── */
 .main-content {
-  height: calc(100vh - 85px); // Precise alignment with navbar height
+  height: calc(100vh - 85px);
   overflow-y: auto;
   overflow-x: hidden;
   padding-top: 0;
   position: relative;
-  
-  /* Smooth scrolling for internal navigation */
   scroll-behavior: smooth;
 }
-
 .page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 3rem 2rem 6rem; // More bottom padding for scroll space
+  padding: 3rem 2rem 6rem;
   position: relative;
   z-index: 1;
 }
-
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -89,7 +70,6 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--border-pink);
   gap: 1.5rem;
-
   h1 {
     font-size: 2.5rem;
     font-weight: 800;
@@ -99,7 +79,6 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
     -webkit-text-fill-color: transparent;
     margin: 0;
   }
-
   p {
     color: var(--text-muted);
     font-size: 1.1rem;
@@ -107,10 +86,6 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
     margin: 0;
   }
 }
-
-/* ─── Premium Components ────────────────────────────────────────────────────── */
-
-/* Glass Card */
 .glass-card, .card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(16px);
@@ -120,15 +95,12 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
   padding: 2.5rem;
   box-shadow: var(--card-shadow);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  
   &:hover {
     transform: translateY(-8px);
     border-color: rgba(233, 30, 99, 0.4);
     box-shadow: 0 25px 50px rgba(233, 30, 99, 0.15);
   }
 }
-
-/* Glass Table Wrapper */
 .table-wrapper {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
@@ -139,11 +111,9 @@ p { font-family: 'Inter', sans-serif; line-height: 1.6; }
   box-shadow: var(--card-shadow);
   margin-bottom: 2rem;
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
-
   thead tr {
     background: var(--claret-gradient);
     th {
@@ -156,14 +126,11 @@ table {
       color: white;
     }
   }
-
   tbody tr {
     border-bottom: 1px solid rgba(233, 30, 99, 0.05);
     transition: background 0.2s;
-    
     &:hover { background: rgba(233, 30, 99, 0.04); }
     &:last-child { border-bottom: none; }
-
     td {
       padding: 1.25rem 1.5rem;
       color: var(--text-main);
@@ -172,8 +139,6 @@ table {
     }
   }
 }
-
-/* Premium Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -189,7 +154,6 @@ table {
   text-decoration: none;
   transition: all 0.3s ease;
   box-shadow: var(--btn-shadow);
-
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 25px rgba(233, 30, 99, 0.35);
@@ -197,7 +161,6 @@ table {
   &:active { transform: translateY(0); }
   &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 }
-
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -211,14 +174,12 @@ table {
   cursor: pointer;
   text-decoration: none;
   transition: all 0.3s ease;
-
   &:hover {
     background: #FFF0F5;
     border-color: #E91E63;
     transform: translateY(-2px);
   }
 }
-
 .btn-danger {
   background: #FFF5F5;
   color: #E11D48;
@@ -230,13 +191,11 @@ table {
   transition: all 0.2s;
   &:hover { background: #FFE4E6; border-color: #E11D48; transform: translateY(-1px); }
 }
-
 .btn-sm {
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
   border-radius: 10px;
 }
-
 .btn-edit {
   background: #EFF6FF;
   color: #2563EB;
@@ -244,7 +203,6 @@ table {
   font-weight: 700;
   &:hover { background: #DBEAFE; border-color: #2563EB; transform: translateY(-1px); }
 }
-
 .btn-view {
   background: #F5F3FF;
   color: #7C3AED;
@@ -252,8 +210,6 @@ table {
   font-weight: 700;
   &:hover { background: #EDE9FE; border-color: #7C3AED; transform: translateY(-1px); }
 }
-
-/* Premium Select Style */
 select.form-select-sm, select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B003F'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -263,13 +219,10 @@ select.form-select-sm, select {
   padding-right: 2.5rem !important;
   cursor: pointer;
 }
-
-/* Forms */
 .form-card {
   @extend .glass-card;
   border-top: 4px solid #E91E63;
 }
-
 .form-group {
   margin-bottom: 1.5rem;
   label {
@@ -289,20 +242,16 @@ select.form-select-sm, select {
     font-size: 1rem;
     color: var(--text-main);
     transition: all 0.2s;
-    
     &:focus {
       outline: none;
       border-color: #E91E63;
       box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.1);
     }
-
-    /* Angular Validation Errors & Custom Error Class */
     &.ng-invalid.ng-touched,
     &.ng-invalid.ng-dirty,
     &.has-error {
       border-color: #E11D48;
       background-color: #FFF5F5;
-      
       &:focus {
         border-color: #E11D48;
         box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15);
@@ -310,36 +259,27 @@ select.form-select-sm, select {
     }
   }
 }
-
-/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-main); }
 ::-webkit-scrollbar-thumb { background: #FFB6C1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #E91E63; }
-
-/* ─── Animation Utilities ───────────────────────────────────────────────────── */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.5s ease forwards; }
-
-/* ─── Icon Utilities ────────────────────────────────────────────────────────── */
 .icon-s {
   width: 1.25rem;
   height: 1.25rem;
   vertical-align: middle;
 }
-
 .icon-m {
   width: 1.5rem;
   height: 1.5rem;
   vertical-align: middle;
 }
-
 .icon-l {
   width: 2rem;
   height: 2rem;
   vertical-align: middle;
 }
-
 .icon-inline, .inline {
   width: 1.5em;
   height: 1.5em;

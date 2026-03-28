@@ -1,5 +1,5 @@
+<!-- Template for the risk-simulator page -->
 <div class="page">
-  <!-- ─── Header ─── -->
   <div class="page-header">
     <div>
       <h1>⚠️ Risk Awareness Simulator</h1>
@@ -12,31 +12,21 @@
       </div>
     }
   </div>
-
-  <!-- ══════════════════════════════════════════════════════════════════════════ -->
-  <!-- INPUT FORM                                                               -->
-  <!-- ══════════════════════════════════════════════════════════════════════════ -->
   @if (!result) {
-
     @if (loading) {
       <div class="loading">Loading available policies...</div>
     }
-
     @if (!loading && policies.length === 0) {
       <div class="empty-state">
         <p>No active policies available at the moment to simulate against.</p>
       </div>
     }
-
     @if (!loading && policies.length > 0) {
       <div class="simulation-form-card">
         <div class="form-hero-icon">🛡️</div>
         <h2>Create Your Own Scenario</h2>
         <p class="form-subtitle">Choose a policy, describe a disaster, and enter its total cost. We'll show you exactly how much the policy would save you.</p>
-
         <div class="form-grid">
-          
-          <!-- Select Policy -->
           <div class="form-group">
             <label for="policySelect">📋 1. Select a Real Policy</label>
             <div class="select-wrapper">
@@ -56,8 +46,6 @@
               </div>
             }
           </div>
-
-          <!-- Scenario Name -->
           <div class="form-group">
             <label for="scenarioName">📝 2. What's the disaster? <span class="optional">(optional)</span></label>
             <input
@@ -66,8 +54,6 @@
               [(ngModel)]="scenarioName"
               placeholder="e.g. Tree falls on the roof, 3-car pileup, Major surgery" />
           </div>
-
-          <!-- Total Cost -->
           <div class="form-group full-width">
             <label for="eventCost">💰 3. How much will it cost to fix? <span class="required">*</span></label>
             <div class="input-prefix">
@@ -81,28 +67,18 @@
             </div>
             <span class="form-hint">Enter the full cost you'd pay if you had NO insurance at all</span>
           </div>
-          
         </div>
-
         <button class="btn-primary btn-simulate" [disabled]="!isFormValid" (click)="simulate()">
           ⚡ Run Simulation
         </button>
       </div>
     }
   }
-
-  <!-- ══════════════════════════════════════════════════════════════════════════ -->
-  <!-- RESULT: Side-by-Side Comparison                                          -->
-  <!-- ══════════════════════════════════════════════════════════════════════════ -->
   @if (result) {
     <div class="comparison-wrapper" [class.visible]="showResult">
-
-      <!-- Back Button -->
       <button class="btn-back" (click)="resetSimulation()">
         ← Edit Scenario
       </button>
-
-      <!-- Scenario Header -->
       <div class="scenario-header">
         <div class="scenario-header-icon">{{ getPolicyIcon(result.policy.policyType) }}</div>
         <div>
@@ -113,8 +89,6 @@
           Baseline Loss: {{ formatCurrency(result.eventCost) }}
         </div>
       </div>
-
-      <!-- Advanced Technical Insights Row -->
       <div class="technical-insights-row fade-in">
         <div class="tech-card">
           <div class="tech-icon">🧘</div>
@@ -135,10 +109,7 @@
           <p style="font-size: 0.6rem; color: #64748b; margin: 0;">Net Liquidity Saved</p>
         </div>
       </div>
-
-      <!-- Side-by-Side Comparison -->
       <div class="comparison-panels">
-        <!-- WITHOUT Insurance -->
         <div class="panel panel-danger" [class.animate]="animateNumbers">
           <div class="panel-header danger">
             <span class="panel-emoji">🚫</span>
@@ -149,34 +120,26 @@
               <div class="cost-block-label">Full Catastrophic Loss</div>
               <div class="cost-block-amount">{{ formatCurrency(result.eventCost) }}</div>
             </div>
-            
             <div class="actuarial-notes">
               <p>⚠️ No stop-loss mechanism active.</p>
               <p>⚠️ 100% liability on personal assets.</p>
             </div>
-
             <div class="panel-divider"></div>
-
             <div class="panel-total">
               <span class="total-label">Personal Liability</span>
               <span class="total-amount danger">{{ formatCurrency(result.eventCost) }}</span>
             </div>
           </div>
         </div>
-
-        <!-- VS Divider -->
         <div class="vs-divider">
           <div class="vs-circle">VS</div>
         </div>
-
-        <!-- WITH IQsure Protection -->
         <div class="panel panel-success" [class.animate]="animateNumbers">
           <div class="panel-header success">
             <span class="panel-emoji">🛸</span>
             <span class="panel-title">IQsure Risk Mitigation</span>
           </div>
           <div class="panel-body">
-            
             <div class="technical-breakdown">
                 <div class="breakdown-row">
                     <span>Initial Deductible</span>
@@ -197,9 +160,7 @@
                     <strong class="green">{{ formatCurrency(result.insuranceCovers) }}</strong>
                 </div>
             </div>
-
             <div class="panel-divider"></div>
-            
             <div class="panel-total">
               <span class="total-label">Effective Risk Cost</span>
               <span class="total-amount success">{{ formatCurrency(result.outOfPocket) }}</span>
@@ -210,8 +171,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Monte Carlo / Expert Insight Box -->
       <div class="expert-mathematician-box fade-in">
           <div class="expert-header">
               <span class="math-icon">∑</span>
@@ -219,19 +178,17 @@
           </div>
           <div class="expert-content">
               <div class="math-p">
-                  Our simulator ran <strong>1,000 Monte Carlo trials</strong> varying the disaster cost by <strong>±40%</strong>. 
-                  Without this policy, you face a <strong>{{ result.financialRuinProb }}%</strong> probability of a "Ruinous Event" 
+                  Our simulator ran <strong>1,000 Monte Carlo trials</strong> varying the disaster cost by <strong>±40%</strong>.
+                  Without this policy, you face a <strong>{{ result.financialRuinProb }}%</strong> probability of a "Ruinous Event"
                   (costing > ₹50,000).
               </div>
               <div class="math-p">
-                  With <strong>{{ result.policy.title }}</strong>, your effective exposure is mathematically capped. 
-                  This results in a <strong>{{ result.peaceOfMindScore }}% Peace of Mind Rank</strong>, moving you from 
+                  With <strong>{{ result.policy.title }}</strong>, your effective exposure is mathematically capped.
+                  This results in a <strong>{{ result.peaceOfMindScore }}% Peace of Mind Rank</strong>, moving you from
                   <em>Fragile</em> to <em>Antifragile</em>.
               </div>
           </div>
       </div>
-
-      <!-- CTA -->
       <div class="simulator-cta" [class.animate]="animateNumbers">
         <h3>Antifragility is just a click away.</h3>
         <p>Transition from risk exposure to controlled security. Our algorithms suggest immediate enrollment.</p>

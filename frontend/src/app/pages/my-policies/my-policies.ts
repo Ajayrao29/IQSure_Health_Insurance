@@ -1,51 +1,38 @@
-/*
- * FILE: my-policies.ts | LOCATION: pages/my-policies/
- * PURPOSE: My Policies page (URL: /my-policies). Shows all policies the user has purchased.
- * CALLS: api.service.ts → getUserPolicies() → UserPolicyController → GET /api/v1/users/{id}/policies
- */
+// Angular component for the my-policies page
+
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UserPolicy } from '../../models/models';
-
 @Component({ selector: 'app-my-policies', standalone: true, imports: [CommonModule, RouterLink, DecimalPipe, DatePipe], templateUrl: './my-policies.html', styleUrls: ['./my-policies.scss'] })
 export class MyPoliciesComponent implements OnInit {
-  policies: UserPolicy[] = []; 
+  policies: UserPolicy[] = [];
   loading = true;
-  
-  // UI States
   showPaymentConfirm = false;
   showSuccessCard = false;
   selectedPolicy: UserPolicy | null = null;
   paymentNotice: { message: string, type: 'success' | 'error' } | null = null;
   processing = false;
   showCertificate = false;
-  
-  // 🛡️ MEMBER IDENTITY (AGENTIC EXPERIENCE)
   viewCertificate(policy: UserPolicy): void {
     this.selectedPolicy = policy;
     this.showCertificate = true;
   }
-
   getPolicyNumber(id: number): string {
     return 'IQ-' + (1000 + id) + '-' + (100000 + id * 7).toString().substring(0, 4);
   }
-
   constructor(private api: ApiService, private auth: AuthService) {}
   ngOnInit(): void { this.loadPolicies(); }
-
   loadPolicies(): void {
-    this.api.getUserPolicies(this.auth.getUserId()!).subscribe(p => { 
-      this.policies = p; 
-      this.loading = false; 
+    this.api.getUserPolicies(this.auth.getUserId()!).subscribe(p => {
+      this.policies = p;
+      this.loading = false;
     });
   }
-
   getPolicyIcon(type: string): string { return type === 'HEALTH' ? '❤️' : type === 'LIFE' ? '🌿' : '🚗'; }
-  
-  getStatusClass(status: string): string { 
+  getStatusClass(status: string): string {
     switch(status) {
       case 'ACTIVE': return 'active';
       case 'PENDING_UNDERWRITING': return 'pending';
@@ -56,25 +43,21 @@ export class MyPoliciesComponent implements OnInit {
       default: return 'cancelled';
     }
   }
-
   payNow(policy: any): void {
     this.selectedPolicy = policy;
     this.showPaymentConfirm = true;
     this.paymentNotice = null;
   }
-
   confirmPayment(): void {
     if (!this.selectedPolicy) return;
     this.processing = true;
     this.showPaymentConfirm = false;
-
     this.api.payPolicy(this.auth.getUserId()!, this.selectedPolicy.id).subscribe({
       next: () => {
         this.processing = false;
         this.showSuccessCard = true;
         this.playSuccessSound();
         this.loadPolicies();
-        // Hide success card after 4 seconds
         setTimeout(() => this.showSuccessCard = false, 4000);
       },
       error: (err: any) => {
@@ -83,11 +66,9 @@ export class MyPoliciesComponent implements OnInit {
       }
     });
   }
-
   playSuccessSound(): void {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
       const playTone = (freq: number, start: number, duration: number) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -100,18 +81,14 @@ export class MyPoliciesComponent implements OnInit {
         osc.start(audioCtx.currentTime + start);
         osc.stop(audioCtx.currentTime + start + duration);
       };
-
-      // Play a pleasant double-chime (E5 -> G5)
-      playTone(659.25, 0, 0.5); // E5
-      playTone(783.99, 0.15, 0.6); // G5
+      playTone(659.25, 0, 0.5);
+      playTone(783.99, 0.15, 0.6);
     } catch (e) {
       console.warn('Audio context not supported');
     }
   }
-
   showNotification(message: string, type: 'success' | 'error'): void {
     this.paymentNotice = { message, type };
-    // Auto-hide after 5 seconds
     setTimeout(() => this.paymentNotice = null, 5000);
   }
 }

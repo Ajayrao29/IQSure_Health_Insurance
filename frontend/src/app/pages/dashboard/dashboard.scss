@@ -1,4 +1,4 @@
-/* 🎨 SIMPLIFIED USER WELCOME BANNER (Reference Match) */
+
 .welcome-banner-simple {
   background: #8B003F;
   border-radius: 24px;
@@ -11,13 +11,10 @@
   box-shadow: 0 15px 40px rgba(139, 0, 63, 0.2);
   position: relative;
   overflow: hidden;
-
-  // Subtle accent
   &::before {
     content: ''; position: absolute; top: -50px; left: -50px;
     width: 250px; height: 250px; background: rgba(255,255,255,0.03); border-radius: 50%;
   }
-
   .banner-text {
     position: relative; z-index: 2;
     h1 {
@@ -26,8 +23,7 @@
       margin: 0 0 0.75rem;
       color: white;
       letter-spacing: -1px;
-
-      .name { color: #FFB7C5; } // Soft pink for highlight
+      .name { color: #FFB7C5; }
     }
     p {
       font-size: 1.2rem;
@@ -36,7 +32,6 @@
       font-weight: 500;
     }
   }
-
   .stats-badge-white {
     background: white;
     padding: 1.5rem 2.5rem;
@@ -45,7 +40,6 @@
     min-width: 160px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     position: relative; z-index: 2;
-
     .val {
       font-size: 3rem;
       font-weight: 900;
@@ -62,15 +56,9 @@
     }
   }
 }
-
-
-/* ── Simplified Navigation & Layout ────────────────────── */
 .no-hero-mode {
   padding-top: 2rem;
 }
-
-/* ── Welcome Banner ───────────────────────────────────── */
-
 .points-badge {
     background: white;
     padding: 1.25rem 2rem;
@@ -78,7 +66,6 @@
     text-align: center;
     min-width: 140px;
     box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-    
     .points-number {
       font-size: 2.5rem;
       font-weight: 800;
@@ -93,11 +80,9 @@
       text-transform: uppercase;
     }
 }
-
 .banner-actions {
   position: relative;
   z-index: 2;
-  
   .btn-browse-plans {
     background: white;
     color: #8B003F;
@@ -108,7 +93,6 @@
     font-size: 1.1rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-
     &:hover {
       transform: translateY(-5px);
       box-shadow: 0 15px 35px rgba(0,0,0,0.15);
@@ -116,14 +100,12 @@
     }
   }
 }
-
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 4rem;
 }
-
 .metric-card {
   background: white;
   padding: 2rem;
@@ -134,9 +116,7 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.04);
   border: 1px solid rgba(0,0,0,0.05);
   transition: transform 0.3s ease;
-
   &:hover { transform: translateY(-5px); }
-
   .metric-icon {
     width: 54px;
     height: 54px;
@@ -145,33 +125,27 @@
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
-
     &.green { background: #E6FFF0; color: #16A34A; }
     &.blue { background: #E6F3FF; color: #0EA5E9; }
     &.yellow { background: #FFF9E6; color: #D97706; }
     &.red { background: #FEF2F2; color: #EF4444; }
-
-    svg { 
-      width: 28px; 
-      height: 28px; 
+    svg {
+      width: 28px;
+      height: 28px;
       stroke-width: 2;
     }
   }
-
   .metric-info {
     h3 { font-size: 2rem; font-weight: 800; margin: 0; color: var(--text-main); line-height: 1; }
     p { color: #64748B; font-size: 0.9rem; font-weight: 600; margin: 0.25rem 0 0; }
   }
 }
-
-/* ── Stats Row ────────────────────────────────────────── */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.75rem;
   margin-bottom: 3rem;
 }
-
 .stat-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(16px);
@@ -182,7 +156,6 @@
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-align: center;
   padding: 2rem;
-
   .stat-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
@@ -190,20 +163,17 @@
     align-items: center;
     justify-content: center;
     filter: drop-shadow(0 4px 10px rgba(233, 30, 99, 0.2));
-    
     svg {
       width: 48px;
       height: 48px;
     }
   }
-
   .stat-value {
     font-size: 2rem;
     font-weight: 800;
     color: #E91E63;
     margin-bottom: 0.25rem;
   }
-
   .stat-label {
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -212,26 +182,20 @@
     font-weight: 700;
   }
 }
-
 .admin-stat {
   .stat-value { color: #8B003F; }
 }
-
-/* ── Two-Column Layout ────────────────────────────────── */
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   margin-bottom: 3rem;
 }
-
-/* ── Specific Card Enhancements ───────────────────────── */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-
   h2 {
     font-size: 1.4rem;
     font-weight: 800;
@@ -240,20 +204,17 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-
     svg {
       width: 24px;
       height: 24px;
     }
   }
 }
-
 .icon-inline {
   width: 1.4em;
   height: 1.4em;
   vertical-align: middle;
 }
-
 .card-link {
   color: #E91E63;
   font-size: 0.95rem;
@@ -262,15 +223,12 @@
   transition: all 0.2s;
   &:hover { transform: translateX(5px); }
 }
-
-/* ── Summary & Actions ────────────────────────────────── */
 .summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.15rem 0.5rem;
   border-bottom: 1px solid rgba(233, 30, 99, 0.05);
-
   span { font-weight: 600; color: var(--text-muted); }
   strong {
     color: #8B003F;
@@ -281,7 +239,6 @@
     border-radius: 10px;
   }
 }
-
 .mini-action {
   display: inline-flex;
   align-items: center;
@@ -295,7 +252,6 @@
   font-weight: 700;
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-
   &:hover {
     background: var(--claret-gradient);
     color: white;
@@ -303,8 +259,6 @@
     box-shadow: 0 10px 25px rgba(139, 0, 63, 0.2);
   }
 }
-
-/* ── Recent Users ─────────────────────────────────────── */
 .recent-user-row {
   display: flex;
   align-items: center;
@@ -314,7 +268,6 @@
   transition: all 0.2s;
   &:hover { background: rgba(233, 30, 99, 0.03); border-radius: 12px; }
 }
-
 .user-avatar {
   width: 65px;
   height: 65px;
@@ -330,7 +283,6 @@
   flex-shrink: 0;
   width: 45px; height: 45px; font-size: 1.1rem;
 }
-
 .role-badge {
   font-size: 0.8rem;
   font-weight: 700;
@@ -340,8 +292,6 @@
   color: #166534;
   &.admin-role { background: #FFF0F5; color: #8B003F; }
 }
-
-/* ── Platform Health ──────────────────────────────────── */
 .health-item {
   display: flex;
   align-items: center;
@@ -352,7 +302,6 @@
   border: 1px solid rgba(233, 30, 99, 0.05);
   margin-bottom: 0.5rem;
 }
-
 .health-icon {
   width: 35px; height: 35px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
@@ -360,17 +309,13 @@
   &.good { background: #DCFCE7; color: #166534; }
   &.warn { background: #FEF9C3; color: #854D0E; }
 }
-
-/* ── Quick Actions Modern ───────────────────────────────── */
 .quick-actions-section { margin: 4rem 0; }
 .section-title { font-size: 1.8rem; font-weight: 800; color: #4A001F; margin-bottom: 2rem; }
-
 .action-grid-modern {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
 }
-
 .action-card-modern {
   background: white;
   padding: 3rem 2rem;
@@ -380,13 +325,11 @@
   border: 1px solid rgba(0,0,0,0.05);
   box-shadow: 0 10px 30px rgba(0,0,0,0.03);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
   &:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(139, 0, 63, 0.08);
     border-color: #8B003F;
   }
-
   .action-icon-wrapper {
     width: 80px;
     height: 80px;
@@ -399,29 +342,22 @@
     margin: 0 auto 1.5rem;
     transition: transform 0.3s ease;
     color: #8B003F;
-
     svg {
       width: 32px;
       height: 32px;
     }
   }
-
   &:hover .action-icon-wrapper { transform: scale(1.1); }
-
   h3 { font-size: 1.25rem; font-weight: 800; color: #4A001F; margin: 0; }
   p { font-size: 0.95rem; color: #64748B; margin-top: 0.5rem; font-weight: 500; }
 }
-
 .mt-4 { margin-top: 2rem; }
-
-/* ── Academy Progress Card ──────────────────────────────── */
 .academy-progress-card {
   .academy-summary {
     padding: 1.5rem;
     background: #FFF0F5;
     border-radius: 20px;
     margin-top: 1rem;
-    
     p {
       font-size: 1rem;
       line-height: 1.6;
@@ -429,11 +365,9 @@
       font-weight: 600;
       margin-bottom: 2rem;
     }
-
     .academy-cta {
       display: flex;
       justify-content: center;
-      
       .btn-primary {
         background: var(--claret-gradient);
         color: white;
@@ -444,7 +378,6 @@
         cursor: pointer;
         transition: all 0.3s;
         box-shadow: 0 8px 16px rgba(139, 0, 63, 0.2);
-
         &:hover {
           transform: translateY(-3px);
           box-shadow: 0 12px 24px rgba(139, 0, 63, 0.3);
@@ -453,15 +386,12 @@
     }
   }
 }
-
-/* ── Attempt Items ────────────────────────────────────── */
 .attempt-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 0;
   border-bottom: 1px solid rgba(233, 30, 99, 0.05);
-
   .attempt-title { font-weight: 700; color: #4A154B; }
   .score-badge {
     padding: 0.45rem 1rem;
@@ -472,8 +402,6 @@
   }
   .attempt-points { color: #E91E63; font-weight: 800; font-size: 1rem; }
 }
-
-/* 🚀 AGENTIC AI: PIPELINE TRACKING */
 .pipeline-section {
   margin: 4rem 0;
   .section-header-modern {
@@ -482,13 +410,11 @@
     p { color: #64748B; font-size: 1rem; font-weight: 500; }
   }
 }
-
 .pipeline-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 2rem; }
 .pipeline-card {
   background: white; border-radius: 28px; padding: 2.5rem; border: 1.5px solid #F1F5F9; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
   .p-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; .p-title { strong { display: block; font-size: 1.1rem; color: #1E293B; } span { font-size: 0.8rem; color: #94A3B8; font-weight: 700; } } .status-pill { padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; background: #F1F5F9; color: #475569; &.ACTIVE { background: #DCFCE7; color: #166534; } &.QUOTES_SENT { background: #FEF9C3; color: #854D0E; animation: softPulse 1.5s infinite; } } }
 }
-
 .p-tracker {
   display: flex; align-items: center; justify-content: space-between; padding: 0 1rem 2rem;
   .track-step {
@@ -500,23 +426,18 @@
   }
   .track-line { flex: 1; height: 4px; background: #E2E8F0; margin: 0 -5px 1.5rem; border-radius: 2px; position: relative; z-index: 1; &.complete { background: #10B981; } }
 }
-
 .action-alert {
   background: #FFFBEB; border-radius: 20px; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #FEF3C7;
   span { font-weight: 800; color: #B45309; }
   .btn-view-quote { background: #8B003F; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; &:hover { background: #6B0030; transform: translateY(-2px); } }
 }
-
 @keyframes pulseSparkle { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
 @keyframes softPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-
-/* ── Badge Grid ── */
 .badge-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
 }
-
 .badge-item {
   background: white;
   border: 1px solid rgba(233,30,99,0.1);
@@ -525,71 +446,57 @@
   text-align: center;
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-
   &:hover {
     transform: translateY(-5px) rotate(3deg);
     border-color: #E91E63;
     box-shadow: 0 10px 25px rgba(233,30,99,0.1);
   }
-
-  .badge-icon { 
-    font-size: 2.5rem; 
+  .badge-icon {
+    font-size: 2.5rem;
     margin-bottom: 0.5rem;
     display: flex;
     justify-content: center;
     color: #E91E63;
-
     svg { width: 44px; height: 44px; }
   }
   .badge-name { font-weight: 800; font-size: 0.9rem; color: #4A154B; }
 }
-
-/* ── Animations ───────────────────────────────────────── */
 @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── Responsive ───────────────────────────────────────── */
 @media (max-width: 1100px) {
   .stats-row, .action-grid { grid-template-columns: repeat(2, 1fr); }
   .two-col { grid-template-columns: 1fr; }
 }
-
 @media (max-width: 768px) {
   .welcome-banner { padding: 2rem; flex-direction: column; text-align: center; gap: 2rem; }
   .stats-row, .action-grid, .badge-grid { grid-template-columns: 1fr; }
   .share-card { flex-direction: column; text-align: center; gap: 1.5rem; }
 }
-
-/* 📥 Savings & Rewards Panels Styling */
 .savings-rewards-panels {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 2rem;
   align-items: center;
   padding: 1.5rem 0;
-
   .panel-item {
     display: flex;
     gap: 1.5rem;
     align-items: center;
-    .p-icon { 
-      font-size: 2.5rem; background: #FFF0F5; padding: 1rem; border-radius: 20px; 
+    .p-icon {
+      font-size: 2.5rem; background: #FFF0F5; padding: 1rem; border-radius: 20px;
       color: #8B003F;
       display: flex;
       align-items: center;
       justify-content: center;
-      
       svg { width: 40px; height: 40px; }
     }
     .p-value { font-size: 1.75rem; font-weight: 800; color: #4A001F; }
     .p-label { font-size: 0.75rem; font-weight: 700; color: #94A3B8; letter-spacing: 0.1em; display: block; margin-top: 0.25rem; }
     .p-subtext { font-size: 0.8rem; color: #64748B; margin: 0.5rem 0 0; font-weight: 500; }
   }
-
   .panel-actions {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-
     button {
       padding: 0.85rem 1.5rem;
       border-radius: 12px;
@@ -598,8 +505,7 @@
       transition: all 0.2s;
       width: 200px;
     }
-
-    .btn-primary-outline { 
+    .btn-primary-outline {
       background: #8B003F; color: white; border: none;
       box-shadow: 0 4px 12px rgba(139, 0, 63, 0.2);
       &:hover { background: #4A001F; transform: translateY(-2px); }
@@ -610,7 +516,6 @@
     }
   }
 }
-
 @media (max-width: 992px) {
   .savings-rewards-panels {
     grid-template-columns: 1fr;
@@ -618,53 +523,35 @@
     .panel-actions { flex-direction: row; button { width: auto; flex: 1; } }
   }
 }
-
-/* ───── GUARDIAN ECOSYSTEM (EXPERT GAMIFICATION) ───── */
-
 .guardian-fortress-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1.5rem;
   margin-bottom: 2.5rem;
-
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
   }
 }
-
 .glass-premium {
-  background: white; // Fallback for light mode
+  background: white;
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 20px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-
   &:hover {
     border-color: #8B003F;
     transform: translateY(-4px);
     box-shadow: 0 12px 24px -8px rgba(139, 0, 63, 0.1);
   }
 }
-
-/* Rank Card */
 .guardian-status-card {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
 }
-
-
-
-
-
-
-
 .fade-in { animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
 .no-top-padding { padding-top: 0 !important; }
-
-/* 📊 SIMPLIFIED METRICS GRID (Reference Match) */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -672,7 +559,6 @@
   margin: 1.5rem 0 3rem;
   max-width: 1540px;
 }
-
 .metric-card {
   background: white;
   padding: 2.5rem 1.5rem;
@@ -685,25 +571,20 @@
   align-items: center;
   gap: 1.25rem;
   transition: all 0.3s ease;
-
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   }
-
   .metric-icon {
     width: 60px; height: 60px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.75rem; flex-shrink: 0;
-    
     svg { width: 28px; height: 28px; stroke-width: 2; }
-
     &.green { background: #f0fdf4; color: #10b981; }
     &.blue { background: #eff6ff; color: #3b82f6; }
     &.yellow { background: #fffbeb; color: #f59e0b; }
     &.red { background: #fef2f2; color: #ef4444; }
   }
-
   .metric-info {
     h3 { font-size: 2.2rem; font-weight: 850; color: #1e293b; margin: 0; line-height: 1; }
     p { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-top: 6px; letter-spacing: 0.5px; }

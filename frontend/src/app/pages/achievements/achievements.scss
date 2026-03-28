@@ -1,4 +1,3 @@
-/* 🏆 PRODUCTION-READY ACHIEVEMENTS STYLES */
 
 .achievement-stats {
   display: grid;
@@ -6,7 +5,6 @@
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
-
 .stat-box {
   background: white;
   border-radius: 24px;
@@ -20,19 +18,14 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-
   &:hover { transform: translateY(-5px); }
-  
   .stat-icon { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.9; }
   .stat-value { font-size: 2.8rem; font-weight: 850; line-height: 1; color: #8b003f; letter-spacing: -1px; }
   .stat-label { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; }
-
-  // Special coloring for different stats
-  &:nth-child(1) .stat-value { color: #10b981; } // Completion
-  &:nth-child(2) .stat-value { color: #f59e0b; } // Streak
-  &:nth-child(3) .stat-value { color: #3b82f6; } // Level
+  &:nth-child(1) .stat-value { color: #10b981; }
+  &:nth-child(2) .stat-value { color: #f59e0b; }
+  &:nth-child(3) .stat-value { color: #3b82f6; }
 }
-
 .progress-section {
   background: white;
   border-radius: 24px;
@@ -40,10 +33,8 @@
   margin-bottom: 3rem;
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
   border: 1px solid #f1f5f9;
-  
   h2 { color: #1e293b; font-size: 1.3rem; margin: 0 0 1.5rem; font-weight: 800; }
 }
-
 .level-bar {
   height: 16px;
   background: #f1f5f9;
@@ -52,7 +43,6 @@
   margin-bottom: 1.25rem;
   position: relative;
 }
-
 .level-fill {
   height: 100%;
   background: linear-gradient(90deg, #8b003f, #c12e5a);
@@ -60,7 +50,6 @@
   transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 0 15px rgba(139, 0, 63, 0.2);
 }
-
 .level-text {
   text-align: center;
   color: #64748b;
@@ -69,13 +58,11 @@
   margin: 0;
   span { color: #1e293b; font-weight: 800; }
 }
-
 .achievements-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1.5rem;
 }
-
 .achievement-card {
   background: white;
   border-radius: 24px;
@@ -85,43 +72,36 @@
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   border: 1px solid #f1f5f9;
   box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-  
   &.unlocked {
     background: linear-gradient(135deg, white 0%, #fff8fa 100%);
     box-shadow: 0 15px 40px rgba(139, 0, 63, 0.08);
     transform: scale(1.02);
     border-color: rgba(139, 0, 63, 0.1);
-    
     .achievement-icon { transform: scale(1.1); filter: none; }
     .achievement-name { color: #1e293b; }
   }
-  
   &:not(.unlocked) {
     opacity: 0.7;
     background: #fafcfe;
     .achievement-icon { filter: grayscale(1) opacity(0.5); }
     .achievement-name { color: #94a3b8; }
   }
-
   &:hover.unlocked {
     transform: translateY(-8px) scale(1.04);
     box-shadow: 0 25px 60px rgba(139, 0, 63, 0.12);
   }
 }
-
 .achievement-icon {
   font-size: 3.5rem;
   margin-bottom: 1.5rem;
   transition: transform 0.4s ease;
   display: block;
 }
-
 .achievement-name {
   font-size: 1.15rem;
   font-weight: 850;
   margin-bottom: 0.6rem;
 }
-
 .achievement-desc {
   color: #64748b;
   font-size: 0.85rem;
@@ -129,7 +109,6 @@
   margin-bottom: 1.5rem;
   min-height: 2.5rem;
 }
-
 .achievement-reward {
   display: inline-flex;
   align-items: center;
@@ -141,14 +120,12 @@
   font-weight: 800;
   border: 1px solid rgba(139,0,63,0.1);
 }
-
 .locked-overlay {
   position: absolute;
   top: 1.5rem; right: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  
   span {
     background: #f1f5f9;
     color: #94a3b8;

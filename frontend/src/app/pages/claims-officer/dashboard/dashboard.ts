@@ -1,9 +1,9 @@
+// Angular component for the dashboard page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
-
 @Component({
   selector: 'app-claims-officer-dashboard',
   standalone: true,
@@ -22,13 +22,10 @@ export class ClaimsOfficerDashboardComponent implements OnInit {
     department: 'Claims Processing',
     approvalLimit: 500000.0
   };
-  
   userName = '';
   employeeId = '';
   loading = true;
-
   constructor(private api: ApiService, private auth: AuthService) {}
-
   ngOnInit(): void {
     const user = this.auth.getUser();
     if (user) {
@@ -37,7 +34,6 @@ export class ClaimsOfficerDashboardComponent implements OnInit {
     }
     this.loadStats();
   }
-
   loadStats(): void {
     const userId = this.auth.getUserId();
     if (userId) {

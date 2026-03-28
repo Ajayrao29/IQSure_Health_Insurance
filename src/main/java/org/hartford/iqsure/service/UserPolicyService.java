@@ -1,13 +1,6 @@
-/*
- * FILE: UserPolicyService.java | LOCATION: service/
- * PURPOSE: Handles policy purchase logic. When user buys a policy, this service:
- *          1. Calls PremiumCalculationService to get discounted price
- *          2. Creates a UserPolicy record with the final premium
- * CALLED BY: UserPolicyController.java
- * USES: UserRepository, PolicyRepository, UserPolicyRepository, PremiumCalculationService
- */
-package org.hartford.iqsure.service;
+// Service containing business logic for UserPolicyService
 
+package org.hartford.iqsure.service;
 import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.dto.request.InsuredMemberRequestDTO;
 import org.hartford.iqsure.dto.request.UserPolicyRequestDTO;
@@ -25,7 +18,6 @@ import org.hartford.iqsure.repository.UserPolicyRepository;
 import org.hartford.iqsure.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
@@ -34,55 +26,43 @@ import java.util.Map;
 import org.hartford.iqsure.dto.response.UnderwriterStatsDTO;
 import org.hartford.iqsure.entity.Notification.NotificationType;
 import org.hartford.iqsure.entity.UserPolicy.PolicyStatus;
-
 @Service
 @RequiredArgsConstructor
 public class UserPolicyService {
-
     private final UserRepository userRepository;
     private final PolicyRepository policyRepository;
     private final UserPolicyRepository userPolicyRepository;
     private final PremiumCalculationService premiumCalculationService;
     private final NotificationService notificationService;
-
     @Transactional
     public UserPolicyResponseDTO purchasePolicy(Long userId, UserPolicyRequestDTO dto, List<Long> selectedRewardIds) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-
         Policy policy = policyRepository.findById(dto.getPolicyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Policy not found: " + dto.getPolicyId()));
-
-        // Check if user already has this policy in a non-rejected status
         boolean alreadyHas = userPolicyRepository.findByUser_UserId(userId).stream()
-                .anyMatch(up -> up.getPolicy().getPolicyId().equals(dto.getPolicyId()) && 
+                .anyMatch(up -> up.getPolicy().getPolicyId().equals(dto.getPolicyId()) &&
                           up.getStatus() != org.hartford.iqsure.entity.UserPolicy.PolicyStatus.REJECTED &&
                           up.getStatus() != org.hartford.iqsure.entity.UserPolicy.PolicyStatus.EXPIRED);
-        
         if (alreadyHas) {
             throw new BadRequestException("You already have a pending or active application for " + policy.getTitle());
         }
-
         if (!policy.getIsActive()) {
             throw new BadRequestException("Policy is not currently active: " + policy.getTitle());
         }
-
-        // Calculate premium using gamification discounts + selected coupon rewards
         PremiumBreakdownDTO breakdown = premiumCalculationService.calculatePremium(userId, dto.getPolicyId(), selectedRewardIds);
-
         UserPolicy userPolicy = UserPolicy.builder()
                 .user(user)
                 .policy(policy)
                 .finalPremium(breakdown.getFinalPremium())
                 .discountApplied(breakdown.getTotalDiscountPercent())
                 .purchaseDate(LocalDateTime.now())
-                .status(UserPolicy.PolicyStatus.PENDING_UNDERWRITING) // Default to PENDING_UNDERWRITING for the pipeline flow
+                .status(UserPolicy.PolicyStatus.PENDING_UNDERWRITING)
                 .remainingCoverage(java.math.BigDecimal.valueOf(policy.getCoverageAmount()))
                 .nomineeName(dto.getNomineeName())
                 .nomineeRelationship(dto.getNomineeRelationship())
                 .healthReportPath(dto.getHealthReportPath())
                 .build();
-
         if (dto.getInsuredMembers() != null) {
             for (InsuredMemberRequestDTO m : dto.getInsuredMembers()) {
                 userPolicy.getInsuredMembers().add(InsuredMember.builder()
@@ -95,24 +75,17 @@ public class UserPolicyService {
                         .build());
             }
         }
-
         UserPolicy saved = userPolicyRepository.save(userPolicy);
         UserPolicyResponseDTO result = toDTO(saved);
-
-        // Mark the selected rewards as used so they can't be applied to another policy
         premiumCalculationService.markRewardsAsUsed(selectedRewardIds);
-
-        // Notify Admins
         notificationService.createNotificationForAdmins(
                 "New policy requested by " + user.getName() + " for " + policy.getTitle(),
                 org.hartford.iqsure.entity.Notification.NotificationType.POLICY_REQUESTED,
                 saved.getId(),
                 "/admin/assign-uw"
         );
-
         return result;
     }
-
     public List<UserPolicyResponseDTO> getUserPolicies(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User not found: " + userId);
@@ -120,7 +93,6 @@ public class UserPolicyService {
         return userPolicyRepository.findByUser_UserId(userId)
                 .stream().map(this::toDTO).toList();
     }
-
     public UserPolicyResponseDTO getUserPolicyById(Long userId, Long userPolicyId) {
         UserPolicy up = userPolicyRepository.findById(userPolicyId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPolicy not found: " + userPolicyId));
@@ -129,43 +101,33 @@ public class UserPolicyService {
         }
         return toDTO(up);
     }
-
     public List<UserPolicyResponseDTO> getAllUserPolicies() {
         return userPolicyRepository.findAll().stream().map(this::toDTO).toList();
     }
-
     public List<UserPolicyResponseDTO> getPoliciesByStatus(UserPolicy.PolicyStatus status) {
         return userPolicyRepository.findByStatus(status).stream().map(this::toDTO).toList();
     }
-
     public List<UserPolicyResponseDTO> getPoliciesByUnderwriterAndStatus(Long underwriterId, UserPolicy.PolicyStatus status) {
         return userPolicyRepository.findByAssignedUnderwriter_UserIdAndStatus(underwriterId, status)
                 .stream().map(this::toDTO).toList();
     }
-
     public List<UserPolicyResponseDTO> getPoliciesByUnderwriter(Long underwriterId) {
         return userPolicyRepository.findByAssignedUnderwriter_UserId(underwriterId)
                 .stream().map(this::toDTO).toList();
     }
-
     @Transactional
     public UserPolicyResponseDTO assignUnderwriter(Long userPolicyId, Long underwriterId) {
         UserPolicy up = userPolicyRepository.findById(userPolicyId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPolicy not found: " + userPolicyId));
         User underwriter = userRepository.findById(underwriterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Underwriter not found: " + underwriterId));
-
         if (underwriter.getRole() != User.Role.ROLE_UNDERWRITER) {
             throw new BadRequestException("User is not an underwriter");
         }
-
         up.setAssignedUnderwriter(underwriter);
         up.setAssignedAt(LocalDateTime.now());
         up.setStatus(UserPolicy.PolicyStatus.UNDER_EVALUATION);
-
         UserPolicy saved = userPolicyRepository.save(up);
-
-        // Notify Underwriter
         notificationService.createNotification(
                 underwriterId,
                 "You have been assigned to evaluate a policy request for " + up.getUser().getName(),
@@ -173,8 +135,6 @@ public class UserPolicyService {
                 saved.getId(),
                 "/underwriter/pending"
         );
-
-        // Notify User
         notificationService.createNotification(
                 up.getUser().getUserId(),
                 "Your application for " + up.getPolicy().getTitle() + " has been assigned to an underwriter for evaluation.",
@@ -182,21 +142,15 @@ public class UserPolicyService {
                 saved.getId(),
                 "/my-policies"
         );
-
         return toDTO(saved);
     }
-
     @Transactional
     public UserPolicyResponseDTO rejectPolicy(Long userPolicyId, String remarks) {
         UserPolicy up = userPolicyRepository.findById(userPolicyId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPolicy not found: " + userPolicyId));
-
         up.setStatus(UserPolicy.PolicyStatus.REJECTED);
         up.setUnderwriterRemarks(remarks);
-
         UserPolicy saved = userPolicyRepository.save(up);
-
-        // Notify User
         notificationService.createNotification(
                 up.getUser().getUserId(),
                 "Your application for " + up.getPolicy().getTitle() + " was not approved at this time. Reason: " + remarks,
@@ -204,46 +158,32 @@ public class UserPolicyService {
                 saved.getId(),
                 "/my-policies"
         );
-
         return toDTO(saved);
     }
-
-    /**
-     * Calculates performance statistics for an underwriter.
-     * Returns a structured DTO for the dashboard.
-     */
     public UnderwriterStatsDTO getUnderwriterStats(Long underwriterId) {
         User underwriter = userRepository.findById(underwriterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Underwriter not found: " + underwriterId));
-
         List<UserPolicy> myPolicies = userPolicyRepository.findByAssignedUnderwriter_UserId(underwriterId);
-
         long pendingAssignments = myPolicies.stream()
                 .filter(p -> p.getStatus() == PolicyStatus.UNDER_EVALUATION)
                 .count();
-
         long quotesSentCount = myPolicies.stream()
                 .filter(p -> p.getStatus() == PolicyStatus.QUOTES_SENT || p.getStatus() == PolicyStatus.ACTIVE)
                 .count();
-
         long activePoliciesCount = myPolicies.stream()
                 .filter(p -> p.getStatus() == PolicyStatus.ACTIVE)
                 .count();
-
         long customersServed = myPolicies.stream()
                 .map(p -> p.getUser().getUserId())
                 .distinct()
                 .count();
-
         double totalPremium = myPolicies.stream()
                 .filter(p -> p.getStatus() == PolicyStatus.ACTIVE)
                 .mapToDouble(UserPolicy::getFinalPremium)
                 .sum();
-
-        double commissionPercentage = underwriter.getCommissionPercentage() != null ? 
+        double commissionPercentage = underwriter.getCommissionPercentage() != null ?
                 underwriter.getCommissionPercentage().doubleValue() : 0.0;
         double commissionEarned = (totalPremium * commissionPercentage) / 100.0;
-
         return UnderwriterStatsDTO.builder()
                 .pendingAssignments(pendingAssignments)
                 .quotesSent(quotesSentCount)
@@ -253,27 +193,19 @@ public class UserPolicyService {
                 .commissionEarned(Math.round(commissionEarned * 100.0) / 100.0)
                 .build();
     }
-
-
     @Transactional
     public UserPolicyResponseDTO sendQuote(Long userPolicyId, java.math.BigDecimal quoteAmount, String remarks) {
         UserPolicy up = userPolicyRepository.findById(userPolicyId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPolicy not found: " + userPolicyId));
-
         up.setQuoteAmount(quoteAmount);
         up.setUnderwriterRemarks(remarks);
         up.setStatus(UserPolicy.PolicyStatus.QUOTES_SENT);
-
-        // Update underwriter stats
         User underwriter = up.getAssignedUnderwriter();
         if (underwriter != null) {
             underwriter.setTotalQuotesSent((underwriter.getTotalQuotesSent() != null ? underwriter.getTotalQuotesSent() : 0) + 1);
             userRepository.save(underwriter);
         }
-
         UserPolicy saved = userPolicyRepository.save(up);
-
-        // Notify User
         notificationService.createNotification(
                 up.getUser().getUserId(),
                 "Good news! Your quote for " + up.getPolicy().getTitle() + " is ready for review.",
@@ -281,23 +213,17 @@ public class UserPolicyService {
                 saved.getId(),
                 "/my-policies"
         );
-
         return toDTO(saved);
     }
-
     @Transactional
     public UserPolicyResponseDTO payPolicy(Long userPolicyId) {
         UserPolicy up = userPolicyRepository.findById(userPolicyId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPolicy not found: " + userPolicyId));
-
         if (up.getStatus() != UserPolicy.PolicyStatus.QUOTES_SENT) {
             throw new BadRequestException("Policy must have a quote sent before it can be paid.");
         }
-
         up.setStatus(UserPolicy.PolicyStatus.ACTIVE);
         UserPolicy saved = userPolicyRepository.save(up);
-
-        // Notify User
         notificationService.createNotification(
                 up.getUser().getUserId(),
                 "Payment successful! Your policy " + up.getPolicy().getTitle() + " is now ACTIVE.",
@@ -305,19 +231,14 @@ public class UserPolicyService {
                 saved.getId(),
                 "/my-policies"
         );
-
         return toDTO(saved);
     }
-
     @Transactional
     public UserPolicyResponseDTO activatePolicy(Long userPolicyId) {
         UserPolicy up = userPolicyRepository.findById(userPolicyId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPolicy not found: " + userPolicyId));
-
         up.setStatus(UserPolicy.PolicyStatus.ACTIVE);
         UserPolicy saved = userPolicyRepository.save(up);
-
-        // Notify User
         notificationService.createNotification(
                 up.getUser().getUserId(),
                 "Your policy " + up.getPolicy().getTitle() + " has been manually activated and is now in effect.",
@@ -325,10 +246,8 @@ public class UserPolicyService {
                 saved.getId(),
                 "/my-policies"
         );
-
         return toDTO(saved);
     }
-
     private UserPolicyResponseDTO toDTO(UserPolicy up) {
         double saved = Math.round((up.getPolicy().getBasePremium() - up.getFinalPremium()) * 100.0) / 100.0;
         return UserPolicyResponseDTO.builder()

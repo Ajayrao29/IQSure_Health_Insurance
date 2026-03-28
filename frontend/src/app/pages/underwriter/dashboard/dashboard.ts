@@ -1,9 +1,9 @@
+// Angular component for the dashboard page
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
-
 @Component({
   selector: 'app-underwriter-dashboard',
   standalone: true,
@@ -20,13 +20,10 @@ export class UnderwriterDashboardComponent implements OnInit {
     totalPremium: 0,
     commissionEarned: 0
   };
-  
   userName = '';
   licenseNumber = '';
   loading = true;
-
   constructor(private api: ApiService, private auth: AuthService) {}
-
   ngOnInit(): void {
     const user = this.auth.getUser();
     if (user) {
@@ -35,7 +32,6 @@ export class UnderwriterDashboardComponent implements OnInit {
     }
     this.loadStats();
   }
-
   loadStats(): void {
     const userId = this.auth.getUserId();
     if (userId) {

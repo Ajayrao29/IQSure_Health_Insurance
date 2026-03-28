@@ -1,13 +1,8 @@
-/*
- * FILE: badges.ts | LOCATION: pages/badges/
- * PURPOSE: Badges page (URL: /badges). Shows all available badges and highlights which ones user earned.
- * CALLS: api.service.ts → getAllBadges(), getBadgesByUser() → BadgeController
- */
-import { Component, OnInit } from '@angular/core';
+// Angular component for the badges page
 
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-
 @Component({ selector: 'app-badges', standalone: true, imports: [], templateUrl: './badges.html', styleUrls: ['./badges.scss'] })
 export class BadgesComponent implements OnInit {
   allBadges: any[] = [];

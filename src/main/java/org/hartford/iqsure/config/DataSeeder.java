@@ -1,37 +1,5 @@
-/*
- * ============================================================================
- * FILE: DataSeeder.java
- * LOCATION: src/main/java/org/hartford/iqsure/config/
- * PURPOSE: Automatically creates a default ADMIN user when the app starts
- *          for the FIRST TIME (when the database is empty).
- *          This ensures there's always an admin who can log in and set up
- *          quizzes, policies, badges, etc. through the admin panel.
- *
- * HOW IT WORKS:
- *   - @PostConstruct → Spring calls seedAdmin() after this bean is created
- *     and all dependencies (userRepository, passwordEncoder) are injected
- *   - Checks if any users exist in the database
- *   - If NO users exist → creates an admin with email "admin@iqsure.com"
- *   - If users already exist → does nothing (skips seeding)
- *
- * DEFAULT ADMIN CREDENTIALS:
- *   - Email:    admin@iqsure.com
- *   - Password: admin123
- *
- * ANNOTATIONS EXPLAINED:
- *   - @Slf4j (Lombok) → Auto-creates a "log" variable for printing messages
- *   - @Component → Tells Spring: "create an instance of this class automatically"
- *   - @RequiredArgsConstructor (Lombok) → Auto-creates constructor for 'final' fields
- *   - @PostConstruct → Method runs once after bean initialization (replaces CommandLineRunner)
- *
- * CONNECTS TO:
- *   - UserRepository.java (repository/) → to check user count and save admin
- *   - SecurityConfig.java (config/) → provides the PasswordEncoder for hashing
- *   - User.java (entity/) → the User entity that gets saved to the "users" table
- * ============================================================================
- */
-package org.hartford.iqsure.config;
 
+package org.hartford.iqsure.config;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +8,10 @@ import org.hartford.iqsure.enums.UserStatus;
 import org.hartford.iqsure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataSeeder {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final org.hartford.iqsure.repository.PolicyRepository policyRepository;
@@ -55,11 +21,8 @@ public class DataSeeder {
     private final org.hartford.iqsure.repository.UserPolicyRepository userPolicyRepository;
     private final org.hartford.iqsure.repository.InsuredMemberRepository insuredMemberRepository;
     private final org.springframework.transaction.support.TransactionTemplate transactionTemplate;
-
-    // This method runs automatically after the bean is created and dependencies are injected
     @PostConstruct
     public void seedAdmin() {
-        // Seed Admin if not exists
         if (userRepository.findByEmail("admin@iqsure.com").isEmpty()) {
             userRepository.save(User.builder()
                     .name("Admin")
@@ -71,8 +34,6 @@ public class DataSeeder {
                     .build());
             log.info("Admin user created: admin@iqsure.com / admin123");
         }
-
-        // Seed Underwriter if not exists
         if (userRepository.findByEmail("underwriter@iqsure.com").isEmpty()) {
             userRepository.save(User.builder()
                     .name("Underwriter1")
@@ -86,8 +47,6 @@ public class DataSeeder {
                     .build());
             log.info("Underwriter created: underwriter@iqsure.com / underwriter123");
         }
-
-        // Seed Claims Officer if not exists
         if (userRepository.findByEmail("bob@iqsure.com").isEmpty()) {
             userRepository.save(User.builder()
                     .name("Claims1")
@@ -101,8 +60,6 @@ public class DataSeeder {
                     .build());
             log.info("Claims Officer created: bob@iqsure.com / claims123");
         }
-
-        // Seed Default User if not exists
         if (userRepository.findByEmail("user@iqsure.com").isEmpty()) {
             userRepository.save(User.builder()
                     .name("John Doe")
@@ -115,32 +72,25 @@ public class DataSeeder {
                     .state("NY")
                     .status(UserStatus.ACTIVE)
                     .build());
-            userRepository.flush(); // Ensure user is in DB
+            userRepository.flush();
             log.info("Default user created: user@iqsure.com / user123");
         }
-
         if (policyRepository.count() == 0) {
             seedPolicies();
         }
-
         if (badgeRepository.count() == 0) {
             seedBadges();
         }
-
         if (rewardRepository.count() == 0) {
             seedRewards();
         }
-
         if (discountRuleRepository.count() == 0) {
             seedDiscountRules();
         }
-
-        // Ensure we have sample data for the assignment pipeline
         if (userPolicyRepository.count() == 0) {
             seedSampleUserPolicy();
         }
     }
-
     private void seedSampleUserPolicy() {
         log.info("Attempting to seed sample UserPolicy...");
         try {
@@ -149,10 +99,8 @@ public class DataSeeder {
                     .filter(p -> p.getTitle().equals("Basic Health Plan"))
                     .findFirst()
                     .orElse(policyRepository.findAll().stream().findFirst().orElse(null));
-
             if (user != null && policy != null) {
                 User underwriter = userRepository.findByEmail("underwriter@iqsure.com").orElse(null);
-                
                 org.hartford.iqsure.entity.UserPolicy up = org.hartford.iqsure.entity.UserPolicy.builder()
                         .user(user)
                         .policy(policy)
@@ -168,8 +116,6 @@ public class DataSeeder {
                         .purchaseDate(java.time.LocalDateTime.now())
                         .build();
                 userPolicyRepository.saveAndFlush(up);
-
-                // Add sample insured members for the underwriter to review
                 org.hartford.iqsure.entity.InsuredMember family1 = org.hartford.iqsure.entity.InsuredMember.builder()
                         .userPolicy(up)
                         .fullName("John Doe")
@@ -178,7 +124,6 @@ public class DataSeeder {
                         .gender("MALE")
                         .preExistingConditions("None")
                         .build();
-                
                 org.hartford.iqsure.entity.InsuredMember family2 = org.hartford.iqsure.entity.InsuredMember.builder()
                         .userPolicy(up)
                         .fullName("Jane Doe")
@@ -187,16 +132,12 @@ public class DataSeeder {
                         .gender("FEMALE")
                         .preExistingConditions("Asthma")
                         .build();
-
                 insuredMemberRepository.save(family1);
                 insuredMemberRepository.save(family2);
-                
-                // Add an additional ACTIVE policy so user can test Claims flow immediately
                 org.hartford.iqsure.entity.Policy goldPolicy = policyRepository.findAll().stream()
                         .filter(p -> p.getTitle().equals("Gold Health Plan"))
                         .findFirst()
                         .orElse(null);
-
                 if (goldPolicy != null) {
                     org.hartford.iqsure.entity.UserPolicy activeUp = org.hartford.iqsure.entity.UserPolicy.builder()
                             .user(user)
@@ -211,10 +152,8 @@ public class DataSeeder {
                             .build();
                     userPolicyRepository.save(activeUp);
                 }
-
                 insuredMemberRepository.flush();
                 userPolicyRepository.flush();
-
                 log.info("SUCCESS: Seeded UNDER_EVALUATION policy for John Doe assigned to underwriter.");
             } else {
                 if (user == null) log.warn("SEEDER ERROR: User 'user@iqsure.com' not found for policy seeding.");
@@ -232,11 +171,9 @@ public class DataSeeder {
         savePolicy("Senior Citizen Plan", "Tailored plan for senior citizens aged 60-80 years. Covers pre-existing diseases after 2-year waiting period.", 25000.0, 800000.0, 12, "60-80", "SENIOR_CITIZEN", "24 months", false, true, 5000.0, 80000.0, 0.2);
         savePolicy("Platinum Health Plan", "Ultimate individual plan with maximum ₹20 Lakh coverage, air ambulance, and personal accident cover.", 30000.0, 2000000.0, 12, "18-55", "INDIVIDUAL", "1 month", true, true, 10000.0, 200000.0, 0.05);
         savePolicy("Cyber Shield Protection", "Modern digital protection against identity theft, online fraud, and social media hacking. Includes 24/7 expert support.", 1200.0, 500000.0, 12, "13-75", "INDIVIDUAL", "Instant", false, false, 1000.0, 25000.0, 0.1);
-
         policyRepository.flush();
         log.info("Health Insurance Policies seeded.");
     }
-
     private void savePolicy(String title, String desc, Double premium, Double coverage, Integer duration, String age, String type, String waiting, Boolean maternity, Boolean preExisting, Double deductible, Double oopMax, Double copay) {
         policyRepository.save(org.hartford.iqsure.entity.Policy.builder()
                 .title(title)
@@ -256,7 +193,6 @@ public class DataSeeder {
                 .isActive(true)
                 .build());
     }
-
     private void seedBadges() {
         badgeRepository.save(org.hartford.iqsure.entity.Badge.builder().name("Quick Learner").description("Complete your first quiz").reqPoints(100).icon("🎓").build());
         badgeRepository.save(org.hartford.iqsure.entity.Badge.builder().name("Insurance Pro").description("Score 100% in any quiz").reqPoints(300).icon("🔍").build());
@@ -264,7 +200,6 @@ public class DataSeeder {
         badgeRepository.save(org.hartford.iqsure.entity.Badge.builder().name("Claim Hero").description("Successfully settle your first claim").reqPoints(1000).icon("🏆").build());
         log.info("Badges seeded.");
     }
-
     private void seedRewards() {
         java.time.LocalDate nextYear = java.time.LocalDate.now().plusYears(1);
         rewardRepository.save(org.hartford.iqsure.entity.Reward.builder().rewardType("CASHBACK").discountValue(10.0).reqPoints(200).description("10% Cashback on next premium pulse").expiryDate(nextYear).build());
@@ -272,7 +207,6 @@ public class DataSeeder {
         rewardRepository.save(org.hartford.iqsure.entity.Reward.builder().rewardType("GIFT_CARD").discountValue(500.0).reqPoints(600).description("₹500 Health Pharmacy Gift Card").expiryDate(nextYear).build());
         log.info("Rewards seeded.");
     }
-
     private void seedDiscountRules() {
         discountRuleRepository.save(org.hartford.iqsure.entity.DiscountRule.builder()
                 .ruleName("Beginner Learner Discount")
@@ -281,7 +215,6 @@ public class DataSeeder {
                 .discountPercentage(5.0)
                 .isActive(true)
                 .build());
-
         discountRuleRepository.save(org.hartford.iqsure.entity.DiscountRule.builder()
                 .ruleName("Quiz Whiz Reward")
                 .description("Get 10% off for scoring 80%+ on any quiz and having 200 points.")
@@ -290,7 +223,6 @@ public class DataSeeder {
                 .discountPercentage(10.0)
                 .isActive(true)
                 .build());
-
         discountRuleRepository.save(org.hartford.iqsure.entity.DiscountRule.builder()
                 .ruleName("Badge Collector Bonus")
                 .description("Get 15% off for earning 3 badges and 500 points.")
@@ -299,7 +231,6 @@ public class DataSeeder {
                 .discountPercentage(15.0)
                 .isActive(true)
                 .build());
-
         discountRuleRepository.save(org.hartford.iqsure.entity.DiscountRule.builder()
                 .ruleName("Health Policy Expert")
                 .description("Get 20% off Health Policies. Req: 90% quiz score.")
@@ -308,7 +239,6 @@ public class DataSeeder {
                 .discountPercentage(20.0)
                 .isActive(true)
                 .build());
-
         discountRuleRepository.save(org.hartford.iqsure.entity.DiscountRule.builder()
                 .ruleName("Elite Insurance Protector")
                 .description("Top-tier 25% discount for 1000+ points and all 4 badges.")
@@ -317,8 +247,6 @@ public class DataSeeder {
                 .discountPercentage(25.0)
                 .isActive(true)
                 .build());
-
         log.info("Discount rules seeded.");
     }
 }
-

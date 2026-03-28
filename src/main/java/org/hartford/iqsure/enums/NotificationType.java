@@ -1,5 +1,4 @@
 package org.hartford.iqsure.enums;
-
 public enum NotificationType {
     PASSWORD_RESET,
     PROFILE_UPDATE,

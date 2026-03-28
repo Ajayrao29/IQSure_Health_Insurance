@@ -1,3 +1,4 @@
+<!-- Template for the leaderboard page -->
 <div class="page">
   <div class="page-header">
     <div>
@@ -5,14 +6,11 @@
       <p>Top users ranked by points — take quizzes to climb the ranks!</p>
     </div>
   </div>
-
   @if (loading) {
     <div class="loading">Loading leaderboard…</div>
   }
-
   @if (!loading) {
     <div class="leaderboard-table">
-      <!-- Top 3 podium -->
       @if (entries.length >= 3) {
         <div class="podium">
           @if (entries[1]) {
@@ -38,7 +36,6 @@
           }
         </div>
       }
-      <!-- Full table -->
       <div class="table-wrapper">
         <table>
           <thead>
@@ -73,4 +70,3 @@
     </div>
   }
 </div>
-

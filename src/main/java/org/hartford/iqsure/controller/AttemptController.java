@@ -1,5 +1,5 @@
+// Controller handling AttemptController related API endpoints
 package org.hartford.iqsure.controller;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,16 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/v1/attempts")
 @RequiredArgsConstructor
 @Tag(name = "Attempts", description = "User quiz attempt history and achievements")
 @CrossOrigin("*")
 public class AttemptController {
-
     private final AttemptRepository attemptRepository;
-
     @GetMapping
     @Operation(summary = "Get quiz attempt history for a specific user")
     public ResponseEntity<List<AttemptResponseDTO>> getAttemptsByUser(@RequestParam Long userId) {

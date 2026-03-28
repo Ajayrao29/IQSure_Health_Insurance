@@ -1,8 +1,7 @@
+// Data Transfer Object for EducationContentDTO
 package org.hartford.iqsure.dto.response;
-
 import lombok.Builder;
 import lombok.Data;
-
 @Data
 @Builder
 public class EducationContentDTO {

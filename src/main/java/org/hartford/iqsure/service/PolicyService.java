@@ -1,11 +1,6 @@
-/*
- * FILE: PolicyService.java | LOCATION: service/
- * PURPOSE: Insurance policy CRUD logic. Admin creates/updates/deletes policies.
- * CALLED BY: PolicyController.java
- * USES: PolicyRepository
- */
-package org.hartford.iqsure.service;
+// Service containing business logic for PolicyService
 
+package org.hartford.iqsure.service;
 import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.dto.request.PolicyRequestDTO;
 import org.hartford.iqsure.dto.response.PolicyResponseDTO;
@@ -15,21 +10,16 @@ import org.hartford.iqsure.exception.ResourceNotFoundException;
 import org.hartford.iqsure.repository.PolicyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class PolicyService {
-
     private final PolicyRepository policyRepository;
-
     @Transactional
     public PolicyResponseDTO createPolicy(PolicyRequestDTO dto) {
         if (policyRepository.existsByTitle(dto.getTitle())) {
             throw new BadRequestException("A policy with this title already exists: " + dto.getTitle());
         }
-
         Policy policy = Policy.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
@@ -47,30 +37,23 @@ public class PolicyService {
                 .outOfPocketMax(dto.getOutOfPocketMax())
                 .copayPercentage(dto.getCopayPercentage())
                 .build();
-
         return toDTO(policyRepository.save(policy));
     }
-
     public PolicyResponseDTO getPolicyById(Long policyId) {
         return toDTO(findOrThrow(policyId));
     }
-
     public List<PolicyResponseDTO> getAllPolicies() {
         return policyRepository.findAll().stream().map(this::toDTO).toList();
     }
-
     public List<PolicyResponseDTO> getActivePolicies() {
         return policyRepository.findByIsActiveTrue().stream().map(this::toDTO).toList();
     }
-
     @Transactional
     public PolicyResponseDTO updatePolicy(Long policyId, PolicyRequestDTO dto) {
         Policy policy = findOrThrow(policyId);
-
         if (!policy.getTitle().equals(dto.getTitle()) && policyRepository.existsByTitle(dto.getTitle())) {
             throw new BadRequestException("A policy with this title already exists: " + dto.getTitle());
         }
-
         policy.setTitle(dto.getTitle());
         policy.setDescription(dto.getDescription());
         policy.setPolicyType(dto.getPolicyType());
@@ -88,10 +71,8 @@ public class PolicyService {
         policy.setDeductibleAmount(dto.getDeductibleAmount());
         policy.setOutOfPocketMax(dto.getOutOfPocketMax());
         policy.setCopayPercentage(dto.getCopayPercentage());
-
         return toDTO(policyRepository.save(policy));
     }
-
     @Transactional
     public void deletePolicy(Long policyId) {
         if (!policyRepository.existsById(policyId)) {
@@ -99,12 +80,10 @@ public class PolicyService {
         }
         policyRepository.deleteById(policyId);
     }
-
     private Policy findOrThrow(Long policyId) {
         return policyRepository.findById(policyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Policy not found with id: " + policyId));
     }
-
     private PolicyResponseDTO toDTO(Policy p) {
         return PolicyResponseDTO.builder()
                 .policyId(p.getPolicyId())

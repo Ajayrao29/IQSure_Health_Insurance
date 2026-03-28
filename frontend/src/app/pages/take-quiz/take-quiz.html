@@ -1,6 +1,6 @@
+<!-- Template for the take-quiz page -->
 @if (!loading) {
   <div class="page">
-    <!-- Quiz Header -->
     <div class="quiz-header">
       <div>
         <h1>{{ quiz?.title }}</h1>
@@ -14,7 +14,6 @@
         }
       </div>
     </div>
-    <!-- Questions -->
     <div class="questions-list">
       @for (q of questions; track q; let i = $index) {
         <div class="question-card">
@@ -34,7 +33,6 @@
         </div>
       }
     </div>
-    <!-- Submit -->
     <div class="submit-section">
       @if (!allAnswered) {
         <p class="submit-hint">
@@ -50,7 +48,6 @@
     </div>
   </div>
 }
-
 @if (loading) {
   <div class="loading">Loading quiz…</div>
 }

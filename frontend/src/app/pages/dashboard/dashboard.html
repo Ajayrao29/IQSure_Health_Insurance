@@ -1,13 +1,10 @@
-<!-- ═══════════════════ LOADING STATE ═══════════════════ -->
+<!-- Template for the dashboard page -->
+
 <div class="loading" *ngIf="loading">
   <p>Loading dashboard…</p>
 </div>
-
-<!-- ═══════════════════ ADMIN DASHBOARD ═══════════════════ -->
 <ng-container *ngIf="!loading && auth.isAdmin()">
 <div class="page">
-
-  <!-- Welcome Banner -->
   <div class="welcome-banner admin-banner">
     <div class="banner-text">
       <h1>Welcome back, <span>Admin</span> <svg class="icon-inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></h1>
@@ -18,8 +15,6 @@
       <div class="points-label">TOTAL USERS</div>
     </div>
   </div>
-
-  <!-- Stats Row -->
   <div class="stats-row">
     <div class="stat-card admin-stat">
       <div class="stat-icon">
@@ -28,7 +23,6 @@
       <div class="stat-value">{{stats.totalUsers}}</div>
       <div class="stat-label">REGISTERED USERS</div>
     </div>
-
     <div class="stat-card admin-stat">
       <div class="stat-icon">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -36,7 +30,6 @@
       <div class="stat-value">{{stats.totalQuizzes}}</div>
       <div class="stat-label">TOTAL QUIZZES</div>
     </div>
-
     <div class="stat-card admin-stat">
       <div class="stat-icon">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -44,7 +37,6 @@
       <div class="stat-value">{{stats.totalPolicies}}</div>
       <div class="stat-label">POLICIES</div>
     </div>
-
     <div class="stat-card admin-stat">
       <div class="stat-icon">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -53,15 +45,11 @@
       <div class="stat-label">REWARDS ISSUED</div>
     </div>
   </div>
-
-  <!-- Two-Column: Platform Overview + Admin Actions -->
   <div class="two-col admin-panels">
-
     <div class="card admin-summary-card">
       <div class="card-header">
         <h2>Platform Overview</h2>
       </div>
-
       <div class="summary-list">
         <div class="summary-row">
           <span>Total Admins</span>
@@ -85,12 +73,10 @@
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <h2>Admin Actions</h2>
       </div>
-
       <div class="admin-actions-list">
         <a routerLink="/admin/users" class="mini-action">
           <svg class="icon-m" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> Manage Users
@@ -112,18 +98,13 @@
         </a>
       </div>
     </div>
-
   </div>
-
-  <!-- Recent Users + Platform Health -->
   <div class="two-col admin-panels">
-
     <div class="card">
       <div class="card-header">
         <h2>Recent Users</h2>
         <a routerLink="/admin/users" class="card-link">View All →</a>
       </div>
-
       <div class="recent-users-list" *ngIf="recentUsers.length > 0; else noUsers">
         <div class="recent-user-row" *ngFor="let u of recentUsers">
           <div class="user-avatar">{{ u.name.charAt(0) || '?' }}</div>
@@ -136,17 +117,14 @@
           </span>
         </div>
       </div>
-
       <ng-template #noUsers>
         <p class="empty-msg">No users found.</p>
       </ng-template>
     </div>
-
     <div class="card">
       <div class="card-header">
         <h2>Platform Health</h2>
       </div>
-
       <div class="health-grid">
         <div class="health-item">
           <div class="health-icon good">✓</div>
@@ -180,18 +158,11 @@
         </div>
       </div>
     </div>
-
   </div>
-
 </div>
 </ng-container>
-
-
-<!-- ═══════════════════ USER DASHBOARD ═══════════════════ -->
 <ng-container *ngIf="!loading && !auth.isAdmin()">
 <div class="page no-hero-mode">
-  
-  <!-- 🎨 SIMPLIFIED USER WELCOME BANNER (Reference Match) -->
   <div class="welcome-banner-simple fade-in" *ngIf="auth.isLoggedIn()">
     <div class="banner-text">
       <h1>Welcome back, <span class="name">{{ auth.getUser()?.name }}</span> 👋</h1>
@@ -202,16 +173,6 @@
       <div class="lbl">TOTAL POINTS</div>
     </div>
   </div>
-
-
-    
-
-
-
-
-
-
-
   <div class="metrics-grid">
     <div class="metric-card">
       <div class="metric-icon green">
@@ -250,14 +211,11 @@
       </div>
     </div>
   </div>
-
-  <!-- 🚀 AGENTIC AI: POLICY TRACKING PIPELINE -->
   <div class="pipeline-section" *ngIf="myPolicies.length > 0">
     <div class="section-header-modern">
       <h2><span class="sparkle">✨</span> Cognitive Pipeline Tracking</h2>
       <p>Real-time status of your active insurance applications</p>
     </div>
-
     <div class="pipeline-grid">
       <div class="pipeline-card fade-in" *ngFor="let p of myPolicies">
         <div class="p-header">
@@ -267,32 +225,27 @@
           </div>
           <span class="status-pill" [class]="p.status">{{ p.status }}</span>
         </div>
-
         <div class="p-tracker">
           <div class="track-step" [class.complete]="true" [class.active]="p.status === 'PENDING_UNDERWRITING' || p.status === 'UNDER_EVALUATION' || p.status === 'QUOTES_SENT' || p.status === 'ACTIVE'">
             <div class="dot">📜</div>
             <label>Signed</label>
           </div>
           <div class="track-line" [class.complete]="p.status === 'UNDER_EVALUATION' || p.status === 'QUOTES_SENT' || p.status === 'ACTIVE'"></div>
-          
           <div class="track-step" [class.complete]="p.status === 'QUOTES_SENT' || p.status === 'ACTIVE'" [class.active]="p.status === 'UNDER_EVALUATION'">
             <div class="dot">🔎</div>
             <label>Underwriting</label>
           </div>
           <div class="track-line" [class.complete]="p.status === 'ACTIVE'"></div>
-
           <div class="track-step" [class.complete]="p.status === 'ACTIVE'" [class.active]="p.status === 'QUOTES_SENT'">
             <div class="dot">💰</div>
             <label>Quote Ready</label>
           </div>
           <div class="track-line" [class.complete]="p.status === 'ACTIVE'"></div>
-
           <div class="track-step" [class.active]="p.status === 'ACTIVE'">
             <div class="dot">🛡️</div>
             <label>Active</label>
           </div>
         </div>
-
         @if (p.status === 'QUOTES_SENT') {
           <div class="action-alert slide-up">
              <span>⚡ Final Quote Available</span>
@@ -302,8 +255,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Quick Actions Section -->
   <div class="quick-actions-section">
     <h2 class="section-title">Quick Actions</h2>
     <div class="action-grid-modern">
@@ -314,7 +265,6 @@
         <h3>Browse Plans</h3>
         <p>Explore insurance options</p>
       </a>
-
       <a routerLink="/my-policies" class="action-card-modern">
         <div class="action-icon-wrapper">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
@@ -322,7 +272,6 @@
         <h3>My Policies</h3>
         <p>View & manage policies</p>
       </a>
-
       <a routerLink="/my-claims" class="action-card-modern">
         <div class="action-icon-wrapper">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01" /></svg>
@@ -330,7 +279,6 @@
         <h3>My Claims</h3>
         <p>Track claim status</p>
       </a>
-
       <a routerLink="/my-claims" class="action-card-modern">
         <div class="action-icon-wrapper">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
@@ -340,10 +288,7 @@
       </a>
     </div>
   </div>
-
-  <!-- Gamification & Recent Activity (Keep existing features) -->
   <div class="two-col mt-4">
-    <!-- Recent Attempts -->
     <div class="card academy-progress-card">
       <div class="card-header">
         <h2>Academy Activity</h2>
@@ -356,8 +301,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Your Badges -->
     <div class="card">
       <div class="card-header">
         <h2>Your Badges</h2>
@@ -367,7 +310,6 @@
         <div class="badge-grid">
           <div class="badge-item" *ngFor="let badge of myBadges">
             <div class="badge-icon">
-              <!-- Using a professional achievement icon as default -->
               <svg *ngIf="!badge.icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
               <span *ngIf="badge.icon">{{badge.icon}}</span>
             </div>
@@ -380,8 +322,6 @@
       </ng-template>
     </div>
   </div>
-
-  <!-- 📥 Savings & Rewards Overview (Restored) -->
   <div class="card mt-4 shadow-sm">
     <div class="card-header">
       <h2><svg class="icon-l inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg> Savings & Rewards</h2>
@@ -413,6 +353,5 @@
       </div>
     </div>
   </div>
-
 </div>
 </ng-container>

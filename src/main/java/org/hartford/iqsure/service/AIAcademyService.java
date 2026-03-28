@@ -1,5 +1,5 @@
+// Service containing business logic for AIAcademyService
 package org.hartford.iqsure.service;
-
 import lombok.extern.slf4j.Slf4j;
 import org.hartford.iqsure.dto.response.EducationContentDTO;
 import org.hartford.iqsure.dto.response.QuestionResponseDTO;
@@ -12,26 +12,18 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
-
-/**
- * Service for AI-powered insurance education system.
- * Handles lesson generation, quiz generation, and reward mechanics.
- */
 @Service
 @Slf4j
 public class AIAcademyService {
-
     private final ChatClient chatClient;
     private final UserRepository userRepository;
     private final AttemptRepository attemptRepository;
     private final BadgeService badgeService;
-
-    public AIAcademyService(ChatClient.Builder chatClientBuilder, 
+    public AIAcademyService(ChatClient.Builder chatClientBuilder,
                             UserRepository userRepository,
                             BadgeService badgeService,
                             AttemptRepository attemptRepository) {
@@ -40,22 +32,13 @@ public class AIAcademyService {
         this.badgeService = badgeService;
         this.attemptRepository = attemptRepository;
     }
-
-    /**
-     * Awards loyalty points for completing an academy session.
-     * Logic: Awards points, updates streak, and checks for badges.
-     */
     @Transactional
     public void rewardCompletion(Long userId, String topic, int score, int total) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-        
-        // 1. Basic Reward Logic (10 points per correct answer)
-        int bonus = (score * 10); 
-        user.setUserPoints(user.getUserPoints() + bonus); 
+        int bonus = (score * 10);
+        user.setUserPoints(user.getUserPoints() + bonus);
         user.setTotalQuizzesTaken(user.getTotalQuizzesTaken() + 1);
-
-        // 2. Daily Streak Calculation
         LocalDate today = LocalDate.now();
         if (user.getLastQuizDate() == null) {
             user.setCurrentStreak(1);
@@ -69,8 +52,6 @@ public class AIAcademyService {
         }
         user.setLastQuizDate(today);
         userRepository.save(user);
-
-        // 3. Record History (Attempt) for auditing and analytics
         Attempt attempt = Attempt.builder()
                 .user(user)
                 .quizTitle(topic)
@@ -80,16 +61,9 @@ public class AIAcademyService {
                 .pointsEarned(bonus)
                 .build();
         attemptRepository.save(attempt);
-
-        // 4. Trigger Badge Progression Check
         badgeService.checkAndAwardBadges(userId);
-        
         log.info("Recorded academy completion for user {}: {} points earned", userId, bonus);
     }
-
-    /**
-     * Generates a professional insurance lesson based on a topic and language using AI.
-     */
     public EducationContentDTO generateLesson(String topic, String language) {
         String prompt = String.format(
             "You are an insurance expert with 30 years of experience. " +
@@ -99,18 +73,12 @@ public class AIAcademyService {
             "The 'content' field should be detailed, structured with Markdown (Headers, bold, sections), and end with a 'Veteran Pro-Tip'.",
             topic, language
         );
-
         log.info("Generating AI lesson for topic: {} in {}", topic, language);
-        
         return chatClient.prompt()
                 .user(prompt)
                 .call()
                 .entity(EducationContentDTO.class);
     }
-
-    /**
-     * Answers follow-up doubts about a specific lesson context using AI.
-     */
     public String generateFollowUp(String context, String doubt, String language) {
         String prompt = String.format(
             "You are an insurance mentor. The user just studied a lesson about: '%s'. " +
@@ -120,18 +88,12 @@ public class AIAcademyService {
             "Use limited Markdown for bolding key terms.",
             context, doubt, language
         );
-
         log.info("Generating AI follow-up for doubt: {}", doubt);
-
         return chatClient.prompt()
                 .user(prompt)
                 .call()
                 .content();
     }
-
-    /**
-     * Generates a quiz based on the lesson content using AI.
-     */
     public List<QuestionResponseDTO> generateQuiz(String context, String language) {
         String prompt = String.format(
             "Based on the following insurance lesson, generate 5 challenging multiple-choice questions in %s. " +
@@ -141,16 +103,12 @@ public class AIAcademyService {
             "Context: %s",
             language, context
         );
-
         log.info("Generating AI quiz in {}", language);
-
         List<AICalibratedQuestion> aiQuestions = chatClient.prompt()
                 .user(prompt)
                 .call()
                 .entity(new ParameterizedTypeReference<List<AICalibratedQuestion>>() {});
-
         if (aiQuestions == null) return List.of();
-
         return aiQuestions.stream()
                 .map(q -> QuestionResponseDTO.builder()
                         .text(q.text)
@@ -159,15 +117,9 @@ public class AIAcademyService {
                         .build())
                 .collect(Collectors.toList());
     }
-
-    // Temporary internal DTO for AI parsing
     public static class AICalibratedQuestion {
         public String text;
         public List<String> options;
         public int correctOptionIndex;
     }
 }
-
-
-
-

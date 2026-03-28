@@ -1,12 +1,11 @@
+<!-- Template for the users page -->
 <div class="page">
   <div class="page-header">
     <h1>User Management</h1>
   </div>
-
   @if (loading) {
     <div class="loading">Loading users…</div>
   }
-
   @if (!loading) {
     <div class="table-wrapper">
       <table>
@@ -34,4 +33,3 @@
     </div>
   }
 </div>
-

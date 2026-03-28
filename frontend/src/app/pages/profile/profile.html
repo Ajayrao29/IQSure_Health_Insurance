@@ -1,3 +1,4 @@
+<!-- Template for the profile page -->
 <div class="profile-container animated fadeIn">
   <div class="profile-header">
     <div class="profile-banner"></div>
@@ -9,13 +10,9 @@
       </div>
     </div>
   </div>
-
   <div class="profile-grid">
-    <!-- Feedback Messages -->
     <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
     <div *ngIf="message" class="alert alert-success">{{ message }}</div>
-
-    <!-- Personal Info Card -->
     <div class="profile-card">
       <div class="card-header">
         <h2>
@@ -25,7 +22,6 @@
           {{ editMode ? '❌ Cancel' : '✏️ Edit Profile' }}
         </button>
       </div>
-      
       <div class="card-content" *ngIf="!editMode">
         <div class="info-row">
           <label><span class="row-icon">📧</span> Email Address</label>
@@ -50,7 +46,6 @@
           </div>
         </div>
       </div>
-
       <form (ngSubmit)="saveProfile()" *ngIf="editMode" class="edit-form">
         <div class="input-grid">
           <div class="form-group">
@@ -79,8 +74,6 @@
         </div>
       </form>
     </div>
-
-    <!-- Security & Password Card -->
     <div class="profile-card security-card">
       <div class="card-header">
         <h2><span>🔐 Security Settings</span></h2>

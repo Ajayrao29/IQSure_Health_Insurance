@@ -1,3 +1,4 @@
+<!-- Template for the underwriters page -->
 <div class="page fade-in">
   <div class="page-header">
     <div>
@@ -8,10 +9,8 @@
       {{ showForm ? 'Cancel' : '+ Add Underwriter' }}
     </button>
   </div>
-
   @if (error) { <div class="alert alert-danger">{{ error }}</div> }
   @if (success) { <div class="alert alert-success">{{ success }}</div> }
-
   @if (showForm) {
     <div class="form-card fade-in">
       <h3>Register New Underwriter</h3>
@@ -51,7 +50,6 @@
       </div>
     </div>
   }
-
   @if (loading) {
     <div class="loading">Loading underwriters...</div>
   } @else {
