@@ -10,4 +10,5 @@ public interface UserRewardRepository extends JpaRepository<UserReward, Long> {
     List<UserReward> findByUser_UserId(Long userId);
     List<UserReward> findByUser_UserIdAndUsedFalse(Long userId);
     boolean existsByUser_UserIdAndReward_RewardId(Long userId, Long rewardId);
+    boolean existsByReward_RewardId(Long rewardId);
 }
