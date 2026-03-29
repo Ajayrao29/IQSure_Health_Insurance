@@ -20,6 +20,9 @@ public class AuthResponse {
     private Integer userPoints;
     private Integer totalQuizzesTaken;
     private Integer currentStreak;
+    private Integer experiencePoints;
+    private String rank;
+    private Integer fortressIntegrity;
     private String licenseNumber;
     private String employeeId;
     private String department;

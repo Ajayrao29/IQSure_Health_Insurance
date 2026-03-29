@@ -33,24 +33,52 @@ public class AIAcademyService {
         this.attemptRepository = attemptRepository;
     }
     @Transactional
-    public void rewardCompletion(Long userId, String topic, int score, int total) {
+    public void rewardCompletion(Long userId, String topic, int score, int total, String reportJson) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         int bonus = (score * 10);
-        user.setUserPoints(user.getUserPoints() + bonus);
-        user.setTotalQuizzesTaken(user.getTotalQuizzesTaken() + 1);
+        int points = (user.getUserPoints() != null) ? user.getUserPoints() : 0;
+        user.setUserPoints(points + bonus);
+        
+        int quizzes = (user.getTotalQuizzesTaken() != null) ? user.getTotalQuizzesTaken() : 0;
+        user.setTotalQuizzesTaken(quizzes + 1);
+        
         LocalDate today = LocalDate.now();
+        int streak = (user.getCurrentStreak() != null) ? user.getCurrentStreak() : 0;
         if (user.getLastQuizDate() == null) {
             user.setCurrentStreak(1);
         } else {
             long daysBetween = ChronoUnit.DAYS.between(user.getLastQuizDate(), today);
             if (daysBetween == 1) {
-                user.setCurrentStreak(user.getCurrentStreak() + 1);
+                user.setCurrentStreak(streak + 1);
             } else if (daysBetween > 1) {
                 user.setCurrentStreak(1);
             }
         }
         user.setLastQuizDate(today);
+        
+        // --- PRO GAMIFICATION ENGINE ---
+        int currentXp = (user.getExperiencePoints() != null) ? user.getExperiencePoints() : 0;
+        int xpGained = (score * 100) + (user.getCurrentStreak() * 20);
+        user.setExperiencePoints(currentXp + xpGained);
+        
+        // Update Fortress Integrity (Visual Health)
+        int integrity = (user.getFortressIntegrity() != null) ? user.getFortressIntegrity() : 50;
+        double scorePercent = (double) score / total;
+        if (scorePercent >= 0.8) {
+            user.setFortressIntegrity(Math.min(100, integrity + 8));
+        } else if (scorePercent < 0.5) {
+            user.setFortressIntegrity(Math.max(10, integrity - 5));
+        }
+        
+        // Update Guardian Rank
+        int xp = user.getExperiencePoints();
+        if (xp > 5000) user.setRank("OVERLORD_OF_SECURITY");
+        else if (xp > 2000) user.setRank("AEGIS_MASTER");
+        else if (xp > 500) user.setRank("SENTINEL_OF_RISK");
+        else user.setRank("NOVICE_GUARDIAN");
+        // --------------------------------
+        
         userRepository.save(user);
         Attempt attempt = Attempt.builder()
                 .user(user)
@@ -59,6 +87,7 @@ public class AIAcademyService {
                 .totalQuestions(total)
                 .percentage((int) ((double) score / total * 100))
                 .pointsEarned(bonus)
+                .questionReportJson(reportJson)
                 .build();
         attemptRepository.save(attempt);
         badgeService.checkAndAwardBadges(userId);
@@ -98,7 +127,7 @@ public class AIAcademyService {
         String prompt = String.format(
             "Based on the following insurance lesson, generate 5 challenging multiple-choice questions in %s. " +
             "MANDATORY: Return the response ONLY as a JSON array of objects. " +
-            "Each object MUST have: 'text' (question string), 'options' (list of exactly 4 strings), and 'correctOptionIndex' (0-3). " +
+            "Each object MUST have: 'text' (question string), 'options' (list of exactly 4 strings), 'correctOptionIndex' (0-3), and 'explanation' (why the correct answer is right). " +
             "No introductory text or conversational fillers. JSON only. " +
             "Context: %s",
             language, context
@@ -114,6 +143,7 @@ public class AIAcademyService {
                         .text(q.text)
                         .options(q.options)
                         .correctOptionIndex(q.correctOptionIndex)
+                        .explanation(q.explanation)
                         .build())
                 .collect(Collectors.toList());
     }
@@ -121,5 +151,6 @@ public class AIAcademyService {
         public String text;
         public List<String> options;
         public int correctOptionIndex;
+        public String explanation;
     }
 }

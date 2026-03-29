@@ -12,4 +12,5 @@ public class QuestionResponseDTO {
     private String text;
     private List<String> options;
     private Integer correctOptionIndex;
+    private String explanation;
 }

@@ -6,13 +6,21 @@
     <p>Master the levels of financial literacy and build your digital fortress.</p>
     <div class="academy-stats" *ngIf="contents.length > 0">
       <div class="stat-item">
-        <span class="val">{{ contents.length }}</span>
-        <span class="lbl">SESSIONS</span>
+        <span class="val">{{ curriculum.length }}</span>
+        <span class="lbl">Missions</span>
       </div>
       <div class="stat-item">
-        <span class="val">100+</span>
-        <span class="lbl">QUIZ PTS</span>
+        <span class="val">{{ completedTopicTitles.length }}</span>
+        <span class="lbl">Completed</span>
       </div>
+      <div class="stat-item">
+        <span class="val">{{ progressPercentage }}%</span>
+        <span class="lbl">Mastery</span>
+      </div>
+    </div>
+    
+    <div class="master-progress-bar-container" *ngIf="contents.length > 0">
+      <div class="master-progress-bar-fill" [style.width.%]="progressPercentage"></div>
     </div>
     <div class="language-dropdown-custom" [class.open]="isLangMenuOpen">
       <div class="lang-trigger shadow-premium" (click)="isLangMenuOpen = !isLangMenuOpen">
@@ -52,17 +60,27 @@
       <div class="journey-path">
         @for (item of contents; track item.id; let i = $index) {
           <div class="journey-node"
-               [class.active]="true"
                [class.even]="i % 2 === 0"
-               (click)="openLesson(item)">
+               [class.completed]="isTopicCompleted(item.title)"
+               [class.locked]="isLocked(i)"
+               [class.next-highlight]="isNextToComplete(i)"
+               (click)="!isLocked(i) && openLesson(item)">
             <div class="node-content">
-              <div class="node-index">0{{ i + 1 }}</div>
+              <div class="node-index">
+                <span *ngIf="isTopicCompleted(item.title)">✅</span>
+                <span *ngIf="isLocked(i)">🔒</span>
+                <span *ngIf="!isTopicCompleted(item.title) && !isLocked(i)">0{{ i + 1 }}</span>
+              </div>
               <div class="node-info">
                 <h3>{{ item.title }}</h3>
-                <span class="node-topic">{{ item.topic || 'General' }}</span>
+                <span class="node-topic">{{ item.icon }} {{ item.topic || 'General' }}</span>
+                <span class="completion-pill" *ngIf="isTopicCompleted(item.title)">MISSION COMPLETE</span>
               </div>
               <div class="node-status">
-                <span class="btn-start">Start Mission</span>
+                <span class="btn-start" *ngIf="!isLocked(i) && !isTopicCompleted(item.title)">
+                  {{ isNextToComplete(i) ? 'START MISSION' : 'VIEW' }}
+                </span>
+                <span class="status-icon" *ngIf="isLocked(i)">🔒</span>
               </div>
             </div>
             <div class="node-connector" *ngIf="i < contents.length - 1">
@@ -103,96 +121,156 @@
             <span class="session-category">{{ selectedTopic.topic || 'Level 1' }}</span>
             <h2>{{ selectedTopic.title }}</h2>
           </div>
-          <div class="session-actions" *ngIf="!showAiQuiz">
+          <div class="session-actions" *ngIf="quizStep === 'LESSON'">
             <button class="btn-audio" (click)="listenToLesson(selectedTopic.content)">
               <span>{{ isPlaying ? '⏹ Stop Audio' : '🔊 Narrate Session' }}</span>
             </button>
-            <button class="btn-quiz-jump" (click)="generateAiQuiz()">
+            <button class="btn-quiz-jump" (click)="startPreQuiz()">
                Calibrate AI Assessment
             </button>
           </div>
-          <div class="ai-quiz-overlay" *ngIf="showAiQuiz">
-             <h3>Assessment Calibrated</h3>
+
+          <!-- STAGE: PRE-QUIZ (Instructions) -->
+          <div class="pro-stage pre-quiz-stage fade-in" *ngIf="quizStep === 'PRE_QUIZ'">
+            <div class="stage-header">
+              <div class="stage-icon">🎯</div>
+              <h3>Mission Readiness Briefing</h3>
+            </div>
+            <div class="stage-body">
+              <p>The Insurance Oracle has prepared a unique assessment based on the material you just reviewed. Accuracy is paramount for a Guardian.</p>
+              <div class="instruction-grid">
+                <div class="instr-item">
+                  <span class="icon">💎</span>
+                  <strong>Rewards:</strong> 
+                  <p>You earn Points, XP, and Fortress Integrity for a passing score (80%+).</p>
+                </div>
+                <div class="instr-item warning">
+                  <span class="icon">⚠️</span>
+                  <strong>First Try Rule:</strong>
+                  <p>Rewards are only granted on your <strong>first</strong> successful assessment for this mission.</p>
+                </div>
+                <div class="instr-item">
+                  <span class="icon">📜</span>
+                  <strong>Review:</strong>
+                  <p>A detailed performance report will be generated after submission.</p>
+                </div>
+              </div>
+            </div>
+            <div class="stage-footer">
+              <button class="btn-primary-claret btn-lg" (click)="generateAiQuiz()">
+                Begin AI Calibration
+              </button>
+              <button class="btn-text" (click)="quizStep = 'LESSON'">Back to Lesson</button>
+            </div>
+          </div>
+
+          <!-- STAGE: QUIZ (Assessment) -->
+          <div class="pro-stage quiz-stage fade-in" *ngIf="quizStep === 'QUIZ'">
+             <div class="stage-header">
+               <div class="progress-bar-mini">
+                 <div class="progress-fill" [style.width]="(Object.keys(userAnswers).length / aiQuizQuestions.length * 100) + '%'"></div>
+               </div>
+               <h3>Active Assessment</h3>
+               <p>Select the most accurate response for each scenario.</p>
+             </div>
              <div class="ai-question" *ngFor="let q of aiQuizQuestions; let qi = index">
-                <p><strong>Q{{ qi+1 }}:</strong> {{ q.text }}</p>
+                <p class="q-text"><strong>Q{{ qi+1 }}:</strong> {{ q.text }}</p>
                 <div class="ai-options">
                    <button class="opt-btn"
                            *ngFor="let opt of q.options; let oi = index"
                            [class.selected]="userAnswers[qi] === oi"
                            (click)="selectOption(qi, oi)">
+                      <span class="opt-letter">{{ ['A','B','C','D'][oi] }}</span>
                       {{ opt }}
                    </button>
                 </div>
              </div>
              <div class="quiz-completion">
-                <button class="btn-complete-session claim-btn"
+                <button class="btn-primary-claret btn-lg claim-btn"
                         (click)="submitAiQuiz()"
                         [disabled]="!canSubmitQuiz">
-                   Verify Assessment & Submit for Evaluation
+                   Verify & Finalize Assessment
                 </button>
              </div>
           </div>
-          <div class="quiz-scorecard-overlay glass-premium fade-in" *ngIf="showScorecard">
-             <div class="scorecard-container">
-                <div class="score-header-visual">
-                   <div class="confetti-emoji" *ngIf="lastScore >= quizPassingScore">🎊</div>
-                   <div class="status-pill" [class.passed]="lastScore >= quizPassingScore">
-                      {{ lastScore >= quizPassingScore ? 'MISSION SUCCESS' : 'MISSION FAILED' }}
-                   </div>
-                   <h2 class="score-title">Assessment Report</h2>
-                   <p class="score-subtitle">Oracle evaluation complete for: <span>{{ selectedTopic.title }}</span></p>
+
+          <!-- STAGE: RESULT (Pro Scorecard) -->
+          <div class="pro-stage result-stage fade-in" *ngIf="quizStep === 'RESULT'">
+             <div class="result-hero" [class.failed]="lastScore < quizPassingScore">
+                <div class="hero-left">
+                  <div class="score-circular" [style.--percent]="lastScore">
+                    <span class="score-num">{{ lastScore }}%</span>
+                  </div>
                 </div>
-                <div class="score-main-row">
-                   <div class="score-ring-container">
-                      <div class="score-ring" [style.--percent]="lastScore" [class.passed]="lastScore >= quizPassingScore">
-                         <div class="inner-circle">
-                            <span class="score-number">{{ lastScore }}%</span>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="score-breakdown">
-                      <div class="breakdown-item">
-                         <span class="lbl">CORRECT ANSWERS</span>
-                         <span class="val">{{ correctCount }} / {{ aiQuizQuestions.length }}</span>
-                      </div>
-                      <div class="breakdown-item">
-                         <span class="lbl">POINTS SECURED</span>
-                         <span class="val" [class.points-award]="lastScore >= quizPassingScore">
-                            {{ lastScore >= quizPassingScore ? '+50 PTS' : '0 PTS' }}
-                         </span>
-                      </div>
-                      <div class="breakdown-item">
-                         <span class="lbl">ACCURACY</span>
-                         <span class="val">{{ lastScore >= quizPassingScore ? 'EXCEPTIONAL' : 'IMPROVE' }}</span>
-                      </div>
-                   </div>
+                <div class="hero-right">
+                  <div class="status-badge">{{ lastScore >= quizPassingScore ? 'MISSION ACCOMPLISHED' : 'MISSION FAILED' }}</div>
+                  <h2>Evaluation Complete</h2>
+                  <p>Evaluation conducted by Oracle AI for: <strong>{{ selectedTopic.title }}</strong></p>
                 </div>
-                <div class="oracle-summary-box">
-                   <div class="oracle-icon">🔮</div>
-                   <div class="oracle-text">
-                      <p *ngIf="lastScore >= quizPassingScore">
-                         <strong>THE ORACLE SAYS:</strong>
-                         Your literacy in this complex domain is officially verified.
-                         The fortress of your knowledge grows stronger. Claim your rewards below.
-                      </p>
-                      <p *ngIf="lastScore < quizPassingScore">
-                         <strong>RE-CALIBRATION REQUIRED:</strong>
-                         A Guardian's shield must be without cracks. Review the fine print of
-                         this module and retry to secure your loyalist points.
-                      </p>
-                   </div>
+             </div>
+
+             <div class="rewards-earned-grid" *ngIf="lastScore >= quizPassingScore">
+               <div class="reward-card points">
+                 <div class="r-icon">💰</div>
+                 <div class="r-info">
+                   <div class="r-val">+50</div>
+                   <div class="r-lbl">LOAYALTY POINTS</div>
+                 </div>
+               </div>
+               <div class="reward-card xp">
+                 <div class="r-icon">⚡</div>
+                 <div class="r-info">
+                   <div class="r-val">+{{ (correctCount * 100) }}</div>
+                   <div class="r-lbl">GUARDIAN XP</div>
+                 </div>
+               </div>
+               <div class="reward-card integrity">
+                 <div class="r-icon">🛡️</div>
+                 <div class="r-info">
+                   <div class="r-val">+8%</div>
+                   <div class="r-lbl">FORTRESS REPAIR</div>
+                 </div>
+               </div>
+             </div>
+
+             <div class="result-actions">
+               <button class="btn-primary-claret btn-lg" (click)="claimRewards()" *ngIf="lastScore >= quizPassingScore && !rewardsClaimed" [disabled]="loading">
+                 {{ loading ? 'Securing Rewards...' : 'Secure Rewards to Profile' }}
+               </button>
+               <button class="btn-success btn-lg" *ngIf="rewardsClaimed" disabled>
+                 ✨ Rewards Secured
+               </button>
+               <button class="btn-outline-claret btn-lg" (click)="retryQuiz()" *ngIf="lastScore < quizPassingScore">
+                 Retry Assessment
+               </button>
+               <button class="btn-text btn-lg" (click)="closeLesson()">Exit Session</button>
+             </div>
+
+             <!-- PERFORMANCE REPORT (DETAILED) -->
+             <div class="detailed-review-section mt-4">
+                <div class="section-divider">
+                  <span>PERFORMANCE REPORT</span>
                 </div>
-                <div class="scorecard-footer">
-                   <button class="btn-primary-claret btn-lg claim-cta"
-                           (click)="claimRewards()"
-                           *ngIf="lastScore >= quizPassingScore">
-                      ✨ Secure 50 Points to Profile
-                   </button>
-                   <button class="btn-outline-claret btn-lg"
-                           (click)="retryQuiz()"
-                           *ngIf="lastScore < quizPassingScore">
-                      🔄 Retry Assessment
-                   </button>
+                <div class="report-card-mini" *ngFor="let q of detailedReport; let i = index" [class.correct]="q.isCorrect" [class.wrong]="!q.isCorrect">
+                  <div class="rm-header">
+                    <span class="rm-num">Question {{ i + 1 }}</span>
+                    <span class="rm-status">{{ q.isCorrect ? '✓ CORRECT' : '✗ INCORRECT' }}</span>
+                  </div>
+                  <p class="rm-text">{{ q.questionText }}</p>
+                  <div class="rm-answers">
+                    <div class="rm-ans user">
+                      <label>YOUR CHOICE</label>
+                      <p>{{ q.selectedAnswer }}</p>
+                    </div>
+                    <div class="rm-ans correct" *ngIf="!q.isCorrect">
+                      <label>CORRECT CHOICE</label>
+                      <p>{{ q.correctAnswer }}</p>
+                    </div>
+                  </div>
+                  <div class="rm-explanation">
+                    <div class="expl-header">ORACLE'S REASONING</div>
+                    <p>{{ q.explanation }}</p>
+                  </div>
                 </div>
              </div>
           </div>
@@ -216,8 +294,11 @@
             </div>
           </div>
           <div class="session-footer">
-            <button class="btn-complete-session" (click)="closeLesson()">
-              Confirm Completion
+            <button class="btn-complete-session success" (click)="closeLesson()" *ngIf="rewardsClaimed">
+              Mission Accomplished: Progress Secured ✓
+            </button>
+            <button class="btn-complete-session" (click)="closeLesson()" *ngIf="!rewardsClaimed">
+              Exit Mission
             </button>
           </div>
         </div>

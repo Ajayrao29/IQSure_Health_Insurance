@@ -42,14 +42,41 @@ export class EducationCenterComponent implements OnInit {
   followUpDoubt = '';
   followUpResponse = '';
   isAskingFollowUp = false;
+  completedTopicTitles: string[] = [];
+  curriculum = [
+    { title: 'Health Insurance Foundations: Why do I need it?', topic: 'Skill 1: Ground Zero', icon: '🌱' },
+    { title: 'The Cost Equation: Premiums, Deductibles & Co-pay', topic: 'Skill 2: Financials', icon: '💰' },
+    { title: 'Hospital Networks: The Secret to Cashless Claims', topic: 'Skill 3: Access', icon: '🏥' },
+    { title: 'Comparison Master: Critical Illness vs Comprehensive', topic: 'Skill 4: Analysis', icon: '⚖️' },
+    { title: 'The Fine Print: Waiting Periods & Pre-existing T&Cs', topic: 'Skill 5: Legal', icon: '📝' },
+    { title: 'Financial Fortress: Advanced Tax & Coverage Strategy', topic: 'Skill 6: Mastery', icon: '🏰' }
+  ];
+  
+  // NEW PRO QUIZ FLOW
+  quizStep: 'LESSON' | 'PRE_QUIZ' | 'QUIZ' | 'RESULT' = 'LESSON';
+  canEarnRewards = true;
+  detailedReport: any[] = [];
+  rewardsClaimed = false;
+  protected readonly Object = Object;
   constructor(private api: ApiService, public auth: AuthService) {}
   ngOnInit() {
+    this.syncProgress();
     this.loadContent();
     if (window.speechSynthesis) {
         window.speechSynthesis.getVoices();
         window.speechSynthesis.onvoiceschanged = () => {
             window.speechSynthesis.getVoices();
         };
+    }
+  }
+  syncProgress() {
+    const userId = this.auth.getUserId();
+    if (userId) {
+      this.api.getAttemptsByUser(userId).subscribe(attempts => {
+        this.completedTopicTitles = attempts
+          .filter(a => a.percentage >= this.quizPassingScore)
+          .map(a => a.quizTitle?.trim()); // Use trimmed titles for comparison
+      });
     }
   }
   onLanguageChange() {
@@ -78,8 +105,11 @@ export class EducationCenterComponent implements OnInit {
     return marked(content) as string;
   }
   openLesson(content: EducationContent) {
+    this.syncProgress();
     this.followUpDoubt = '';
     this.followUpResponse = '';
+    this.rewardsClaimed = false;
+    this.quizStep = 'LESSON';
     if (!content.content) {
       this.generateStageContent(content);
       return;
@@ -113,8 +143,11 @@ export class EducationCenterComponent implements OnInit {
     this.selectedTopic = null;
     this.showAiQuiz = false;
     this.showScorecard = false;
+    this.quizStep = 'LESSON';
     this.aiQuizQuestions = [];
     this.userAnswers = {};
+    this.rewardsClaimed = false;
+    this.detailedReport = [];
   }
   showMessage(msg: string, type: 'success' | 'error' | 'info' = 'info') {
     this.feedbackMessage = msg;
@@ -129,22 +162,33 @@ export class EducationCenterComponent implements OnInit {
       const data = await res.json();
       return data[0]?.map((item: any) => item[0])?.join('') || text;
     } catch (err) {
-      console.error('Translation API error:', err);
+      console.error('Translation error:', err);
       return text;
     }
   }
-  curriculum = [
-    { id: 1, title: 'Health Insurance Foundations: Why do I need it?', topic: 'Level 1: Ground Zero', content: '' },
-    { id: 2, title: 'The Cost Equation: Premiums, Deductibles & Co-pay', topic: 'Level 2: Financials', content: '' },
-    { id: 3, title: 'Hospital Networks: The Secret to Cashless Claims', topic: 'Level 3: Access', content: '' },
-    { id: 4, title: 'Comparison Master: Critical Illness vs Comprehensive', topic: 'Level 4: Analysis', content: '' },
-    { id: 5, title: 'The Fine Print: Waiting Periods & Pre-existing T&Cs', topic: 'Level 5: Expertise', content: '' },
-    { id: 6, title: 'Financial Fortress: Advanced Tax & Coverage Strategy', topic: 'Level 6: Mastery', content: '' }
-  ];
+  isTopicCompleted(title: string): boolean {
+    if (!title) return false;
+    return this.completedTopicTitles.some(t => t?.trim() === title.trim());
+  }
+  isLocked(index: number): boolean {
+    if (index === 0) return false;
+    const prevTopic = this.curriculum[index - 1];
+    return !this.isTopicCompleted(prevTopic.title);
+  }
+  isNextToComplete(index: number): boolean {
+    if (this.isTopicCompleted(this.curriculum[index].title)) return false;
+    return index === 0 || this.isTopicCompleted(this.curriculum[index - 1].title);
+  }
+  get progressPercentage(): number {
+    if (this.curriculum.length === 0) return 0;
+    return Math.round((this.completedTopicTitles.length / this.curriculum.length) * 100);
+  }
   loadContent() {
-    this.contents = this.curriculum.map(item => ({
+    this.contents = this.curriculum.map((item, idx) => ({
       ...item,
-      language: this.selectedLanguageCode
+      id: idx + 1,
+      language: this.selectedLanguageCode,
+      content: ''
     }));
   }
   async listenToLesson(textContent: string) {
@@ -279,6 +323,7 @@ export class EducationCenterComponent implements OnInit {
     this.api.generateAiQuiz(this.selectedTopic.content, this.selectedLanguageCode).subscribe({
       next: (questions) => {
         this.aiQuizQuestions = questions;
+        this.quizStep = 'QUIZ';
         this.showAiQuiz = true;
         this.loading = false;
       },
@@ -289,6 +334,9 @@ export class EducationCenterComponent implements OnInit {
       }
     });
   }
+  startPreQuiz() {
+    this.quizStep = 'PRE_QUIZ';
+  }
   selectOption(qIndex: number, oIndex: number) {
     this.userAnswers[qIndex] = oIndex;
   }
@@ -297,13 +345,22 @@ export class EducationCenterComponent implements OnInit {
            Object.keys(this.userAnswers).length === this.aiQuizQuestions.length;
   }
   submitAiQuiz() {
-    const user = this.auth.getUser();
-    if (!user) return;
     this.correctCount = 0;
     this.aiQuizQuestions.forEach((q, idx) => {
       if (this.userAnswers[idx] === q.correctOptionIndex) this.correctCount++;
     });
-    this.lastScore = Math.round((this.correctCount / this.aiQuizQuestions.length) * 100);
+    this.lastScore = Math.round((this.correctCount / (this.aiQuizQuestions.length || 1)) * 100);
+    
+    // Build report for UI
+    this.detailedReport = this.aiQuizQuestions.map((q, idx) => ({
+      questionText: q.text,
+      selectedAnswer: q.options[this.userAnswers[idx]],
+      correctAnswer: q.options[q.correctOptionIndex],
+      explanation: q.explanation || 'Analyzed as correct by Oracle.',
+      isCorrect: this.userAnswers[idx] === q.correctOptionIndex
+    }));
+
+    this.quizStep = 'RESULT';
     this.showScorecard = true;
     this.showAiQuiz = false;
   }
@@ -311,23 +368,42 @@ export class EducationCenterComponent implements OnInit {
     const user = this.auth.getUser();
     if (!user || !this.selectedTopic) return;
     this.loading = true;
+
+    // Create a detailed question report
+    const report = this.aiQuizQuestions.map((q, idx) => ({
+      questionText: q.text,
+      selectedAnswer: q.options[this.userAnswers[idx]],
+      correctAnswer: q.options[q.correctOptionIndex],
+      explanation: q.explanation || 'No detailed explanation provided.',
+      isCorrect: this.userAnswers[idx] === q.correctOptionIndex
+    }));
+    const reportJson = JSON.stringify(report);
+
     this.api.completeAcademyLesson(
       user.userId,
       this.selectedTopic.title,
       this.correctCount,
-      this.aiQuizQuestions.length || 5
+      this.aiQuizQuestions.length || 5,
+      reportJson
     ).subscribe({
       next: (updatedUser) => {
-        this.auth.updateUserPoints(updatedUser.userPoints);
-        this.auth.updateUserStats(updatedUser.totalQuizzesTaken, updatedUser.currentStreak);
+        this.auth.updateUserGamification(
+          updatedUser.userPoints,
+          updatedUser.totalQuizzesTaken,
+          updatedUser.currentStreak,
+          updatedUser.experiencePoints || 0,
+          updatedUser.rank || 'NOVICE_GUARDIAN',
+          updatedUser.fortressIntegrity || 50
+        );
         this.showMessage(`Digital Fortress Strengthened! Points secured.`, 'success');
+        this.syncProgress(); // Immediately update the local completion list
         this.loading = false;
-        this.closeLesson();
+        this.rewardsClaimed = true;
       },
       error: (err) => {
         console.error('Failed to claim points', err);
+        this.showMessage('Oracle connection interrupted. Please RE-TRY securing your rewards.', 'error');
         this.loading = false;
-        this.closeLesson();
       }
     });
   }

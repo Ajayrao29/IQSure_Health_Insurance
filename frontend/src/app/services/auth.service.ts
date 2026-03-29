@@ -19,19 +19,19 @@ export class AuthService {
   getUser(): AuthResponse | null {
     return this.userSub.value;
   }
-  updateUserPoints(points: number): void {
+  updateUserGamification(points: number, quizzes: number, streak: number, xp: number, rank: string, integrity: number): void {
     const user = this.getUser();
     if (user) {
-      user.userPoints = points;
-      this.saveUser(user);
-    }
-  }
-  updateUserStats(totalQuizzes: number, streak: number): void {
-    const user = this.getUser();
-    if (user) {
-      user.totalQuizzesTaken = totalQuizzes;
-      user.currentStreak = streak;
-      this.saveUser(user);
+      const updatedUser = { 
+        ...user, 
+        userPoints: points, 
+        totalQuizzesTaken: quizzes, 
+        currentStreak: streak, 
+        experiencePoints: xp, 
+        rank: rank, 
+        fortressIntegrity: integrity 
+      };
+      this.saveUser(updatedUser);
     }
   }
   isLoggedIn(): boolean {

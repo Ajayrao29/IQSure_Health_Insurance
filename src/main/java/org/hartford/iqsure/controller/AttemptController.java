@@ -30,6 +30,7 @@ public class AttemptController {
                         .percentage(a.getPercentage())
                         .pointsEarned(a.getPointsEarned())
                         .attemptDate(a.getAttemptDate())
+                        .questionReportJson(a.getQuestionReportJson())
                         .build())
                 .collect(Collectors.toList()));
     }

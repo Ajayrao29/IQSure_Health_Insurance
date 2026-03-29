@@ -243,9 +243,9 @@ export class ApiService {
   generateAiQuiz(context: string, lang: string = 'English'): Observable<Question[]> {
     return this.http.post<Question[]>(`${API}/api/ai-academy/generate-quiz?lang=${lang}`, context);
   }
-  completeAcademyLesson(userId: number, topic: string, score: number, total: number): Observable<User> {
-    const params = `userId=${userId}&topic=${encodeURIComponent(topic)}&score=${score}&total=${total}`;
-    return this.http.post<User>(`${API}/api/ai-academy/complete-lesson?${params}`, {});
+  completeAcademyLesson(userId: number, topic: string, score: number, total: number, reportJson?: string): Observable<User> {
+    const body = { userId, topic, score, total, reportJson };
+    return this.http.post<User>(`${API}/api/ai-academy/complete-lesson`, body);
   }
   askOracleFollowUp(context: string, doubt: string, lang: string = 'English'): Observable<string> {
     const params = new URLSearchParams({ context, doubt, lang }).toString();

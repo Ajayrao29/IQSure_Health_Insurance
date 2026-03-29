@@ -29,9 +29,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     totalPolicies: 0,
     activePolicies: 0,
     awaitingQuote: 0,
-    pendingClaims: 0
+    pendingClaims: 0,
+    academyCompletionRate: 0
   };
   recentUsers: User[] = [];
+  selectedReport: any[] | null = null;
+  selectedReportTitle = '';
   stats = {
     totalUsers: 0,
     totalAdmins: 0,
@@ -58,12 +61,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private subscribeToUserChanges(): void {
     this.auth.currentUser$.pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        if (user) {
-          if (this.user) {
-            this.user.userPoints = user.userPoints || 0;
-            this.user.totalQuizzesTaken = user.totalQuizzesTaken || 0;
-            this.user.currentStreak = user.currentStreak || 0;
-          }
+        if (user && this.user) {
+          this.user = { 
+            ...this.user,
+            userPoints: user.userPoints || 0,
+            totalQuizzesTaken: user.totalQuizzesTaken || 0,
+            currentStreak: user.currentStreak || 0,
+            experiencePoints: user.experiencePoints || 0,
+            rank: user.rank || 'NOVICE_GUARDIAN',
+            fortressIntegrity: user.fortressIntegrity || 0
+          };
         }
       });
   }
@@ -106,10 +113,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: ({ profile, badges, attempts, policies, claims }) => {
           this.user = profile;
           this.myBadges = badges;
-          this.myAttempts = [...attempts].reverse().slice(0, 5);
+          this.myAttempts = attempts.slice(0, 8);
           this.myPolicies = policies;
           this.totalSavings = policies.reduce((sum, p) => sum + (p.totalClaimedAmount || 0), 0);
-          this.updateMetrics(policies, claims);
+          this.updateMetrics(policies, claims, attempts);
           this.loading = false;
         },
         error: (err) => {
@@ -118,13 +125,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
   }
-  private updateMetrics(policies: UserPolicy[], claims: Claim[]): void {
+  private updateMetrics(policies: UserPolicy[], claims: Claim[], attempts: AttemptResponse[] = []): void {
     this.userStats.totalPolicies = policies.length;
     this.userStats.activePolicies = policies.filter(p => p.status === 'ACTIVE').length;
     this.userStats.awaitingQuote = policies.filter(p => p.status === 'PENDING_UNDERWRITING').length;
     this.userStats.pendingClaims = claims.filter(c => c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW').length;
+    
+    // Calculate Academy Completion Rate (6 levels total)
+    const uniqueCompletions = new Set(attempts.filter(a => a.percentage >= 80).map(a => a.quizTitle));
+    this.userStats.academyCompletionRate = Math.round((uniqueCompletions.size / 6) * 100);
   }
   get recentAttempts(): AttemptResponse[] {
     return this.myAttempts;
+  }
+  viewReport(attempt: AttemptResponse): void {
+    if (attempt.questionReportJson) {
+      try {
+        this.selectedReport = JSON.parse(attempt.questionReportJson);
+        this.selectedReportTitle = attempt.quizTitle;
+      } catch (e) {
+        console.error('Failed to parse report', e);
+      }
+    }
+  }
+  closeReport(): void {
+    this.selectedReport = null;
   }
 }

@@ -173,6 +173,55 @@
       <div class="lbl">TOTAL POINTS</div>
     </div>
   </div>
+
+  <div class="gamification-hub fade-in">
+    <div class="fortress-card">
+      <div class="card-glow"></div>
+      <div class="fortress-visual">
+         <div class="shield-container">
+            <div class="shield" [style.opacity]="(user?.fortressIntegrity || 50) / 100" [class.low]="(user?.fortressIntegrity || 0) < 30">
+               <div class="shield-inner"></div>
+            </div>
+            <div class="fortress-heart">🛡️</div>
+         </div>
+      </div>
+      <div class="fortress-info">
+        <h3>Digital Fortress</h3>
+        <div class="integrity-bar">
+          <div class="integrity-fill" [style.width.%]="user?.fortressIntegrity || 0"></div>
+        </div>
+        <p>Integrity: <span>{{user?.fortressIntegrity}}%</span></p>
+        <small>Protect your score by completing daily lessons</small>
+      </div>
+    </div>
+
+    <div class="rank-card">
+      <div class="rank-header">
+        <div class="rank-icon-wrapper">
+           <span *ngIf="user?.rank === 'NOVICE_GUARDIAN'">🌱</span>
+           <span *ngIf="user?.rank === 'SENTINEL_OF_RISK'">⚔️</span>
+           <span *ngIf="user?.rank === 'AEGIS_MASTER'">🏗️</span>
+           <span *ngIf="user?.rank === 'OVERLORD_OF_SECURITY'">👑</span>
+        </div>
+        <div class="rank-titles">
+           <div class="rank-label">CURRENT RANK</div>
+           <div class="rank-name">{{ user?.rank || 'Novice Guardian' }}</div>
+        </div>
+      </div>
+      <div class="xp-container">
+        <div class="xp-info">
+          <span>XP: {{user?.experiencePoints}}</span>
+          <span>Level Progress</span>
+        </div>
+        <div class="xp-bar">
+          <div class="xp-fill" [style.width.%]="((user?.experiencePoints || 0) % 1000) / 10"></div>
+        </div>
+      </div>
+      <div class="streak-mini">
+         <span class="fire">🔥</span> {{user?.currentStreak}} DAY STREAK
+      </div>
+    </div>
+  </div>
   <div class="metrics-grid">
     <div class="metric-card">
       <div class="metric-icon green">
@@ -208,6 +257,15 @@
       <div class="metric-info">
         <h3>{{ userStats.pendingClaims }}</h3>
         <p>Pending Claims</p>
+      </div>
+    </div>
+    <div class="metric-card academy-completion-metric">
+      <div class="metric-icon pink">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+      </div>
+      <div class="metric-info">
+        <h3>{{ userStats.academyCompletionRate }}%</h3>
+        <p>Academy Mastery</p>
       </div>
     </div>
   </div>
@@ -289,17 +347,42 @@
     </div>
   </div>
   <div class="two-col mt-4">
-    <div class="card academy-progress-card">
+    <div class="card history-card shadow-premium">
       <div class="card-header">
-        <h2>Academy Activity</h2>
-        <a routerLink="/learning-center/education-center" class="card-link">See Oracle →</a>
+        <div class="header-with-icon">
+          <span class="icon">📜</span>
+          <h2>Activity History</h2>
+        </div>
+        <a routerLink="/learning-center/quiz-reports" class="card-link">View Full Archive →</a>
       </div>
-      <div class="academy-summary">
-        <p>Your current mastery is building through AI-powered on-demand sessions. Complete more modules to rank up!</p>
-        <div class="academy-cta">
-           <button class="btn-primary" routerLink="/learning-center/education-center">Enter Guardian Academy</button>
+      <div class="activity-history" *ngIf="myAttempts.length > 0; else noActivity">
+        <div class="activity-row slide-in-bottom" *ngFor="let attempt of myAttempts" (click)="viewReport(attempt)">
+          <div class="activity-date">
+            <span class="day">{{ attempt.attemptDate | date:'dd' }}</span>
+            <span class="month">{{ attempt.attemptDate | date:'MMM' }}</span>
+          </div>
+          <div class="activity-main">
+            <div class="activity-title">{{ attempt.quizTitle }}</div>
+            <div class="activity-meta">
+              <span class="stat-pill" [class.excellent]="attempt.percentage >= 80" [class.fail]="attempt.percentage < 80">
+                {{ attempt.score }}/{{ attempt.totalQuestions }} Correct
+              </span>
+              <span class="points-earned">+{{ attempt.pointsEarned }} Points Earned</span>
+            </div>
+          </div>
+          <div class="activity-action">
+            <button class="btn-audit" *ngIf="attempt.questionReportJson">Audit Report</button>
+          </div>
         </div>
       </div>
+      <ng-template #noActivity>
+        <div class="empty-activity-state">
+          <div class="empty-icon">📂</div>
+          <h3>No Academy Missions Yet</h3>
+          <p>Complete your first AI-powered lesson to see your history here.</p>
+          <a routerLink="/learning-center/education-center" class="btn-primary-claret btn-sm">Enter Academy</a>
+        </div>
+      </ng-template>
     </div>
     <div class="card">
       <div class="card-header">
@@ -350,6 +433,39 @@
       <div class="panel-actions">
         <button routerLink="/rewards" class="btn-primary-outline">Go to Rewards Shop</button>
         <button routerLink="/savings" class="btn-secondary-outline">Analyze Savings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="report-overlay fade-in" *ngIf="selectedReport" (click)="closeReport()">
+  <div class="report-modal slide-up" (click)="$event.stopPropagation()">
+    <div class="report-header">
+      <h2>Review: {{ selectedReportTitle }}</h2>
+      <button class="close-modal" (click)="closeReport()">✕</button>
+    </div>
+    <div class="report-content">
+      <div class="report-q-card" *ngFor="let q of selectedReport; let i = index">
+        <div class="q-header">
+          <span class="q-num">Question {{ i + 1 }}</span>
+          <span class="q-status" [class.correct]="q.isCorrect">{{ q.isCorrect ? 'CORRECT' : 'INCORRECT' }}</span>
+        </div>
+        <p class="q-text">{{ q.questionText }}</p>
+        <div class="q-answers">
+          <div class="ans-box user-ans" [class.wrong]="!q.isCorrect">
+            <label>YOUR ANSWER</label>
+            <div>{{ q.selectedAnswer || 'Skipped' }}</div>
+          </div>
+          <div class="ans-box correct-ans" *ngIf="!q.isCorrect">
+            <label>CORRECT ANSWER</label>
+            <div>{{ q.correctAnswer }}</div>
+          </div>
+        </div>
+        <div class="q-explanation">
+          <label>REASONING</label>
+          <p>{{ q.explanation }}</p>
+        </div>
       </div>
     </div>
   </div>

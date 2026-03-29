@@ -96,9 +96,16 @@
           <div class="tech-value">{{ result.peaceOfMindScore }}%</div>
           <div class="tech-progress"><div class="tech-fill" [style.width]="result.peaceOfMindScore + '%'"></div></div>
         </div>
+        <div class="tech-card guardian-highlight">
+          <div class="tech-icon">🏢</div>
+          <div class="tech-label">Fortress Shielding</div>
+          <div class="tech-value">+{{ (result.peaceOfMindScore / 10).toFixed(1) }}%</div>
+          <div class="tech-progress"><div class="tech-fill fortress" [style.width]="(result.peaceOfMindScore) + '%'"></div></div>
+          <p style="font-size: 0.6rem; color: #8B003F; font-weight: 800; margin-top: 5px;">POTENTIAL FORTRESS GAIN</p>
+        </div>
         <div class="tech-card">
           <div class="tech-icon">💸</div>
-          <div class="tech-label">Financial Ruin Probability</div>
+          <div class="tech-label">Financial Ruin Prob</div>
           <div class="tech-value">{{ result.financialRuinProb }}%</div>
           <div class="tech-progress"><div class="tech-fill danger" [style.width]="result.financialRuinProb + '%'"></div></div>
         </div>

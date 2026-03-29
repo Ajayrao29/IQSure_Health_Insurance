@@ -13,6 +13,9 @@ export interface AuthResponse {
   employeeId?: string;
   department?: string;
   approvalLimit?: number;
+  experiencePoints?: number;
+  rank?: string;
+  fortressIntegrity?: number;
 }
 export interface RegisterRequest { name: string; email: string; password: any; phone?: string; }
 export interface LoginRequest { email: string; password: any; }
@@ -20,6 +23,7 @@ export interface ResetPasswordRequest { otp: string; newPassword: any; }
 export interface User {
   userId: number; name: string; email: string; phone: string; userPoints: number; role: string;
   totalQuizzesTaken: number; currentStreak: number;
+  experiencePoints: number; rank: string; fortressIntegrity: number;
   licenseNumber?: string; specialization?: string; commissionPercentage?: number; totalQuotesSent?: number;
   employeeId?: string; department?: string; approvalLimit?: number; totalClaimsProcessed?: number;
   totalClaimsApproved?: number; totalClaimsRejected?: number;
@@ -29,7 +33,7 @@ export interface LeaderboardEntry { rank: number; userId: number; name: string; 
 export interface Quiz { quizId: number; title: string; category: string; difficulty: string; totalQuestions: number; }
 export interface Question { questionId: number; quizId: number; text: string; options: string[]; explanation?: string; }
 export interface QuestionReport { questionText: string; selectedAnswer: string; correctAnswer: string; explanation: string; isCorrect: boolean; }
-export interface AttemptResponse { attemptId: number; userId: number; quizId: number; quizTitle: string; score: number; totalQuestions: number; percentage: number; pointsEarned: number; attemptDate: string; newBadgesUnlocked: Badge[]; questions?: QuestionReport[]; }
+export interface AttemptResponse { attemptId: number; userId: number; quizId: number; quizTitle: string; score: number; totalQuestions: number; percentage: number; pointsEarned: number; attemptDate: string; newBadgesUnlocked: Badge[]; questions?: QuestionReport[]; questionReportJson?: string; }
 export interface Badge { badgeId: number; name: string; description: string; reqPoints: number; icon?: string; }
 export interface Reward {
   rewardId: number;
@@ -93,7 +97,7 @@ export interface InsuredMember {
 export interface PremiumBreakdown { policyId: number; policyTitle: string; policyType: string; basePremium: number; durationMonths: number; coverageAmount: number; userId: number; userPoints: number; badgesEarned: number; bestQuizScorePercent: number; appliedDiscounts: AppliedDiscount[]; totalDiscountPercent: number; discountedAmount: number; finalPremium: number; calculatedAt: string; }
 export interface AppliedDiscount { ruleName: string; discountPercentage: number; reason: string; }
 export interface DiscountRule { ruleId: number; ruleName: string; description: string; minQuizScorePercent: number; minUserPoints: number; minBadgesEarned: number; discountPercentage: number; applicablePolicyType: string | null; isActive: boolean; }
-export interface EducationContent { id: number; topic: string; language: string; title: string; content: string; }
+export interface EducationContent { id: number; topic: string; language: string; title: string; content: string; icon?: string; }
 export interface Claim {
   id: number;
   claimNumber: string;

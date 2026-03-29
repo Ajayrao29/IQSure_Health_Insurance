@@ -34,8 +34,46 @@
               <span class="stat-value">{{ attempt.attemptDate | date:'medium' }}</span>
             </div>
           </div>
+          <div class="card-footer">
+            <button class="btn-review" (click)="viewReport(attempt)" *ngIf="attempt.questionReportJson">
+              Audit Report →
+            </button>
+          </div>
         </div>
       }
     </div>
   }
+</div>
+
+<!-- REPORT MODAL (SAME AS DASHBOARD FOR CONSISTENCY) -->
+<div class="report-overlay fade-in" *ngIf="selectedReport" (click)="closeReport()">
+  <div class="report-modal slide-up" (click)="$event.stopPropagation()">
+    <div class="report-header">
+      <h2>History: {{ selectedReportTitle }}</h2>
+      <button class="close-modal" (click)="closeReport()">✕</button>
+    </div>
+    <div class="report-content">
+      <div class="report-q-card" *ngFor="let q of selectedReport; let i = index">
+        <div class="q-header">
+          <span class="q-num">Question {{ i + 1 }}</span>
+          <span class="q-status" [class.correct]="q.isCorrect">{{ q.isCorrect ? 'CORRECT' : 'INCORRECT' }}</span>
+        </div>
+        <p class="q-text">{{ q.questionText }}</p>
+        <div class="q-answers">
+          <div class="ans-box user-ans" [class.wrong]="!q.isCorrect">
+            <label>YOUR ANSWER</label>
+            <div>{{ q.selectedAnswer || 'Skipped' }}</div>
+          </div>
+          <div class="ans-box correct-ans" *ngIf="!q.isCorrect">
+            <label>CORRECT ANSWER</label>
+            <div>{{ q.correctAnswer }}</div>
+          </div>
+        </div>
+        <div class="q-explanation">
+          <label>ORACLE REASONING</label>
+          <p>{{ q.explanation }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

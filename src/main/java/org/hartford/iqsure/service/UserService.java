@@ -217,6 +217,9 @@ public class UserService {
                 .status(user.getStatus() != null ? user.getStatus().name() : null)
                 .totalQuizzesTaken(user.getTotalQuizzesTaken())
                 .currentStreak(user.getCurrentStreak())
+                .experiencePoints(user.getExperiencePoints())
+                .rank(user.getRank())
+                .fortressIntegrity(user.getFortressIntegrity())
                 .build();
     }
     private AuthResponse buildAuthResponse(User user, String token) {
@@ -234,6 +237,9 @@ public class UserService {
                 .userPoints(user.getUserPoints())
                 .totalQuizzesTaken(user.getTotalQuizzesTaken())
                 .currentStreak(user.getCurrentStreak())
+                .experiencePoints(user.getExperiencePoints())
+                .rank(user.getRank())
+                .fortressIntegrity(user.getFortressIntegrity())
                 .build();
     }
 }

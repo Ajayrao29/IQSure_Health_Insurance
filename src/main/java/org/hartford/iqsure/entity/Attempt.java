@@ -23,4 +23,6 @@ public class Attempt {
     private Integer pointsEarned;
     @Builder.Default
     private LocalDateTime attemptDate = LocalDateTime.now();
+    @Column(columnDefinition = "TEXT")
+    private String questionReportJson;
 }

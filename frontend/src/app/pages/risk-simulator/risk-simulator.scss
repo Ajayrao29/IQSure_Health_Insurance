@@ -504,3 +504,22 @@ h2 {
   .vs-divider { display: none; }
   .summary-arrow { display: none; }
 }
+
+.guardian-highlight {
+  background: #FFF0F5 !important;
+  border: 2px solid #8B003F !important;
+  box-shadow: 0 10px 30px rgba(139, 0, 63, 0.15) !important;
+  animation: glow-guardian 3s infinite alternate;
+  
+  .tech-label { color: #8B003F !important; }
+  .tech-value { color: #8B003F !important; }
+}
+
+.tech-fill.fortress {
+  background: linear-gradient(90deg, #E91E63, #8B003F) !important;
+}
+
+@keyframes glow-guardian {
+  from { box-shadow: 0 10px 30px rgba(139, 0, 63, 0.15); }
+  to { box-shadow: 0 10px 40px rgba(139, 0, 63, 0.3); }
+}

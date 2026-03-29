@@ -15,4 +15,5 @@ public class AttemptResponseDTO {
     private Integer percentage;
     private Integer pointsEarned;
     private LocalDateTime attemptDate;
+    private String questionReportJson;
 }

@@ -14,6 +14,9 @@ public class UserResponseDTO {
     private String role;
     private Integer totalQuizzesTaken;
     private Integer currentStreak;
+    private Integer experiencePoints;
+    private String rank;
+    private Integer fortressIntegrity;
     private String licenseNumber;
     private String specialization;
     private java.math.BigDecimal commissionPercentage;

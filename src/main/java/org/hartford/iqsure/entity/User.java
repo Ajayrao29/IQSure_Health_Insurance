@@ -57,6 +57,12 @@ public class User {
     @Builder.Default
     private Integer currentStreak = 0;
     private LocalDate lastQuizDate;
+    @Builder.Default
+    private Integer experiencePoints = 0;
+    @Builder.Default
+    private String rank = "NOVICE_GUARDIAN";
+    @Builder.Default
+    private Integer fortressIntegrity = 50; // 0-100 scale
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<UserBadge> userBadges = new ArrayList<>();

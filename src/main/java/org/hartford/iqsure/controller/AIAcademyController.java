@@ -46,12 +46,9 @@ public class AIAcademyController {
     @PostMapping("/complete-lesson")
     @Operation(summary = "Record completion of an academy session and award loyalty points")
     public ResponseEntity<org.hartford.iqsure.dto.response.UserResponseDTO> completeLesson(
-            @RequestParam Long userId,
-            @RequestParam String topic,
-            @RequestParam int score,
-            @RequestParam int total) {
-        aiAcademyService.rewardCompletion(userId, topic, score, total);
-        return ResponseEntity.ok(userService.getProfile(userId));
+            @RequestBody org.hartford.iqsure.dto.request.LessonCompletionRequest request) {
+        aiAcademyService.rewardCompletion(request.getUserId(), request.getTopic(), request.getScore(), request.getTotal(), request.getReportJson());
+        return ResponseEntity.ok(userService.getProfile(request.getUserId()));
     }
     @GetMapping("/tts")
     @Operation(summary = "Proxy for free Google TTS to avoid CORS/Rate issues")

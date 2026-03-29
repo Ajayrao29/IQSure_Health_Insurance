@@ -15,6 +15,8 @@ import { AttemptResponse } from '../../../models/models';
 export class QuizReportsComponent implements OnInit {
   attempts: AttemptResponse[] = [];
   loading = true;
+  selectedReport: any[] | null = null;
+  selectedReportTitle = '';
   constructor(private api: ApiService, private auth: AuthService) {}
   ngOnInit() {
     const userId = this.auth.getUserId();
@@ -32,5 +34,20 @@ export class QuizReportsComponent implements OnInit {
     } else {
       this.loading = false;
     }
+  }
+
+  viewReport(attempt: AttemptResponse): void {
+    if (attempt.questionReportJson) {
+      try {
+        this.selectedReport = JSON.parse(attempt.questionReportJson);
+        this.selectedReportTitle = attempt.quizTitle;
+      } catch (e) {
+        console.error('Failed to parse report', e);
+      }
+    }
+  }
+
+  closeReport(): void {
+    this.selectedReport = null;
   }
 }
