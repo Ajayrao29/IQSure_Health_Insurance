@@ -30,6 +30,8 @@ public class ClaimResponseDTO {
     private LocalDateTime reviewStartedAt;
     private LocalDateTime reviewedAt;
     private String reviewerRemarks;
+    private String aiAuditSummary;
+    private Double fraudRiskScore;
     private LocalDate settlementDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -57,6 +59,8 @@ public class ClaimResponseDTO {
                 .reviewStartedAt(claim.getReviewStartedAt())
                 .reviewedAt(claim.getReviewedAt())
                 .reviewerRemarks(claim.getReviewerRemarks())
+                .aiAuditSummary(claim.getAiAuditSummary())
+                .fraudRiskScore(claim.getFraudRiskScore())
                 .settlementDate(claim.getSettlementDate())
                 .createdAt(claim.getCreatedAt())
                 .updatedAt(claim.getUpdatedAt())

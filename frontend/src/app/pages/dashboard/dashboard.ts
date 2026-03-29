@@ -32,6 +32,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     pendingClaims: 0,
     academyCompletionRate: 0
   };
+  totalQuizzes: number = 0; // used for completion rate denominator
   recentUsers: User[] = [];
   selectedReport: any[] | null = null;
   selectedReportTitle = '';
@@ -106,7 +107,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           
           this.stats.totalPolicies = userPolicies.length;
           this.stats.activePolicies = userPolicies.filter(p => p.status === 'ACTIVE').length;
-          this.stats.inactivePolicies = userPolicies.filter(p => p.status !== 'ACTIVE').length;
+          // inactivePolicies = truly closed (expired, rejected, cancelled) — not in-progress
+          this.stats.inactivePolicies = userPolicies.filter(p =>
+            ['EXPIRED', 'CANCELLED', 'REJECTED'].includes(p.status)
+          ).length;
           
           this.stats.discountRules = discountRules.length;
           
@@ -126,15 +130,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
       badges: this.api.getBadgesByUser(userId),
       attempts: this.api.getAttemptsByUser(userId),
       policies: this.api.getUserPolicies(userId),
-      claims: this.api.getClaimsByUser(userId)
+      claims: this.api.getClaimsByUser(userId),
+      quizzes: this.api.getAllQuizzes()
     }).pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: ({ profile, badges, attempts, policies, claims }) => {
+        next: ({ profile, badges, attempts, policies, claims, quizzes }) => {
           this.user = profile;
           this.myBadges = badges;
           this.myAttempts = attempts.slice(0, 8);
           this.myPolicies = policies;
-          this.totalSavings = policies.reduce((sum, p) => sum + (p.totalClaimedAmount || 0), 0);
+          this.totalQuizzes = quizzes.length;
+          // totalSavings = sum of premium discounts earned, not claim amounts paid out
+          this.totalSavings = policies.reduce((sum, p) => sum + (p.savedAmount || 0), 0);
           this.updateMetrics(policies, claims, attempts);
           this.loading = false;
         },
@@ -147,12 +154,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private updateMetrics(policies: UserPolicy[], claims: Claim[], attempts: AttemptResponse[] = []): void {
     this.userStats.totalPolicies = policies.length;
     this.userStats.activePolicies = policies.filter(p => p.status === 'ACTIVE').length;
-    this.userStats.awaitingQuote = policies.filter(p => p.status === 'PENDING_UNDERWRITING').length;
-    this.userStats.pendingClaims = claims.filter(c => c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW').length;
-    
-    // Calculate Academy Completion Rate (6 levels total)
-    const uniqueCompletions = new Set(attempts.filter(a => a.percentage >= 80).map(a => a.quizTitle));
-    this.userStats.academyCompletionRate = Math.round((uniqueCompletions.size / 6) * 100);
+    // All statuses that are "still in progress" — user is waiting
+    this.userStats.awaitingQuote = policies.filter(p =>
+      ['PENDING_UNDERWRITING', 'UNDER_EVALUATION', 'QUOTES_SENT'].includes(p.status)
+    ).length;
+    this.userStats.pendingClaims = claims.filter(
+      c => c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW'
+    ).length;
+
+    // Academy: unique quiz topics passed at >=80% — as % of total quizzes available
+    const uniqueCompletions = new Set(
+      attempts.filter(a => a.percentage >= 80).map(a => a.quizTitle)
+    );
+    const denom = this.totalQuizzes > 0 ? this.totalQuizzes : Math.max(uniqueCompletions.size, 1);
+    this.userStats.academyCompletionRate = Math.min(
+      100,
+      Math.round((uniqueCompletions.size / denom) * 100)
+    );
   }
   get recentAttempts(): AttemptResponse[] {
     return this.myAttempts;

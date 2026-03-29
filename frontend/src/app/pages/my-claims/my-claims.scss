@@ -1,76 +1,374 @@
-.page-header {
+// My Claims — Premium SCSS
+
+$claret: #4A001F;
+$rose: #8B003F;
+$white: #fff;
+$text: #1E293B;
+$muted: #64748B;
+$light: #94A3B8;
+$border: #E2E8F0;
+$bg: #F8FAFC;
+
+$green: #10B981;
+$amber: #F59E0B;
+$blue: #3B82F6;
+$purple: #8B5CF6;
+$red: #EF4444;
+
+.fade-in { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+// ── Page Layout ───────────────────────────────────────────────────
+.claims-page {
+  font-family: 'Inter', sans-serif;
+  padding: 5.5rem 2rem 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+// ── Header ────────────────────────────────────────────────────────
+.claims-header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
+  gap: 2rem;
   margin-bottom: 3rem;
-  h1 { font-size: 2.25rem; font-weight: 800; color: #4A001F; margin: 0; }
-  p { color: #64748B; font-weight: 500; font-size: 1.1rem; }
-}
-.btn-file-new {
-  background: #8B003F;
-  color: white;
-  padding: 0.85rem 1.75rem;
-  border-radius: 12px;
-  border: none;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.3s;
-  &:hover { background: #4A001F; transform: translateY(-2px); }
-}
-.empty-state-card {
-  background: white;
-  padding: 8rem 2rem;
-  border-radius: 32px;
-  text-align: center;
-  border: 1px dashed rgba(0,0,0,0.1);
-  .no-claims-text { font-size: 1.5rem; font-weight: 800; color: #1E293B; margin-bottom: 0.5rem; }
-  p { color: #64748B; font-weight: 500; }
-}
-.btn-primary-claret {
-  background: #8B003F;
-  color: white;
-  padding: 0.75rem 2rem;
-  border-radius: 10px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-  &:hover { background: #4A001F; }
-}
-.claims-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-.claim-item-card {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  border: 1px solid rgba(0,0,0,0.05);
-  .claim-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    .claim-number { font-weight: 800; color: #4A001F; font-size: 1.1rem; }
+  flex-wrap: wrap;
+
+  .ch-eyebrow {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: $rose;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
   }
-  .claim-body {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    .info-group {
-      label { display: block; font-size: 0.7rem; font-weight: 700; color: #94A3B8; letter-spacing: 0.1em; margin-bottom: 0.25rem; }
-      p { font-size: 1.1rem; font-weight: 700; color: #1E293B; margin: 0; }
+
+  h1 { font-size: 2.25rem; font-weight: 900; color: $claret; margin: 0; }
+  p { color: $muted; font-weight: 500; margin: 0.4rem 0 0; }
+
+  .btn-file-claim {
+    background: $rose;
+    color: $white;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    border: none;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+    box-shadow: 0 8px 20px rgba($rose, 0.25);
+    &:hover { background: $claret; transform: translateY(-2px); }
+  }
+}
+
+// ── Loading & Empty ───────────────────────────────────────────────
+.claims-loading {
+  text-align: center;
+  padding: 6rem 0;
+  .loading-ring {
+    width: 48px; height: 48px;
+    border: 4px solid rgba($rose, 0.15);
+    border-top-color: $rose;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+  p { color: $muted; margin-top: 1.25rem; font-weight: 600; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-claims-state {
+  background: $white;
+  border-radius: 28px;
+  padding: 6rem 2rem;
+  text-align: center;
+  border: 1.5px dashed $border;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+
+  .ec-icon { font-size: 3rem; margin-bottom: 1.25rem; }
+  h3 { font-size: 1.5rem; font-weight: 900; color: $claret; margin: 0 0 0.5rem; }
+  p { color: $muted; font-weight: 500; max-width: 400px; margin: 0 auto 1.75rem; }
+
+  .btn-start-claim {
+    background: $rose;
+    color: $white;
+    padding: 0.9rem 2.5rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    &:hover { background: $claret; transform: translateY(-2px); }
+  }
+}
+
+// ── Stats Bar ─────────────────────────────────────────────────────
+.claims-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr 1fr; }
+
+  .csb-item {
+    background: $white;
+    border: 1.5px solid $border;
+    border-radius: 18px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.25s;
+
+    &:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
+
+    &.active { border-color: rgba($blue, 0.3); background: rgba($blue, 0.03); }
+    &.green { border-color: rgba($green, 0.3); background: rgba($green, 0.03); }
+    &.purple { border-color: rgba($purple, 0.3); background: rgba($purple, 0.03); }
+
+    .csb-val {
+      display: block;
+      font-size: 2rem;
+      font-weight: 900;
+      color: $claret;
+      margin-bottom: 0.25rem;
+    }
+
+    .csb-lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: $light;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
   }
 }
-.status-badge {
-  padding: 0.35rem 0.85rem;
+
+// ── Claims List ───────────────────────────────────────────────────
+.claims-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.claim-card {
+  background: $white;
+  border-radius: 24px;
+  border: 1.5px solid $border;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  transition: all 0.3s;
+
+  &:hover { box-shadow: 0 12px 35px rgba(0,0,0,0.07); transform: translateY(-3px); }
+
+  &.status-approved { border-left: 4px solid $green; }
+  &.status-partial { border-left: 4px solid $amber; }
+  &.status-rejected { border-left: 4px solid $red; }
+  &.status-submitted { border-left: 4px solid $amber; }
+  &.status-review { border-left: 4px solid $blue; }
+  &.status-settled { border-left: 4px solid $purple; }
+}
+
+// Card Header
+.cc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid $border;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  .cc-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .cc-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .claim-date { font-size: 0.78rem; color: $light; font-weight: 500; }
+  }
+
+  .claim-num-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    background: rgba($claret, 0.06);
+    color: $claret;
+    border-radius: 8px;
+    border: 1px solid rgba($claret, 0.1);
+  }
+
+  .claim-type-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $muted;
+    background: $bg;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid $border;
+  }
+}
+
+// Status Pills
+.status-pill {
+  padding: 0.3rem 0.9rem;
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 800;
+
   &.status-approved { background: #DCFCE7; color: #166534; }
-  &.status-rejected { background: #FEF2F2; color: #991B1B; }
-  &.status-submitted { background: #FFF9E6; color: #D97706; }
-  &.status-review { background: #E0F2FE; color: #0369A1; }
+  &.status-partial { background: #FEF9C3; color: #A16207; }
+  &.status-rejected { background: #FEE2E2; color: #991B1B; }
+  &.status-submitted { background: #FEF3C7; color: #D97706; }
+  &.status-review { background: #DBEAFE; color: #1E40AF; }
   &.status-settled { background: #F3E8FF; color: #7E22CE; }
+}
+
+// Card Body
+.cc-body {
+  padding: 1.5rem 1.75rem;
+
+  .cc-amounts {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+
+    .amount-sep { font-size: 1rem; color: $light; }
+
+    .amount-block {
+      .ab-label {
+        display: block;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: $light;
+        text-transform: uppercase;
+        margin-bottom: 0.15rem;
+      }
+      .ab-val {
+        font-size: 1.5rem;
+        font-weight: 900;
+
+        &.primary { color: $claret; }
+        &.approved { color: $green; }
+        &.settled { color: $purple; }
+      }
+    }
+  }
+
+  .cc-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    .detail-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      background: $bg;
+      border: 1px solid $border;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $text;
+
+      &.officer { border-color: rgba($blue, 0.2); background: rgba($blue, 0.05); color: #1E40AF; }
+      .dc-icon { font-size: 0.9rem; }
+    }
+  }
+}
+
+// AI Audit
+.cc-ai-audit {
+  padding: 1rem 1.75rem;
+  background: linear-gradient(135deg, rgba(15, 20, 34, 0.96) 0%, rgba(26, 31, 53, 0.96) 100%);
+  border-top: 1px solid rgba(255,255,255,0.05);
+
+  .ai-audit-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+
+    .ai-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #6366f1;
+      letter-spacing: 0.04em;
+    }
+
+    .fraud-score {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+
+      &.low { background: rgba($green, 0.1); color: $green; }
+      &.mid { background: rgba($amber, 0.1); color: $amber; }
+      &.high { background: rgba($red, 0.1); color: #f87171; }
+    }
+  }
+
+  .ai-audit-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.6;
+    font-style: italic;
+  }
+}
+
+// Remarks & Rejection
+.cc-remarks {
+  padding: 1rem 1.75rem;
+  background: rgba($blue, 0.03);
+  border-top: 1px solid rgba($blue, 0.1);
+
+  .remarks-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #1E40AF;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  p { font-size: 0.85rem; color: $text; margin: 0; line-height: 1.6; }
+}
+
+.cc-rejection {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  background: rgba($red, 0.04);
+  border-top: 1px solid rgba($red, 0.1);
+
+  .rej-icon { font-size: 1rem; flex-shrink: 0; }
+  p { font-size: 0.85rem; color: #991B1B; margin: 0; font-weight: 600; line-height: 1.6; }
+}
+
+.cc-settled-bar {
+  padding: 0.75rem 1.75rem;
+  background: rgba($purple, 0.06);
+  border-top: 1px solid rgba($purple, 0.1);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #7E22CE;
 }

@@ -58,7 +58,9 @@ public class UserPolicyService {
                 .discountApplied(breakdown.getTotalDiscountPercent())
                 .purchaseDate(LocalDateTime.now())
                 .status(UserPolicy.PolicyStatus.PENDING_UNDERWRITING)
+                // remainingCoverage starts at full coverageAmount; decrements as claims are settled
                 .remainingCoverage(java.math.BigDecimal.valueOf(policy.getCoverageAmount()))
+                .totalClaimedAmount(java.math.BigDecimal.ZERO)
                 .nomineeName(dto.getNomineeName())
                 .nomineeRelationship(dto.getNomineeRelationship())
                 .healthReportPath(dto.getHealthReportPath())
@@ -250,6 +252,10 @@ public class UserPolicyService {
     }
     private UserPolicyResponseDTO toDTO(UserPolicy up) {
         double saved = Math.round((up.getPolicy().getBasePremium() - up.getFinalPremium()) * 100.0) / 100.0;
+        // Compute expiry date from purchase date + policy duration (in months)
+        java.time.LocalDateTime expiryDate = up.getPurchaseDate() != null
+                ? up.getPurchaseDate().plusMonths(up.getPolicy().getDurationMonths())
+                : null;
         return UserPolicyResponseDTO.builder()
                 .id(up.getId())
                 .userId(up.getUser().getUserId())
@@ -263,6 +269,7 @@ public class UserPolicyService {
                 .finalPremium(up.getFinalPremium())
                 .discountApplied(up.getDiscountApplied())
                 .purchaseDate(up.getPurchaseDate())
+                .expiryDate(expiryDate)
                 .status(up.getStatus())
                 .savedAmount(saved)
                 .assignedUnderwriterId(up.getAssignedUnderwriter() != null ? up.getAssignedUnderwriter().getUserId() : null)

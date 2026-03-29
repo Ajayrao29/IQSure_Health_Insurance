@@ -119,5 +119,7 @@ export interface Claim {
   reviewedAt?: string;
   reviewerRemarks?: string;
   settlementDate?: string;
+  aiAuditSummary?: string;
+  fraudRiskScore?: number;
   createdAt: string;
 }

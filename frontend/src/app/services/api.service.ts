@@ -76,6 +76,10 @@ export class ApiService {
   settleClaim(claimId: number, settlementAmount: number): Observable<Claim> {
     return this.http.put<Claim>(`${API}/api/v1/claims/${claimId}/settle?settlementAmount=${settlementAmount}`, {});
   }
+  aiInvestigateClaim(claimId: number): Observable<any> {
+    return this.http.get<any>(`${API}/api/v1/claims/${claimId}/ai-investigate`);
+  }
+
   getAllUserPoliciesAdmin(): Observable<UserPolicy[]> {
     return this.http.get<UserPolicy[]>(`${API}/api/v1/admin/pipeline/policies`);
   }
@@ -218,6 +222,12 @@ export class ApiService {
   }
   markAllNotificationsAsRead(userId: number): Observable<void> {
     return this.http.put<void>(`${API}/api/v1/notifications/user/${userId}/read-all`, {});
+  }
+  generateHealthDeclaration(data: any): Observable<any> {
+    return this.http.post<any>(`${API}/api/v1/documents/generate-health-declaration`, data);
+  }
+  generateClaimLetter(data: any): Observable<any> {
+    return this.http.post<any>(`${API}/api/v1/documents/generate-claim-letter`, data);
   }
   uploadFile(file: File): Observable<{ filePath: string }> {
     const formData = new FormData();

@@ -1,44 +1,155 @@
-<!-- Template for the my-claims page -->
-<div class="page fade-in">
-  <div class="page-header">
-    <div class="header-content">
-      <h1>My Claims</h1>
-      <p>Track your insurance claims and remaining coverage</p>
+<!-- My Claims — IQsure Premium Claims Tracker -->
+<div class="page fade-in claims-page">
+
+  <div class="claims-header">
+    <div class="ch-text">
+      <span class="ch-eyebrow">⚡ CLAIMS CENTER</span>
+      <h1>My Insurance Claims</h1>
+      <p>Track every claim — from submission to settlement — in real time.</p>
     </div>
-    <button class="btn-file-new" routerLink="/file-claim">+ File New Claim</button>
+    <button class="btn-file-claim" routerLink="/file-claim">+ File New Claim</button>
   </div>
+
   @if (loading) {
-    <div class="loading-state">Loading claims...</div>
+    <div class="claims-loading">
+      <div class="loading-ring"></div>
+      <p>Fetching your claims...</p>
+    </div>
   } @else if (claims.length === 0) {
-    <div class="empty-state-card shadow-premium">
-      <div class="empty-content">
-        <h3 class="no-claims-text">No claims filed</h3>
-        <p>File a claim when you need to use your insurance</p>
-        <button class="btn-primary-claret mt-4" routerLink="/file-claim">File Claim</button>
-      </div>
+    <div class="empty-claims-state">
+      <div class="ec-icon">📋</div>
+      <h3>No claims filed yet</h3>
+      <p>When you need to use your insurance, file a claim here and our AI-powered claims engine handles the rest.</p>
+      <button class="btn-start-claim" routerLink="/file-claim">File Your First Claim</button>
     </div>
   } @else {
+
+    <!-- Summary Stats Bar -->
+    <div class="claims-stats-bar">
+      <div class="csb-item">
+        <span class="csb-val">{{ claims.length }}</span>
+        <span class="csb-lbl">Total Claims</span>
+      </div>
+      <div class="csb-item active">
+        <span class="csb-val">{{ getPendingCount() }}</span>
+        <span class="csb-lbl">Under Review</span>
+      </div>
+      <div class="csb-item green">
+        <span class="csb-val">{{ getApprovedCount() }}</span>
+        <span class="csb-lbl">Approved</span>
+      </div>
+      <div class="csb-item purple">
+        <span class="csb-val">₹{{ getTotalSettled() | number }}</span>
+        <span class="csb-lbl">Total Settled</span>
+      </div>
+    </div>
+
     <div class="claims-list">
       @for (c of claims; track c.id) {
-        <div class="claim-item-card">
-          <div class="claim-header">
-            <span class="claim-number">Claim #{{ c.claimNumber }}</span>
-            <span class="status-badge" [ngClass]="getStatusClass(c.status)">{{ c.status }}</span>
-          </div>
-          <div class="claim-body">
-            <div class="info-group">
-              <label>TYPE</label>
-              <p>{{ c.type }}</p>
+        <div class="claim-card" [ngClass]="getStatusClass(c.status)">
+
+          <!-- Card Header -->
+          <div class="cc-header">
+            <div class="cc-left">
+              <span class="claim-num-badge">{{ c.claimNumber }}</span>
+              <span class="claim-type-tag">{{ c.type }}</span>
             </div>
-            <div class="info-group">
-              <label>AMOUNT</label>
-              <p>₹{{ c.amount | number }}</p>
-            </div>
-            <div class="info-group">
-              <label>INCIDENT DATE</label>
-              <p>{{ c.incidentDate | date:'mediumDate' }}</p>
+            <div class="cc-right">
+              <span class="status-pill" [ngClass]="getStatusClass(c.status)">
+                {{ getStatusLabel(c.status) }}
+              </span>
+              <span class="claim-date">{{ c.createdAt | date:'mediumDate' }}</span>
             </div>
           </div>
+
+          <!-- Main Amount + Details -->
+          <div class="cc-body">
+            <div class="cc-amounts">
+              <div class="amount-block">
+                <span class="ab-label">CLAIMED</span>
+                <span class="ab-val primary">₹{{ c.amount | number }}</span>
+              </div>
+              @if (c.approvedAmount && c.approvedAmount > 0) {
+                <div class="amount-sep">→</div>
+                <div class="amount-block">
+                  <span class="ab-label">APPROVED</span>
+                  <span class="ab-val approved">₹{{ c.approvedAmount | number }}</span>
+                </div>
+              }
+              @if (c.settlementAmount && c.settlementAmount > 0) {
+                <div class="amount-sep">→</div>
+                <div class="amount-block">
+                  <span class="ab-label">SETTLED</span>
+                  <span class="ab-val settled">₹{{ c.settlementAmount | number }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="cc-details">
+              @if (c.diagnosis) {
+                <div class="detail-chip">
+                  <span class="dc-icon">🩺</span>
+                  <span>{{ c.diagnosis }}</span>
+                </div>
+              }
+              @if (c.hospitalName) {
+                <div class="detail-chip">
+                  <span class="dc-icon">🏥</span>
+                  <span>{{ c.hospitalName }}</span>
+                </div>
+              }
+              @if (c.incidentDate) {
+                <div class="detail-chip">
+                  <span class="dc-icon">📅</span>
+                  <span>Incident: {{ c.incidentDate | date:'mediumDate' }}</span>
+                </div>
+              }
+              @if (c.assignedOfficerName) {
+                <div class="detail-chip officer">
+                  <span class="dc-icon">👤</span>
+                  <span>Officer: {{ c.assignedOfficerName }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- AI Audit Section -->
+          @if (c.aiAuditSummary) {
+            <div class="cc-ai-audit">
+              <div class="ai-audit-header">
+                <span class="ai-badge">🤖 IQsure AI Audit</span>
+                @if (c.fraudRiskScore !== undefined && c.fraudRiskScore !== null) {
+                  <span class="fraud-score" [class.low]="c.fraudRiskScore < 20" [class.mid]="c.fraudRiskScore >= 20 && c.fraudRiskScore < 50" [class.high]="c.fraudRiskScore >= 50">
+                    Risk Score: {{ c.fraudRiskScore }}%
+                  </span>
+                }
+              </div>
+              <p class="ai-audit-text">{{ c.aiAuditSummary }}</p>
+            </div>
+          }
+
+          <!-- Reviewer Remarks -->
+          @if (c.reviewerRemarks) {
+            <div class="cc-remarks">
+              <span class="remarks-label">📝 Officer Remarks</span>
+              <p>{{ c.reviewerRemarks }}</p>
+            </div>
+          }
+
+          <!-- Rejection Reason -->
+          @if (c.status === 'REJECTED' && c.rejectionReason) {
+            <div class="cc-rejection">
+              <span class="rej-icon">⚠️</span>
+              <p>{{ c.rejectionReason }}</p>
+            </div>
+          }
+
+          <!-- Settlement Date -->
+          @if (c.settlementDate) {
+            <div class="cc-settled-bar">
+              ✅ Settled on {{ c.settlementDate | date:'longDate' }}
+            </div>
+          }
         </div>
       }
     </div>

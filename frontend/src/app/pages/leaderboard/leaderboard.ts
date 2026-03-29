@@ -1,8 +1,9 @@
 // Angular component for the leaderboard page
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
-@Component({ selector: 'app-leaderboard', standalone: true, imports: [], templateUrl: './leaderboard.html', styleUrls: ['./leaderboard.scss'] })
+@Component({ selector: 'app-leaderboard', standalone: true, imports: [CommonModule], templateUrl: './leaderboard.html', styleUrls: ['./leaderboard.scss'] })
 export class LeaderboardComponent implements OnInit {
   entries: any[] = [];
   loading = true;

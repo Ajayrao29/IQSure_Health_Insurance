@@ -1,81 +1,74 @@
 // Angular component for the savings-calculator page
-
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+
 @Component({
   selector: 'app-savings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DecimalPipe],
   templateUrl: './savings-calculator.html',
   styleUrls: ['./savings-calculator.scss']
 })
 export class SavingsCalculatorComponent implements OnInit {
-  totalSavings = 0;
-  potentialSavings = 0;
+  totalSavings = 0;       // Actual discounts earned on purchased policies
+  potentialSavings = 0;   // How much more the user could save with their current rewards
   policies: any[] = [];
   userPoints = 0;
   availableRewards: any[] = [];
   projectedYears = [5, 10, 20, 30];
-  expectedReturn = 0.08;
-  wealthData: { years: number, wealth: number }[] = [];
+  expectedReturn = 0.08;  // 8% annual return assumption
+  wealthData: { years: number; wealth: number }[] = [];
   maxWealth = 0;
+
   constructor(private api: ApiService, private auth: AuthService) {}
+
   ngOnInit(): void {
     const userId = this.auth.getUserId()!;
+
     this.api.getUserPolicies(userId).subscribe(policies => {
       this.policies = policies;
+      // totalSavings = sum of premium discounts earned (difference between base and final premium)
       this.totalSavings = policies.reduce((sum, p) => sum + (p.savedAmount || 0), 0);
+      // Generate projection after loading savings
+      this.generateWealthProjection();
     });
+
     this.api.getProfile(userId).subscribe(u => {
       this.userPoints = u.userPoints || 0;
-      this.api.getAvailableRewardsForUser(userId).subscribe(rewards => {
-        this.availableRewards = rewards || [];
-        this.calculatePotentialSavings(userId);
-      });
+    });
+
+    // Load outstanding unused rewards (potential additional savings)
+    this.api.getEarnedRewardsByUser(userId).subscribe(rewards => {
+      this.availableRewards = (rewards || []).filter((r: any) => !r.used && !r.isExpired);
+      this.potentialSavings = this.availableRewards.reduce(
+        (sum, r) => sum + (r.discountValue || 0), 0
+      );
     });
   }
+
+  /**
+   * Projects the compound growth of the user's realized premium savings
+   * if they were invested at the expected annual return rate.
+   * This is the correct interpretation: "how much would your insurance savings
+   * be worth if you invested them?"
+   */
   generateWealthProjection(): void {
-    const annualSavings = this.totalSavings > 0 ? this.totalSavings : 5000;
+    // If no savings yet, show projection on a minimum of ₹2,000 to make the chart meaningful
+    const principal = Math.max(this.totalSavings, 2000);
+
     this.wealthData = this.projectedYears.map(year => {
-      const wealth = annualSavings * ((Math.pow(1 + this.expectedReturn, year) - 1) / this.expectedReturn);
-      return { years: year, wealth: Math.round(wealth) };
+      // Compound interest: P * (1 + r)^n
+      const wealth = Math.round(principal * Math.pow(1 + this.expectedReturn, year));
+      return { years: year, wealth };
     });
+
     this.maxWealth = Math.max(...this.wealthData.map(d => d.wealth));
   }
-  calculatePotentialSavings(userId: number): void {
-    this.api.getActivePolicies().subscribe(policies => {
-      if (!policies || policies.length === 0) {
-        this.potentialSavings = 0;
-        return;
-      }
-      const selectedRewardIds = this.availableRewards.map(r => r.userRewardId);
-      if (selectedRewardIds.length === 0) {
-        this.potentialSavings = 0;
-        return;
-      }
-      let potential = 0;
-      let completed = 0;
-      policies.forEach(p => {
-        this.api.calculatePremium(userId, p.policyId, selectedRewardIds).subscribe({
-          next: calc => {
-            potential += calc.discountedAmount || 0;
-            completed++;
-            if (completed === policies.length) {
-              this.potentialSavings = Number(potential.toFixed(2));
-              this.generateWealthProjection();
-            }
-          },
-          error: () => {
-            completed++;
-            if (completed === policies.length) {
-              this.potentialSavings = Number(potential.toFixed(2));
-              this.generateWealthProjection();
-            }
-          }
-        });
-      });
-    });
+
+  getBarHeight(wealth: number): number {
+    if (this.maxWealth === 0) return 0;
+    return Math.round((wealth / this.maxWealth) * 100);
   }
 }

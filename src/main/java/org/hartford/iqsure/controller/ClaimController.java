@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.hartford.iqsure.dto.response.ClaimResponseDTO;
 import org.hartford.iqsure.entity.Claim;
 import org.hartford.iqsure.service.ClaimService;
+import org.hartford.iqsure.service.ClaimInvestigationAIService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ClaimController {
     private final ClaimService claimService;
+    private final ClaimInvestigationAIService claimInvestigationAIService;
     @GetMapping
     public ResponseEntity<List<ClaimResponseDTO>> getAllClaims() {
         return ResponseEntity.ok(claimService.getAllClaims().stream()
@@ -53,5 +55,15 @@ public class ClaimController {
     @PutMapping("/{id}/settle")
     public ResponseEntity<ClaimResponseDTO> settleClaim(@PathVariable Long id, @RequestParam java.math.BigDecimal settlementAmount) {
         return ResponseEntity.ok(ClaimResponseDTO.fromEntity(claimService.settleClaim(id, settlementAmount)));
+    }
+
+    /**
+     * NEW: AI-powered fraud investigation endpoint.
+     * Calls the real Spring AI / Groq LLM to analyze the claim for fraud risk,
+     * coverage eligibility, and produce a structured investigation report.
+     */
+    @GetMapping("/{id}/ai-investigate")
+    public ResponseEntity<ClaimInvestigationAIService.ClaimAIInvestigationReport> aiInvestigateClaim(@PathVariable Long id) {
+        return ResponseEntity.ok(claimInvestigationAIService.investigateClaim(id));
     }
 }

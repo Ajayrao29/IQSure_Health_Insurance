@@ -1,129 +1,292 @@
-<!-- Template for the file-claim page -->
-<div class="page fade-in claim-wizard-page">
-  <div class="form-header">
-    <button class="btn-back" routerLink="/my-claims">← Back to My Claims</button>
+<!-- IQsure Claim Filing — AI Claim Studio -->
+<div class="page fade-in claim-page">
+
+  <div class="claim-header">
+    <button class="btn-back" routerLink="/my-claims">← My Claims</button>
     <div class="header-main">
-      <h1>Submit a Claim</h1>
-      <p>Follow the steps below to report your medical incident and request settlement.</p>
-    </div>
-    <div class="step-stepper">
-      <div class="step-dot" [class.active]="claimStep === 1" [class.done]="claimStep > 1"><span>1</span><label>Incident</label></div>
-      <div class="step-line"></div>
-      <div class="step-dot" [class.active]="claimStep === 2" [class.done]="claimStep > 2"><span>2</span><label>Medical</label></div>
-      <div class="step-line"></div>
-      <div class="step-dot" [class.active]="claimStep === 3" [class.done]="claimStep > 3"><span>3</span><label>Evidence</label></div>
-      <div class="step-line"></div>
-      <div class="step-dot" [class.active]="claimStep === 4" [class.done]="claimStep > 4"><span>4</span><label>Settlement</label></div>
+      <span class="header-badge">⚡ AI Claim Studio</span>
+      <h1>File Insurance Claim</h1>
+      <p>Our AI drafts your formal claim submission letter from your form data.</p>
     </div>
   </div>
-  <div class="claim-form-card shadow-premium mt-4">
+
+  <!-- Step Wizard -->
+  <div class="step-wizard">
+    @for (s of [1,2,3,4]; track s) {
+      <div class="step-node" [class.active]="claimStep === s" [class.done]="claimStep > s">
+        <div class="step-circle">
+          @if (claimStep > s) { <span>✓</span> }
+          @else { <span>{{ s }}</span> }
+        </div>
+        <label>{{ getStepLabel(s) }}</label>
+      </div>
+      @if (s < 4) {
+        <div class="step-conn" [class.filled]="claimStep > s"></div>
+      }
+    }
+  </div>
+
+  <div class="claim-form-card">
+
+    <!-- ══ STEP 1: Incident Data ══ -->
     @if (claimStep === 1) {
       <section class="form-section fade-in">
-        <h3>Primary Incident Data</h3>
-        <p>Select the policy you are claiming against and provide the basic event details.</p>
-        <div class="form-group mb-4">
-          <label>Select Active Policy *</label>
+        <div class="section-hd">
+          <div class="sh-icon">🚨</div>
+          <div>
+            <h3>Incident Details</h3>
+            <p>Select the policy and describe the event basics.</p>
+          </div>
+        </div>
+
+        <div class="field-group full-width">
+          <label>Active Policy <span class="req">*</span></label>
           <select [(ngModel)]="formData.userPolicyId">
             <option [ngValue]="null">— Select Policy —</option>
             @for (p of policies; track p.id) {
-              <option [ngValue]="p.id">{{ p.policyTitle }} (#{{ p.id }})</option>
+              <option [ngValue]="p.id">{{ p.policyTitle }} · Coverage ₹{{ p.remainingCoverage | number }} remaining</option>
             }
           </select>
         </div>
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label>Claim Category *</label>
+
+        <div class="field-grid-2">
+          <div class="field-group">
+            <label>Claim Category <span class="req">*</span></label>
             <select [(ngModel)]="formData.type">
-              <option value="CASHLESS">Cashless (Integrated Hospital)</option>
-              <option value="REIMBURSEMENT">Reimbursement (Out-of-pocket)</option>
-              <option value="ACCIDENTAL">Accidental / Trauma</option>
+              <option value="CASHLESS">🏥 Cashless (Integrated Hospital)</option>
+              <option value="REIMBURSEMENT">💳 Reimbursement (Out-of-pocket)</option>
+              <option value="ACCIDENTAL">⚡ Accidental / Trauma</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Requested Settlement (₹) *</label>
-            <input type="number" [(ngModel)]="formData.amount" placeholder="e.g. 50000">
+          <div class="field-group">
+            <label>Claimed Amount (₹) <span class="req">*</span></label>
+            <input type="number" [(ngModel)]="formData.amount" placeholder="e.g. 75000" min="1" />
           </div>
         </div>
-        <div class="form-group mt-3">
-          <label>Date of Incident *</label>
-          <input type="date" [(ngModel)]="formData.incidentDate" [max]="today">
+
+        <div class="field-grid-2">
+          <div class="field-group">
+            <label>Date of Incident <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="formData.incidentDate" [max]="today" />
+          </div>
+          <div class="field-group">
+            <label>Hospital / Facility</label>
+            <input type="text" [(ngModel)]="formData.hospitalName" placeholder="Name of treating hospital..." />
+          </div>
         </div>
       </section>
     }
+
+    <!-- ══ STEP 2: Medical Details ══ -->
     @if (claimStep === 2) {
       <section class="form-section fade-in">
-        <h3>Medical Details & Diagnosis</h3>
-        <p>Tell us more about the symptoms and the hospital involved.</p>
-        <div class="form-group mb-4">
-          <label>Hospital or Healthcare Facility Name</label>
-          <input type="text" [(ngModel)]="formData.hospitalName" placeholder="Enter Facility Name">
+        <div class="section-hd">
+          <div class="sh-icon">🩺</div>
+          <div>
+            <h3>Medical Details & Diagnosis</h3>
+            <p>Describe the medical event. The AI will use this to draft your submission letter.</p>
+          </div>
         </div>
-        <div class="form-group mb-4">
-          <label>Primary Diagnosis *</label>
-          <input type="text" [(ngModel)]="formData.diagnosis" placeholder="What was the medical issue?">
+
+        <div class="field-group full-width">
+          <label>Primary Diagnosis <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="formData.diagnosis" placeholder="e.g. Acute Appendicitis, Fracture — Right Femur..." />
         </div>
-        <div class="form-group">
-          <label>Narrative / Event Description</label>
-          <textarea rows="5" [(ngModel)]="formData.description" placeholder="Provide a detailed description of how the incident happened..."></textarea>
+
+        <div class="field-group full-width mt-sm">
+          <label>Detailed Incident Description</label>
+          <textarea rows="5" [(ngModel)]="formData.description"
+            placeholder="Describe what happened — when symptoms started, treatment received, and any other relevant medical information..."></textarea>
+          <p class="field-hint">The more detail you provide, the more accurate your AI-generated claim letter will be.</p>
+        </div>
+
+        <div class="ai-preview-tip">
+          <span class="apt-icon">🤖</span>
+          <p>On the next step, our AI will draft a formal <strong>Claim Submission Letter</strong> using this medical data. It takes about 5–10 seconds.</p>
         </div>
       </section>
     }
+
+    <!-- ══ STEP 3: AI Claim Document ══ -->
     @if (claimStep === 3) {
       <section class="form-section fade-in">
-        <h3>Digital Evidence & Documentation</h3>
-        <p>Upload clear photos of bills, prescriptions, and discharge summaries.</p>
-        <div class="mock-upload-container">
-          <div class="upload-item" (click)="formData.billsUploaded = !formData.billsUploaded" [class.checked]="formData.billsUploaded">
-            <div class="u-icon">📄</div>
-            <div class="u-meta">
-              <strong>Medical Bills / Invoices</strong>
-              <span>{{ formData.billsUploaded ? 'Document Linked' : 'Click to simulate upload' }}</span>
-            </div>
-            <div class="u-check">{{ formData.billsUploaded ? '✔️' : '○' }}</div>
+        <div class="section-hd">
+          <div class="sh-icon">🤖</div>
+          <div>
+            <h3>AI Claim Document Engine</h3>
+            <p>Your formal claim submission letter — generated from your data above.</p>
           </div>
-          <div class="upload-item info-note">
-             <span class="icon">ℹ️</span>
-             <p>Our AI will automatically extract data from these documents to speed up your settlement.</p>
-          </div>
+          @if (claimDocument && !generatingDoc) {
+            <button class="btn-regen-small" (click)="regenerateDocument()">🔄 Regenerate</button>
+          }
         </div>
+
+        <!-- AI Generation Panel -->
+        <div class="ai-claim-doc-panel" [class.gen]="generatingDoc" [class.ready]="!!claimDocument && !generatingDoc">
+
+          <div class="acd-header">
+            <div class="acd-pulse" [class.on]="generatingDoc || !!claimDocument"></div>
+            <span class="acd-label">🤖 IQsure Claim Document Engine</span>
+            @if (claimDocument) {
+              <span class="acd-ref">{{ claimDocument.referenceId }}</span>
+            }
+          </div>
+
+          @if (generatingDoc) {
+            <div class="acd-generating">
+              <div class="gen-wave">
+                @for (b of [1,2,3,4,5,6,7]; track b) {
+                  <div class="wave-bar" [style.animation-delay]="((b-1) * 0.12) + 's'"></div>
+                }
+              </div>
+              <p class="gen-status">🔬 Analyzing incident and medical data...</p>
+              <div class="gen-checklist">
+                <span>📋 Structuring incident chronology...</span>
+                <span>⚖️ Computing claim eligibility indicators...</span>
+                <span>✍️ Drafting formal claim submission letter...</span>
+                <span>🔏 Assigning official reference ID...</span>
+              </div>
+            </div>
+          }
+
+          @if (claimDocument && !generatingDoc) {
+            <div class="acd-ready slide-up">
+              <!-- Document Summary -->
+              <div class="doc-summary">
+                <div class="ds-icon">📄</div>
+                <div class="ds-content">
+                  <strong>{{ claimDocument.documentTitle }}</strong>
+                  <p>{{ claimDocument.aiSummary }}</p>
+                </div>
+                <div class="ds-ref-block">
+                  <span class="ds-ref">{{ claimDocument.referenceId }}</span>
+                  <span class="ds-date">{{ claimDocument.generatedAt }}</span>
+                </div>
+              </div>
+
+              <!-- Preview Toggle -->
+              <div class="preview-toggle-bar">
+                <button class="btn-preview-toggle" (click)="toggleDocPreview()">
+                  {{ showDocPreview ? '▲ Hide Document' : '▼ Preview Full Document' }}
+                </button>
+                <div class="doc-ready-indicator">✅ Document ready for submission</div>
+              </div>
+
+              @if (showDocPreview) {
+                <div class="claim-doc-text slide-up">
+                  <pre>{{ claimDocument.documentText }}</pre>
+                </div>
+              }
+            </div>
+          }
+
+          @if (!generatingDoc && !claimDocument) {
+            <div class="acd-idle">
+              <p>Document generation in progress...</p>
+              <button class="btn-gen-claim" (click)="generateClaimDocument()">▶ Generate Now</button>
+            </div>
+          }
+        </div>
+
+        @if (docError) {
+          <div class="doc-error mt-sm">⚠️ {{ docError }}</div>
+        }
+
+        <!-- Document stats/info -->
+        @if (claimDocument) {
+          <div class="doc-stats-row">
+            <div class="dsr-item">
+              <span class="dsr-label">Claim Type</span>
+              <strong>{{ getClaimTypeLabel() }}</strong>
+            </div>
+            <div class="dsr-item">
+              <span class="dsr-label">Amount</span>
+              <strong>₹{{ formData.amount | number }}</strong>
+            </div>
+            <div class="dsr-item">
+              <span class="dsr-label">Incident</span>
+              <strong>{{ formData.incidentDate | date:'mediumDate' }}</strong>
+            </div>
+            <div class="dsr-item">
+              <span class="dsr-label">Diagnosis</span>
+              <strong>{{ formData.diagnosis | slice:0:30 }}{{ formData.diagnosis.length > 30 ? '...' : '' }}</strong>
+            </div>
+          </div>
+        }
       </section>
     }
+
+    <!-- ══ STEP 4: Settlement & Declaration ══ -->
     @if (claimStep === 4) {
       <section class="form-section fade-in">
-        <h3>Settlement Mode & Bank Details</h3>
-        <p>Provide the account details where the funds should be disbursed if approved.</p>
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label>Bank Account Number</label>
-            <input type="password" [(ngModel)]="formData.bankAccountNo" placeholder="•••• •••• ••••">
-          </div>
-          <div class="form-group">
-            <label>Bank IFSC Code</label>
-            <input type="text" [(ngModel)]="formData.bankIFSC" placeholder="e.g. SBIN0001234">
+        <div class="section-hd">
+          <div class="sh-icon">🏦</div>
+          <div>
+            <h3>Settlement Details</h3>
+            <p>Provide account details for fund disbursement if the claim is approved.</p>
           </div>
         </div>
-        <div class="confirmation-checkbox mt-4">
-          <label class="check-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            I hereby declare that all information provided is true and accurate to the best of my knowledge.
+
+        <div class="field-grid-2">
+          <div class="field-group">
+            <label>Bank Account Number</label>
+            <input type="password" [(ngModel)]="formData.bankAccountNo" placeholder="•••• •••• ••••" />
+          </div>
+          <div class="field-group">
+            <label>IFSC Code</label>
+            <input type="text" [(ngModel)]="formData.bankIFSC" placeholder="e.g. SBIN0001234" class="mono-input" />
+          </div>
+        </div>
+
+        <!-- Document Confirmation -->
+        @if (claimDocument) {
+          <div class="doc-confirm-card mt-md">
+            <div class="dcc-icon">📄</div>
+            <div class="dcc-info">
+              <strong>AI Claim Letter Attached</strong>
+              <span>{{ claimDocument.documentTitle }}</span>
+              <span class="dcc-ref">Ref: {{ claimDocument.referenceId }}</span>
+            </div>
+            <div class="dcc-check">✅</div>
+          </div>
+        }
+
+        <!-- Solemn Declaration -->
+        <div class="declaration-box mt-md">
+          <label class="decl-check-label">
+            <input type="checkbox" [(ngModel)]="formData.declarationChecked" />
+            <div class="decl-check-text">
+              <strong>Declaration of Truth</strong>
+              <p>I hereby solemnly declare that all information provided in this claim application is accurate, complete, and true to the best of my knowledge. I understand that submission of false information may result in claim rejection and legal action as per applicable laws.</p>
+            </div>
           </label>
         </div>
       </section>
     }
-    @if (successMessage) { <div class="alert alert-success mt-4">✅ {{ successMessage }}</div> }
-    @if (errorMessage) { <div class="alert alert-error mt-4">⚠️ {{ errorMessage }}</div> }
-    <div class="form-wizard-footer mt-4">
+
+    <!-- Alerts -->
+    @if (successMessage) {
+      <div class="form-alert success slide-up">✅ {{ successMessage }}</div>
+    }
+    @if (errorMessage) {
+      <div class="form-alert error slide-up">⚠️ {{ errorMessage }}</div>
+    }
+
+    <!-- Navigation -->
+    <div class="form-nav">
       @if (claimStep > 1) {
-        <button class="btn-prev" (click)="prevStep()">Back</button>
-      } @else { <div></div> }
+        <button class="btn-prev" (click)="prevStep()">← Previous</button>
+      } @else {
+        <div></div>
+      }
       @if (claimStep < 4) {
         <button class="btn-next" (click)="nextStep()">
-          Next: {{ (claimStep === 1 ? 'Medical Data' : claimStep === 2 ? 'Upload Evidence' : 'Settlement Mode') }} →
+          {{ claimStep === 1 ? 'Medical Details' : claimStep === 2 ? 'Generate Document' : 'Settlement Mode' }} →
         </button>
       } @else {
-        <button class="btn-submit-final" (click)="submitClaim()">
-          Confirm & File Claim
+        <button class="btn-submit" (click)="submitClaim()" [disabled]="submitting || !formData.declarationChecked">
+          @if (submitting) { ⏳ Filing Claim... }
+          @else { 🚀 File Claim }
         </button>
       }
     </div>

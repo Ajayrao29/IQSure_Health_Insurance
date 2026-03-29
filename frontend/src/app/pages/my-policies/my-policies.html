@@ -1,71 +1,209 @@
-<!-- Template for the my-policies page -->
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1>My Policies</h1>
-      <p>Your purchased insurance policies</p>
+<!-- My Policies — IQsure Premium Policy Wallet -->
+<div class="policies-page fade-in">
+
+  <!-- ── PAGE HEADER ─────────────────────────────────────────── -->
+  <div class="mp-header">
+    <div class="mph-left">
+      <span class="mph-eyebrow">🛡️ POLICY WALLET</span>
+      <h1>My Insurance Policies</h1>
+      <p>Manage, track, and activate your coverage portfolio.</p>
     </div>
-    <a routerLink="/policies" class="btn-primary">Browse More Policies</a>
+    <a routerLink="/policies" class="btn-browse">+ Browse Policies</a>
   </div>
+
+  <!-- ── STATS SUMMARY ROW ───────────────────────────────────── -->
+  @if (!loading && policies.length > 0) {
+    <div class="mp-stats-row">
+      <div class="mps-card">
+        <div class="mpsc-icon green">✅</div>
+        <div class="mpsc-data">
+          <span class="mpsd-val">{{ activePolicies.length }}</span>
+          <span class="mpsd-lbl">Active Policies</span>
+        </div>
+      </div>
+      <div class="mps-card">
+        <div class="mpsc-icon blue">🔍</div>
+        <div class="mpsc-data">
+          <span class="mpsd-val">{{ pendingPolicies.length }}</span>
+          <span class="mpsd-lbl">In Review</span>
+        </div>
+      </div>
+      <div class="mps-card" [class.pulse-card]="actionNeeded.length > 0">
+        <div class="mpsc-icon amber">💬</div>
+        <div class="mpsc-data">
+          <span class="mpsd-val">{{ actionNeeded.length }}</span>
+          <span class="mpsd-lbl">Action Needed</span>
+        </div>
+      </div>
+      <div class="mps-card">
+        <div class="mpsc-icon purple">💰</div>
+        <div class="mpsc-data">
+          <span class="mpsd-val">₹{{ totalCoverage | number }}</span>
+          <span class="mpsd-lbl">Total Coverage</span>
+        </div>
+      </div>
+      <div class="mps-card">
+        <div class="mpsc-icon rose">🎁</div>
+        <div class="mpsc-data">
+          <span class="mpsd-val">₹{{ totalSaved | number }}</span>
+          <span class="mpsd-lbl">Premium Saved</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── NOTIFICATION ────────────────────────────────────────── -->
   @if (paymentNotice) {
     <div class="inline-notification" [ngClass]="paymentNotice.type">
       <span class="icon">{{ paymentNotice.type === 'success' ? '✅' : '❌' }}</span>
       <p>{{ paymentNotice.message }}</p>
     </div>
   }
+
+  <!-- ── LOADING ─────────────────────────────────────────────── -->
   @if (loading) {
-    <div class="loading">Loading your policies…</div>
-  }
-  @if (!loading && policies.length === 0) {
-    <div class="empty-state">
-      <div class="empty-icon">📋</div>
-      <h3>No policies yet</h3>
-      <p>Browse our policies and use your quiz points for discounts!</p>
-      <a routerLink="/policies" class="btn-primary">Browse Policies</a>
+    <div class="loading-state">
+      <div class="loading-ring"></div>
+      <p>Loading your policies…</p>
     </div>
   }
+
+  <!-- ── EMPTY ───────────────────────────────────────────────── -->
+  @if (!loading && policies.length === 0) {
+    <div class="empty-wallet">
+      <div class="ew-icon">🗂️</div>
+      <h3>Your policy wallet is empty</h3>
+      <p>Explore our plans and use your IQsure points for premium discounts!</p>
+      <div class="ew-cta">
+        <a routerLink="/policies" class="btn-primary-cta">Browse Policies</a>
+        <a routerLink="/risk-simulator" class="btn-sim-link">⚡ Simulate Risk First</a>
+      </div>
+    </div>
+  }
+
+  <!-- ── POLICY LIST ─────────────────────────────────────────── -->
   @if (!loading && policies.length > 0) {
     <div class="policy-list">
-      @for (p of policies; track p) {
-        <div class="policy-card" [class.pending]="p.status !== 'ACTIVE'">
-          <div class="card-left">
-            <div class="type-icon">{{ getPolicyIcon(p.policyType) }}</div>
-            <div>
-              <h3>{{ p.policyTitle }}</h3>
-              <div class="policy-meta">
-                <span class="type-tag">{{ p.policyType }}</span>
-                <span class="status-tag" [ngClass]="getStatusClass(p.status)">{{ p.status.replace('_', ' ') }}</span>
+      @for (p of policies; track p.id) {
+
+        <!-- ACTION BANNER — QUOTES_SENT -->
+        @if (p.status === 'QUOTES_SENT') {
+          <div class="action-banner">
+            <div class="ab-pulse"></div>
+            <div class="ab-content">
+              <span class="ab-icon">💬</span>
+              <div>
+                <strong>Underwriter Quote Ready!</strong>
+                <p>Your underwriter has reviewed <em>{{ p.policyTitle }}</em> and sent you a premium quote. Review and pay to activate your coverage.</p>
               </div>
             </div>
+            <button class="ab-cta" (click)="openQuoteDetail(p)">View Quote →</button>
           </div>
-          <div class="card-right">
-            <div class="premium-info">
-              @if (p.status === 'QUOTES_SENT') {
-                <div class="quote-received">
-                  <small>Underwriter Quote:</small>
-                  <div class="final-premium quote-highlight">₹{{ p.quoteAmount | number }}</div>
-                  <button class="btn-primary btn-sm pay-btn" (click)="payNow(p)">💳 Pay Now (Razorpay)</button>
+        }
+
+        <div class="policy-card" [class]="'status-' + p.status.toLowerCase().split('_').join('-')">
+
+          <!-- Status left-border indicator -->
+          <div class="pc-status-bar" [class]="getStatusClass(p.status)"></div>
+
+          <!-- Card main body -->
+          <div class="pc-body">
+
+            <!-- Top row: icon + title + status + premium -->
+            <div class="pc-top">
+              <div class="pc-icon-wrap">{{ getPolicyIcon(p.policyType) }}</div>
+
+              <div class="pc-title-block">
+                <h3>{{ p.policyTitle }}</h3>
+                <div class="pc-tags">
+                  <span class="tag type-tag">{{ p.policyType }}</span>
+                  <span class="tag status-tag" [ngClass]="getStatusClass(p.status)">{{ getStatusLabel(p.status) }}</span>
                 </div>
-              } @else {
-                <div class="final-premium">₹{{ (p.quoteAmount || p.finalPremium) | number }}/yr</div>
+              </div>
+
+              <div class="pc-premium-block">
+                @if (p.status === 'QUOTES_SENT') {
+                  <div class="quoted-premium">
+                    <span class="qp-label">Quote Received</span>
+                    <span class="qp-amount">₹{{ p.quoteAmount | number }}</span>
+                    <span class="qp-sub">Annual premium</span>
+                  </div>
+                } @else if (p.status === 'ACTIVE') {
+                  <div class="active-premium">
+                    <span class="ap-amount">₹{{ (p.quoteAmount || p.finalPremium) | number }}</span>
+                    <span class="ap-sub">/year</span>
+                  </div>
+                } @else {
+                  <div class="pending-premium">
+                    <span class="pp-amount">₹{{ p.finalPremium | number }}</span>
+                    <span class="pp-sub">Est. premium/yr</span>
+                  </div>
+                }
+
+                @if (p.savedAmount > 0) {
+                  <div class="saved-chip">🎁 Saved ₹{{ p.savedAmount | number }}</div>
+                }
+              </div>
+            </div>
+
+            <!-- Coverage + duration chips -->
+            <div class="pc-meta-chips">
+              <div class="meta-chip"><span>Coverage</span><strong>₹{{ p.coverageAmount | number }}</strong></div>
+              <div class="meta-chip"><span>Duration</span><strong>{{ p.durationMonths }} months</strong></div>
+              @if (p.discountApplied > 0) {
+                <div class="meta-chip green"><span>Discount</span><strong>{{ p.discountApplied | number:'1.0-1' }}%</strong></div>
               }
-              @if (p.savedAmount > 0 && p.status !== 'QUOTES_SENT') {
-                <div class="base-info">
-                  <span class="original">₹{{ p.basePremium | number }}</span>
-                  <span class="saved">You saved ₹{{ p.savedAmount | number }}!</span>
-                </div>
+              @if (p.status === 'ACTIVE' && p.remainingCoverage !== undefined) {
+                <div class="meta-chip blue"><span>Remaining</span><strong>₹{{ p.remainingCoverage | number }}</strong></div>
+              }
+              @if (p.assignedUnderwriterName) {
+                <div class="meta-chip purple"><span>Underwriter</span><strong>{{ p.assignedUnderwriterName }}</strong></div>
+              }
+              @if (p.expiryDate && p.status === 'ACTIVE') {
+                <div class="meta-chip"><span>Valid Until</span><strong>{{ p.expiryDate | date:'MMM yyyy' }}</strong></div>
               }
             </div>
-            <div class="extra-details">
-              <span>Coverage: ₹{{ p.coverageAmount | number }}</span>
-              <span>{{ p.durationMonths }} months</span>
-              @if (p.discountApplied > 0 && p.status !== 'QUOTES_SENT') {
-                <span class="discount-applied">{{ p.discountApplied }}% discount</span>
+
+            <!-- Pipeline progress steps -->
+            @if (!['ACTIVE', 'EXPIRED', 'REJECTED', 'CANCELLED'].includes(p.status)) {
+              <div class="pipeline-steps">
+                @for (step of getStatusSteps(p.status); track step.label; let last = $last) {
+                  <div class="ps-step" [class.done]="step.done" [class.active-step]="step.active">
+                    <div class="ps-dot">
+                      @if (step.done) { <span>✓</span> }
+                      @else if (step.active) { <span class="ps-pulse"></span> }
+                    </div>
+                    <span class="ps-label">{{ step.label }}</span>
+                  </div>
+                  @if (!last) { <div class="ps-line" [class.done]="step.done"></div> }
+                }
+              </div>
+            }
+
+            <!-- Underwriter remarks (if any) -->
+            @if (p.underwriterRemarks && p.status !== 'ACTIVE') {
+              <div class="uw-remarks">
+                <span class="uwr-icon">💬</span>
+                <p><strong>Underwriter Note:</strong> {{ p.underwriterRemarks }}</p>
+              </div>
+            }
+
+            <!-- Card actions -->
+            <div class="pc-actions">
+              @if (p.status === 'QUOTES_SENT') {
+                <button class="btn-pay-cta" (click)="payNow(p)">
+                  <span>💳</span> Confirm Payment — ₹{{ p.quoteAmount | number }}
+                </button>
+                <button class="btn-detail" (click)="openQuoteDetail(p)">Quote Details</button>
               }
               @if (p.status === 'ACTIVE') {
-                 <button class="btn-card-view" (click)="viewCertificate(p)">
-                   <span class="view-id-icon">🪪</span> Digital ID
-                 </button>
+                <button class="btn-cert" (click)="viewCertificate(p)">🪪 Digital ID Card</button>
+                <a routerLink="/file-claim" class="btn-claim-link">📋 File a Claim</a>
+              }
+              @if (p.status === 'REJECTED' && p.underwriterRemarks) {
+                <div class="rejection-reason">
+                  <strong>⚠️ Rejection Reason:</strong> {{ p.underwriterRemarks }}
+                </div>
               }
             </div>
           </div>
@@ -73,91 +211,254 @@
       }
     </div>
   }
-  @if (showPaymentConfirm && selectedPolicy) {
-    <div class="modal-overlay">
-      <div class="modal-card">
-        <span class="modal-icon">💳</span>
-        <h2>Secure Payment</h2>
-        <p>
-          You are about to pay <strong>₹{{ selectedPolicy.quoteAmount | number }}</strong> for the
-          <strong>{{ selectedPolicy.policyTitle }}</strong>.
-        </p>
-        <div class="modal-actions">
-          <button class="btn-cancel" (click)="showPaymentConfirm = false">Cancel</button>
-          <button class="btn-confirm" (click)="confirmPayment()">Pay Now</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL: QUOTE DETAIL DRAWER ─────────────────────────────────── -->
+@if (showQuoteDetail && selectedPolicy) {
+  <div class="modal-overlay" (click)="showQuoteDetail = false">
+    <div class="quote-drawer" (click)="$event.stopPropagation()">
+      <button class="drawer-close" (click)="showQuoteDetail = false">✕</button>
+      <div class="qd-header">
+        <span class="qd-icon">{{ getPolicyIcon(selectedPolicy.policyType) }}</span>
+        <div>
+          <h2>{{ selectedPolicy.policyTitle }}</h2>
+          <p>Underwriter Premium Assessment</p>
         </div>
       </div>
-    </div>
-  }
-  @if (processing) {
-    <div class="modal-overlay">
-      <div class="modal-card">
-        <div class="dot-loader"></div>
-        <p style="margin-top: 1.5rem; font-weight: 700;">Processing Transaction...</p>
-      </div>
-    </div>
-  }
-  @if (showSuccessCard && selectedPolicy) {
-    <div class="modal-overlay celebration">
-      <div class="success-card">
-        <div class="success-icon-wrap">
-          <div class="check-container">
-            <div class="check-mark"></div>
+
+      <div class="qd-body">
+        <div class="qd-section">
+          <h4>💰 Premium Breakdown</h4>
+          <div class="qd-table">
+            <div class="qdt-row">
+              <span>Base Premium</span>
+              <strong>₹{{ selectedPolicy.basePremium | number }}</strong>
+            </div>
+            @if (selectedPolicy.discountApplied > 0) {
+              <div class="qdt-row discount">
+                <span>IQsure Discount ({{ selectedPolicy.discountApplied | number:'1.0-1' }}%)</span>
+                <strong class="green">−₹{{ selectedPolicy.savedAmount | number }}</strong>
+              </div>
+            }
+            <div class="qdt-divider"></div>
+            <div class="qdt-row total">
+              <span>Your Final Premium (Underwriter Approved)</span>
+              <strong class="blue">₹{{ selectedPolicy.quoteAmount | number }}</strong>
+            </div>
           </div>
         </div>
-        <h2>Payment Successful!</h2>
-        <p class="success-sub">Congratulations! Your policy is now active.</p>
-        <div class="receipt-box">
-          <div class="r-row">
+
+        <div class="qd-section">
+          <h4>🛡️ Policy Coverage</h4>
+          <div class="qd-coverage-grid">
+            <div class="qdc-item"><span>Max Coverage</span><strong>₹{{ selectedPolicy.coverageAmount | number }}</strong></div>
+            <div class="qdc-item"><span>Duration</span><strong>{{ selectedPolicy.durationMonths }} months</strong></div>
+            @if (selectedPolicy.nomineeName) {
+              <div class="qdc-item"><span>Nominee</span><strong>{{ selectedPolicy.nomineeName }} ({{ selectedPolicy.nomineeRelationship }})</strong></div>
+            }
+            @if (selectedPolicy.assignedUnderwriterName) {
+              <div class="qdc-item"><span>Underwriter</span><strong>{{ selectedPolicy.assignedUnderwriterName }}</strong></div>
+            }
+          </div>
+        </div>
+
+        @if (selectedPolicy.underwriterRemarks) {
+          <div class="qd-section">
+            <h4>📝 Underwriter Notes</h4>
+            <div class="qd-remarks-box">{{ selectedPolicy.underwriterRemarks }}</div>
+          </div>
+        }
+      </div>
+
+      <div class="qd-footer">
+        <button class="btn-cancel-drawer" (click)="showQuoteDetail = false">Maybe Later</button>
+        <button class="btn-pay-now-main" (click)="showQuoteDetail = false; payNow(selectedPolicy!)">
+          💳 Confirm Payment — ₹{{ selectedPolicy.quoteAmount | number }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL: PAYMENT CONFIRMATION ────────────────────────────────── -->
+@if (showPaymentConfirm && selectedPolicy) {
+  <div class="modal-overlay" (click)="showPaymentConfirm = false">
+    <div class="payment-confirm-card" (click)="$event.stopPropagation()">
+      <div class="pcc-lock-icon">🔐</div>
+      <h2>Confirm Secure Payment</h2>
+      <p class="pcc-sub">Review your policy details before completing.</p>
+
+      <div class="pcc-policy-chip">
+        <span class="pcc-policy-icon">{{ getPolicyIcon(selectedPolicy.policyType) }}</span>
+        <div>
+          <strong>{{ selectedPolicy.policyTitle }}</strong>
+          <span>{{ selectedPolicy.policyType }} • {{ selectedPolicy.durationMonths }} months of coverage</span>
+        </div>
+      </div>
+
+      <div class="pcc-amount-block">
+        <span class="pccab-label">ANNUAL PREMIUM</span>
+        <span class="pccab-amount">₹{{ selectedPolicy.quoteAmount | number }}</span>
+        @if (selectedPolicy.savedAmount > 0) {
+          <span class="pccab-saved">You saved ₹{{ selectedPolicy.savedAmount | number }} with IQsure rewards!</span>
+        }
+      </div>
+
+      <div class="pcc-security-badges">
+        <span class="sec-badge">🔒 256-bit Encrypted</span>
+        <span class="sec-badge">✅ PCI Compliant</span>
+        <span class="sec-badge">🛡️ Instant Activation</span>
+      </div>
+
+      <div class="pcc-actions">
+        <button class="btn-pcc-cancel" (click)="showPaymentConfirm = false">Cancel</button>
+        <button class="btn-pcc-confirm" (click)="confirmPayment()">
+          💳 Pay ₹{{ selectedPolicy.quoteAmount | number }} Now
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL: PAYMENT PROCESSING ──────────────────────────────────── -->
+@if (showProcessing) {
+  <div class="modal-overlay processing-overlay">
+    <div class="processing-card">
+      <div class="processing-ring">
+        <div class="pr-inner"></div>
+      </div>
+      <div class="processing-step-label">{{ getPayStepLabel() }}</div>
+      <div class="processing-steps">
+        <div class="prs-step" [class.done]="payStep > 1" [class.active-step]="payStep === 1">
+          {{ payStep > 1 ? '✓' : '○' }} Initiating secure connection
+        </div>
+        <div class="prs-step" [class.done]="payStep > 2" [class.active-step]="payStep === 2">
+          {{ payStep > 2 ? '✓' : '○' }} Encrypting payment data
+        </div>
+        <div class="prs-step" [class.done]="payStep > 3" [class.active-step]="payStep === 3">
+          {{ payStep > 3 ? '✓' : '○' }} Confirming with server
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL: PAYMENT SUCCESS & RECEIPT ───────────────────────────── -->
+@if (showSuccessCard && selectedPolicy) {
+  <div class="modal-overlay celebration-overlay">
+    <div class="success-receipt-card">
+
+      <!-- Confetti-like success ring -->
+      <div class="src-check-ring">
+        <div class="src-check">✓</div>
+      </div>
+
+      <h2>Policy Activated! 🎉</h2>
+      <p class="src-sub">Your coverage is now live and fully active.</p>
+
+      <!-- Transaction receipt -->
+      <div class="receipt-paper">
+        <div class="receipt-header">PAYMENT RECEIPT</div>
+
+        <div class="receipt-rows">
+          <div class="rr-row">
             <span>Policy</span>
             <strong>{{ selectedPolicy.policyTitle }}</strong>
           </div>
-          <div class="r-row">
+          <div class="rr-row">
+            <span>Coverage</span>
+            <strong>₹{{ selectedPolicy.coverageAmount | number }}</strong>
+          </div>
+          <div class="rr-row">
+            <span>Duration</span>
+            <strong>{{ selectedPolicy.durationMonths }} months</strong>
+          </div>
+          @if (selectedPolicy.nomineeName) {
+            <div class="rr-row">
+              <span>Nominee</span>
+              <strong>{{ selectedPolicy.nomineeName }}</strong>
+            </div>
+          }
+          <div class="rr-divider"></div>
+          <div class="rr-row total-row">
             <span>Amount Paid</span>
-            <strong class="price">₹{{ selectedPolicy.quoteAmount | number }}</strong>
+            <strong class="paid-amount">₹{{ selectedPolicy.quoteAmount | number }}</strong>
           </div>
-          <div class="r-row">
-            <span>Ref No.</span>
-            <strong>#{{ (100000 + selectedPolicy.id * 7).toString().substring(0,6) }}</strong>
+          <div class="rr-row">
+            <span>Transaction Ref.</span>
+            <strong class="ref-no">#{{ getPolicyNumber(selectedPolicy.id) }}</strong>
+          </div>
+          <div class="rr-row">
+            <span>Date</span>
+            <strong>{{ today | date:'medium' }}</strong>
           </div>
         </div>
-        <p class="footer-note">A confirmation email has been sent to your registered address.</p>
-        <button class="btn-done" (click)="showSuccessCard = false">Back to Dashboard</button>
+
+        <div class="receipt-barcode"></div>
+      </div>
+
+      <p class="receipt-footer-note">📧 Confirmation email sent. You can file claims immediately.</p>
+
+      <div class="src-actions">
+        <button class="btn-view-id" (click)="showSuccessCard = false; viewCertificate(selectedPolicy!)">🪪 View Digital ID Card</button>
+        <button class="btn-go-claims" routerLink="/my-claims" (click)="showSuccessCard = false">Go to Claims</button>
       </div>
     </div>
-  }
-  @if (showCertificate && selectedPolicy) {
-    <div class="modal-overlay" (click)='showCertificate = false'>
-      <div class="digital-member-card fade-in" [class]="selectedPolicy.policyType" (click)="$event.stopPropagation()">
-        <div class="card-glass"></div>
-        <div class="card-inner">
-          <div class="p-card-top">
-            <span class="p-brand">IQsure 🛡️</span>
-            <span class="p-tier-badge">{{ selectedPolicy.policyTitle.includes('Gold') ? 'ELITE' : 'PLATINUM' }}</span>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL: DIGITAL INSURANCE ID CARD ───────────────────────────── -->
+@if (showCertificate && selectedPolicy) {
+  <div class="modal-overlay cert-overlay" (click)="showCertificate = false">
+    <div class="digital-member-card" [class]="selectedPolicy.policyType" (click)="$event.stopPropagation()">
+      <div class="card-glass"></div>
+      <div class="card-inner">
+        <div class="p-card-top">
+          <span class="p-brand">IQsure 🛡️</span>
+          <span class="p-tier-badge">
+            {{ selectedPolicy.policyTitle.toUpperCase().includes('GOLD') ? 'ELITE GOLD' : 'PLATINUM' }}
+          </span>
+        </div>
+
+        <div class="p-card-middle">
+          <div class="p-user-v">
+            <span class="p-label">CARD HOLDER</span>
+            <strong class="p-user-name">{{ selectedPolicy.userName }}</strong>
           </div>
-          <div class="p-card-middle">
-            <div class="p-user-v">
-              <span class="p-label">CARD HOLDER</span>
-              <strong class="p-user-name">{{ selectedPolicy.userName }}</strong>
-            </div>
-            <div class="p-policy-v">
-              <span class="p-label">INSURANCE ID</span>
-              <strong class="p-id-num">{{ getPolicyNumber(selectedPolicy.id) }}</strong>
-            </div>
+          <div class="p-policy-v">
+            <span class="p-label">INSURANCE ID</span>
+            <strong class="p-id-num">{{ getPolicyNumber(selectedPolicy.id) }}</strong>
           </div>
-          <div class="p-card-footer">
-            <div class="f-item">
-              <span>PLAN TIER</span>
-              <strong>{{ selectedPolicy.policyTitle }}</strong>
-            </div>
-            <div class="f-item">
-              <span>VALID UNTIL</span>
-              <strong>{{ selectedPolicy.expiryDate ? (selectedPolicy.expiryDate | date:'mediumDate') : '03/2027'}}</strong>
-            </div>
+        </div>
+
+        <div class="p-card-footer">
+          <div class="f-item">
+            <span>PLAN</span>
+            <strong>{{ selectedPolicy.policyTitle }}</strong>
           </div>
-          <button class="btn-card-close" (click)="showCertificate = false">Close Access Pass</button>
+          <div class="f-item">
+            <span>TYPE</span>
+            <strong>{{ selectedPolicy.policyType }}</strong>
+          </div>
+          <div class="f-item">
+            <span>VALID UNTIL</span>
+            <strong>{{ selectedPolicy.expiryDate ? (selectedPolicy.expiryDate | date:'MM/yyyy') : '–' }}</strong>
+          </div>
+          <div class="f-item">
+            <span>MAX COVERAGE</span>
+            <strong>₹{{ selectedPolicy.coverageAmount | number }}</strong>
+          </div>
+        </div>
+
+        <div class="card-chip-row">
+          <button class="btn-card-close" (click)="showCertificate = false">Close</button>
         </div>
       </div>
     </div>
-  }
-</div>
+  </div>
+}

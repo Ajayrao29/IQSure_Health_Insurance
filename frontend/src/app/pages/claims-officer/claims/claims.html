@@ -1,237 +1,402 @@
-<!-- Template for the claims page -->
+<!-- IQsure Sentinel Intelligence — Claims Officer Command Center -->
 <div class="page fade-in">
+
+  <!-- ═══════════════════════════════ LIST VIEW ══════════════════════════════ -->
   @if (!selectedClaim) {
-    <div class="control-center-header">
-      <div class="title-area">
-        <h1>Claims Control Center</h1>
-        <p>Operational Queue: {{ claims.length }} file(s) awaiting oversight</p>
+    <div class="co-header">
+      <div class="header-left">
+        <div class="sentinel-badge">
+          <span class="s-icon">🛡️</span>
+          <div>
+            <span class="s-label">SENTINEL INTELLIGENCE</span>
+            <h1>Claims Command Center</h1>
+          </div>
+        </div>
+        <p class="subtitle">AI-powered fraud detection • Real-time adjudication • Coverage analytics</p>
       </div>
-      <div class="header-actions">
-        <a routerLink="/claims-officer/dashboard" class="btn-dash">Dashboard Overview</a>
-      </div>
+      <a routerLink="/claims-officer/dashboard" class="btn-dash">
+        <span>📊</span> Dashboard
+      </a>
     </div>
+
     @if (notification) {
       <div class="inline-notification" [ngClass]="notification.type">
         <span class="icon">{{ notification.type === 'success' ? '✅' : '❌' }}</span>
         <p>{{ notification.message }}</p>
       </div>
     }
-    <div class="filter-wrapper">
-      <div class="filter-pill" [class.active]="activeFilter === 'ALL'" (click)="applyFilter('ALL')">
-        <span>📁</span> All Claims
-      </div>
-      <div class="filter-pill" [class.active]="activeFilter === 'UNDER_REVIEW'" (click)="applyFilter('UNDER_REVIEW')">
-        <span>🕒</span> Under Review
-      </div>
-      <div class="filter-pill" [class.active]="activeFilter === 'APPROVED'" (click)="applyFilter('APPROVED')">
-        <span>✅</span> Approved
-      </div>
-      <div class="filter-pill" [class.active]="activeFilter === 'REJECTED'" (click)="applyFilter('REJECTED')">
-        <span>❌</span> Rejected
-      </div>
-      <div class="filter-pill" [class.active]="activeFilter === 'SETTLED'" (click)="applyFilter('SETTLED')">
-        <span>💰</span> Settled
-      </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      @for (f of [
+        {key:'ALL', label:'All Claims', icon:'📁'},
+        {key:'SUBMITTED', label:'Submitted', icon:'📬'},
+        {key:'UNDER_REVIEW', label:'Under Review', icon:'🔍'},
+        {key:'APPROVED', label:'Approved', icon:'✅'},
+        {key:'PARTIAL_APPROVED', label:'Partial', icon:'⚡'},
+        {key:'REJECTED', label:'Rejected', icon:'❌'},
+        {key:'SETTLED', label:'Settled', icon:'💰'}
+      ]; track f.key) {
+      <button class="filter-chip" [class.active]="activeFilter === f.key" (click)="applyFilter(f.key)">
+          <span>{{ f.icon }}</span>{{ f.label }}
+        </button>
+      }
     </div>
+
     @if (loading) {
-      <div class="loading-state">
-        <div class="dot-loader"></div>
-        <p>Synchronizing with Claims Engine...</p>
+      <div class="sentinel-loading">
+        <div class="scan-animation">
+          <div class="scan-ring r1"></div>
+          <div class="scan-ring r2"></div>
+          <div class="scan-ring r3"></div>
+          <span class="scan-icon">🛡️</span>
+        </div>
+        <p>Sentinel Intelligence scanning claims queue...</p>
       </div>
     } @else if (filteredClaims.length === 0) {
       <div class="empty-state">
         <div class="empty-icon">📂</div>
-        <h3>Queue Empty</h3>
-        <p>No claims match the current security filter.</p>
+        <h3>Queue Clear</h3>
+        <p>No claims match the active filter criteria.</p>
       </div>
     } @else {
-      <div class="table-card">
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Customer Reference</th>
-              <th>Service Type</th>
-              <th>Claimed Amount</th>
-              <th>Status</th>
-              <th>Incident Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (c of filteredClaims; track c.id) {
-              <tr>
-                <td><span class="claim-id">#{{ c.claimNumber }}</span></td>
-                <td>
-                  <div class="customer-info">User ID: {{ c.userId }}</div>
-                </td>
-                <td><span class="type-tag">{{ c.type }}</span></td>
-                <td><strong>₹{{ c.amount | number }}</strong></td>
-                <td>
-                  <span class="status-indicator" [ngClass]="getStatusClass(c.status)">{{ c.status }}</span>
-                </td>
-                <td>{{ c.incidentDate | date:'mediumDate' }}</td>
-                <td>
-                  <div class="action-buttons">
-                    @if (c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW') {
-                      <button class="btn-sm btn-primary" (click)="openProcessModal(c)">Investigate</button>
-                    }
-                    @if (c.status === 'APPROVED' || c.status === 'PARTIAL_APPROVED') {
-                      <button class="btn-sm btn-success" (click)="openSettleModal(c)">💰 Settle</button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+      <div class="claims-grid">
+        @for (c of filteredClaims; track c.id) {
+          <div class="claim-card" [class]="'card-' + getStatusClass(c.status)" (click)="c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW' ? openProcessModal(c) : c.status === 'APPROVED' || c.status === 'PARTIAL_APPROVED' ? openSettleModal(c) : null">
+            <div class="card-top-bar">
+              <span class="claim-num">#{{ c.claimNumber }}</span>
+              <span class="status-dot" [ngClass]="getStatusClass(c.status)">{{ c.status | titlecase }}</span>
+            </div>
+            <div class="card-body">
+              <div class="claim-meta">
+                <span class="type-badge">{{ c.type }}</span>
+                <span class="date-tag">{{ c.incidentDate | date:'MMM d, y' }}</span>
+              </div>
+              <div class="claim-amount">
+                <span class="amount-label">Claimed</span>
+                <strong class="amount-val">₹{{ c.amount | number }}</strong>
+              </div>
+              @if (c.hospitalName) {
+                <p class="hospital-tag">🏥 {{ c.hospitalName }}</p>
+              }
+              @if (c.diagnosis) {
+                <p class="diagnosis-preview">{{ c.diagnosis | slice:0:60 }}{{ c.diagnosis.length > 60 ? '...' : '' }}</p>
+              }
+            </div>
+            <div class="card-footer-actions">
+              @if (c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW') {
+                <button class="action-btn investigate" (click)="$event.stopPropagation(); openProcessModal(c)">
+                  🔬 Investigate
+                </button>
+              }
+              @if (c.status === 'APPROVED' || c.status === 'PARTIAL_APPROVED') {
+                <button class="action-btn settle" (click)="$event.stopPropagation(); openSettleModal(c)">
+                  💰 Settle
+                </button>
+              }
+              @if (c.status === 'SETTLED') {
+                <div class="settled-tag">✅ ₹{{ c.settlementAmount | number }}</div>
+              }
+            </div>
+          </div>
+        }
       </div>
     }
-  } @else {
-    <div class="focus-mode">
-      <div class="focus-header">
-        <button class="back-link" (click)="selectedClaim = null; showSettlementModal = false">← Return to Tactical Queue</button>
-        <div class="focus-title">
-          <h1>Incident Investigation: {{ selectedClaim.claimNumber }}</h1>
-          <span class="focus-id">Status: <strong [ngClass]="getStatusClass(selectedClaim.status)">{{ selectedClaim.status }}</strong></span>
+  }
+
+  <!-- ═══════════════════════════════ DETAIL / INVESTIGATION VIEW ════════════ -->
+  @if (selectedClaim && !showSettlementModal) {
+    <div class="investigation-view fade-in">
+
+      <!-- Header -->
+      <div class="inv-header">
+        <button class="back-btn" (click)="selectedClaim = null; aiReport = null">
+          ← Back to Queue
+        </button>
+        <div class="inv-title">
+          <div class="inv-badge">🔬 CASE FILE</div>
+          <h1>{{ selectedClaim.claimNumber }}</h1>
+          <span class="inv-status" [ngClass]="getStatusClass(selectedClaim.status)">
+            {{ selectedClaim.status }}
+          </span>
         </div>
+        <button class="btn-reanalyze" (click)="runAiInvestigation()" [disabled]="aiInvestigating">
+          @if (aiInvestigating) { ⏳ Analyzing... }
+          @else { 🔄 Re-Analyze }
+        </button>
       </div>
-      <div class="assessment-layout">
-        <div class="assessment-data">
-          <div class="data-section">
-            <h4 class="section-title">Incident Intelligence</h4>
-            <div class="info-strip">
+
+      <div class="inv-layout">
+
+        <!-- LEFT COL: Claim Details -->
+        <div class="inv-left">
+
+          <!-- Incident Intel -->
+          <div class="info-section">
+            <h4 class="section-hd"><span>📋</span> Incident Intelligence</h4>
+            <div class="info-grid">
               <div class="info-cell">
-                <span class="cell-label">Occurrence Date</span>
-                <span class="cell-val">{{ selectedClaim.incidentDate | date:'longDate' }}</span>
-              </div>
-              <div class="info-cell">
-                <span class="cell-label">Claim Type</span>
-                <span class="cell-val">{{ selectedClaim.type }}</span>
-              </div>
-              <div class="info-cell">
-                <span class="cell-label">Requested Payout</span>
-                <span class="cell-val pink">₹{{ selectedClaim.amount | number }}</span>
-              </div>
-            </div>
-            <div class="info-strip" style="margin-top: 1rem;">
-              <div class="info-cell" style="grid-column: span 2;">
-                <span class="cell-label">Hospital Facility</span>
-                <span class="cell-val">{{ selectedClaim.hospitalName || 'Not Disclosed' }}</span>
+                <span class="ic-label">Claim Type</span>
+                <span class="ic-val type">{{ selectedClaim.type }}</span>
               </div>
               <div class="info-cell">
-                <span class="cell-label">Customer ID</span>
-                <span class="cell-val">#{{ selectedClaim.userId }}</span>
+                <span class="ic-label">Incident Date</span>
+                <span class="ic-val">{{ selectedClaim.incidentDate | date:'longDate' }}</span>
               </div>
-            </div>
-            <div class="diagnosis-card">
-              <span class="label">Clinical Diagnosis / Event Summary</span>
-              <p>{{ selectedClaim.diagnosis }}</p>
-            </div>
-          </div>
-          <div class="data-section">
-            <h4 class="section-title">Policy Relationship</h4>
-            <div class="policy-link-card">
-              <div class="p-icon">🛡️</div>
-              <div class="p-details">
-                <strong>Plan: {{ selectedClaim.policyTitle || 'Standard Plan' }}</strong>
-                <p>Policy ID: #{{ selectedClaim.userPolicyId }} • Verify limits before authorizing.</p>
+              <div class="ic-full">
+                <span class="ic-label">Claimed Amount</span>
+                <span class="ic-val amount pink">₹{{ selectedClaim.amount | number }}</span>
               </div>
-            </div>
-          </div>
-          @if (selectedClaim.status === 'SETTLED') {
-            <div class="data-section">
-              <h4 class="section-title">Settlement Intelligence</h4>
-              <div class="settlement-success">
-                <span class="icon">💰</span>
-                <div class="text">
-                  <strong>Finalized Payout: ₹{{ selectedClaim.settlementAmount | number }}</strong>
-                  <p>Settled on {{ selectedClaim.settlementDate | date }}</p>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-        <div class="assessment-form-container">
-          @if (!showSettlementModal) {
-            <div class="form-card">
-              <div class="ai-audit-portal">
-                <div class="audit-header">
-                  <span class="ai-chip">AGENTIC AI AUDITOR</span>
-                  <h4>Cognitive Audit Assessment</h4>
-                </div>
-                @if (aiGenerating) {
-                  <div class="audit-thinking">
-                    <div class="pulse-ring"></div>
-                    <span>Analyzing hospital policy compliance...</span>
-                  </div>
-                } @else if (aiAudit) {
-                  <div class="audit-result slide-up">
-                    <pre>{{ aiAudit }}</pre>
-                    <div class="confidence-tag">98.2% Confidence Level Matrix</div>
-                  </div>
-                }
-              </div>
-              <h3>Adjudication Verdict</h3>
-              <p>Execute the final decision and record regulatory remarks.</p>
-              <div class="v-group">
-                <label>Actionable Status</label>
-                <select [(ngModel)]="processingStatus" class="st-select">
-                  <option value="UNDER_REVIEW">UNDER REVIEW</option>
-                  <option value="APPROVED">APPROVE FULL</option>
-                  <option value="PARTIAL_APPROVED">PARTIAL APPROVAL</option>
-                  <option value="REJECTED">REJECT CLAIM</option>
-                </select>
-              </div>
-              @if (processingStatus === 'APPROVED' || processingStatus === 'PARTIAL_APPROVED') {
-                <div class="v-group">
-                  <label>Authorized Amount (₹)</label>
-                  <div class="premium-input-wrap pink">
-                    <input type="number" [(ngModel)]="approvedAmount" placeholder="0.00" />
-                    <span class="currency-tag">INR</span>
-                  </div>
-                  <p class="input-note">Customer requested: ₹{{ selectedClaim.amount | number }}</p>
+              @if (selectedClaim.hospitalName) {
+                <div class="ic-full">
+                  <span class="ic-label">Hospital</span>
+                  <span class="ic-val">{{ selectedClaim.hospitalName }}</span>
                 </div>
               }
-              <div class="v-group">
-                <label>Professional Remarks (Internal)</label>
-                <textarea [(ngModel)]="remarks" rows="6" placeholder="Document the rationale for this adjudication..."></textarea>
+            </div>
+            <div class="diagnosis-block">
+              <span class="ic-label">Clinical Diagnosis</span>
+              <p class="diagnosis-text">{{ selectedClaim.diagnosis || 'Not provided' }}</p>
+            </div>
+          </div>
+
+          <!-- Policy Relationship -->
+          <div class="info-section">
+            <h4 class="section-hd"><span>🛡️</span> Policy Relationship</h4>
+            <div class="policy-card">
+              <div class="p-row">
+                <span class="ic-label">Policy</span>
+                <span class="ic-val">{{ selectedClaim.policyTitle || 'Linked Policy' }}</span>
               </div>
-              <div class="form-footer">
-                <button class="btn-cancel" (click)="selectedClaim = null">Defer</button>
-                <button class="btn-submit" (click)="submitProcess()" [disabled]="isProcessing">
-                  {{ isProcessing ? 'Adjudicating...' : 'Authorize Verdict' }}
-                </button>
+              <div class="p-row">
+                <span class="ic-label">Policy ID</span>
+                <span class="ic-val">#{{ selectedClaim.userPolicyId }}</span>
+              </div>
+              <div class="p-row">
+                <span class="ic-label">Filing Date</span>
+                <span class="ic-val">{{ selectedClaim.createdAt | date:'mediumDate' }}</span>
               </div>
             </div>
-          } @else {
-            <div class="form-card settlement">
-              <h3>Financial Settlement</h3>
-              <p>Authorize the definitive payout to the customer's account.</p>
-              <div class="settlement-overview">
-                <div class="ov-item">
-                  <span class="l">Verified Payload</span>
-                  <span class="v">₹{{ selectedClaim.approvedAmount | number }}</span>
-                </div>
-              </div>
-              <div class="v-group">
-                <label>Final Disbursed Amount (₹)</label>
-                <div class="premium-input-wrap success-green">
-                  <input type="number" [(ngModel)]="settlementAmount" class="large-input" />
-                  <span class="currency-tag">INR</span>
-                </div>
-                <p class="input-note">This amount will be deducted from policy coverage.</p>
-              </div>
-              <div class="form-footer">
-                <button class="btn-cancel" (click)="selectedClaim = null; showSettlementModal = false">Cancel</button>
-                <button class="btn-submit settle" (click)="confirmSettlement()" [disabled]="isProcessing">
-                  {{ isProcessing ? 'Disbursing...' : 'Confirm Disbursal' }}
-                </button>
+          </div>
+
+          @if (selectedClaim.status === 'SETTLED') {
+            <div class="info-section settled-info">
+              <h4 class="section-hd"><span>✅</span> Settlement Record</h4>
+              <div class="settle-card">
+                <span class="settle-label">Final Payout</span>
+                <strong class="settle-val">₹{{ selectedClaim.settlementAmount | number }}</strong>
+                <span class="settle-date">Settled {{ selectedClaim.settlementDate | date:'mediumDate' }}</span>
               </div>
             </div>
           }
         </div>
+
+        <!-- RIGHT COL: AI Sentinel Panel + Adjudication Form -->
+        <div class="inv-right">
+
+          <!-- ══ SENTINEL AI INVESTIGATION PANEL ══ -->
+          <div class="sentinel-panel" [class.investigating]="aiInvestigating" [class.complete]="aiInvestigated && !aiInvestigating">
+
+            <div class="sentinel-panel-header">
+              <div class="sentinel-logo">
+                <div class="s-pulse"></div>
+                <span class="s-name">🤖 SENTINEL AI</span>
+              </div>
+              <span class="sentinel-version">Fraud & Coverage Intelligence Engine v2.0</span>
+            </div>
+
+            @if (aiInvestigating) {
+              <!-- Scanning State -->
+              <div class="sentinel-scanning">
+                <div class="scan-bars">
+                  <div class="bar b1"></div>
+                  <div class="bar b2"></div>
+                  <div class="bar b3"></div>
+                  <div class="bar b4"></div>
+                  <div class="bar b5"></div>
+                </div>
+                <p class="scan-label">Scanning claim pattern database...</p>
+                <div class="scan-tasks">
+                  <span class="task">🔍 Cross-referencing hospital records</span>
+                  <span class="task">📊 Computing fraud risk vectors</span>
+                  <span class="task">⚖️ Verifying policy coverage limits</span>
+                  <span class="task">🧠 Generating adjudication recommendation</span>
+                </div>
+              </div>
+            }
+
+            @if (aiReport && !aiInvestigating) {
+              <!-- AI Report Display -->
+              <div class="sentinel-report slide-up">
+
+                <!-- Risk Score + Verdict Row -->
+                <div class="ai-verdict-row">
+                  <div class="risk-meter">
+                    <div class="risk-label">FRAUD RISK</div>
+                    <div class="risk-gauge">
+                      <div class="gauge-fill" [class]="getRiskClass(aiReport.fraudRiskLevel)"
+                           [style.width]="aiReport.fraudRiskScore + '%'"></div>
+                    </div>
+                    <div class="risk-stats">
+                      <span class="risk-score" [class]="getRiskClass(aiReport.fraudRiskLevel)">
+                        {{ getRiskIcon(aiReport.fraudRiskLevel) }} {{ aiReport.fraudRiskLevel }} ({{ aiReport.fraudRiskScore }}/100)
+                      </span>
+                    </div>
+                  </div>
+                  <div class="verdict-block">
+                    <div class="verdict-label">COVERAGE</div>
+                    <div class="verdict-tag" [class]="getVerdictClass(aiReport.coverageVerdict)">
+                      {{ aiReport.coverageVerdict }}
+                    </div>
+                    <div class="confidence-display">
+                      AI Confidence: <strong>{{ aiReport.confidenceScore }}%</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AI Narrative -->
+                <div class="ai-narrative">
+                  <div class="narrative-icon">💬</div>
+                  <p>"{{ aiReport.aiNarrative }}"</p>
+                </div>
+
+                <!-- Red Flags & Positive Signals -->
+                <div class="signals-row">
+                  @if (aiReport.redFlags && aiReport.redFlags.length > 0) {
+                    <div class="signal-col red">
+                      <div class="sig-header">🚨 Red Flags</div>
+                      <ul>
+                        @for (f of aiReport.redFlags; track f) {
+                          <li>{{ f }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (aiReport.positiveSignals && aiReport.positiveSignals.length > 0) {
+                    <div class="signal-col green">
+                      <div class="sig-header">✅ Positive Signals</div>
+                      <ul>
+                        @for (s of aiReport.positiveSignals; track s) {
+                          <li>{{ s }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+
+                <!-- AI Recommended Action -->
+                <div class="ai-action-box">
+                  <div class="ai-action-label">AI RECOMMENDED ACTION</div>
+                  <div class="ai-action-tag" [class]="'action-' + aiReport.recommendedAction.toLowerCase()">
+                    {{ aiReport.recommendedAction.replace('_', ' ') }}
+                  </div>
+                  <div class="ai-payout-line">
+                    Suggested Payout: <strong>₹{{ aiReport.recommendedPayout | number }}</strong>
+                  </div>
+                  <p class="officer-guidance">💡 {{ aiReport.officerGuidance }}</p>
+                  <button class="btn-adopt-ai" (click)="applyAiRecommendation()">
+                    ⚡ Adopt AI Recommendation
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (!aiReport && !aiInvestigating) {
+              <div class="sentinel-idle">
+                <p>AI investigation will auto-launch when a claim is opened.</p>
+                <button class="btn-ai-start" (click)="runAiInvestigation()">▶ Run Investigation</button>
+              </div>
+            }
+          </div>
+
+          <!-- ══ ADJUDICATION FORM ══ -->
+          <div class="adjudication-card">
+            <h3>⚖️ Adjudication Verdict</h3>
+            <p>Record the final decision with regulatory remarks.</p>
+
+            <div class="form-group">
+              <label>Decision Status</label>
+              <select [(ngModel)]="processingStatus" class="status-select">
+                <option value="UNDER_REVIEW">🔍 UNDER REVIEW</option>
+                <option value="APPROVED">✅ APPROVE FULL</option>
+                <option value="PARTIAL_APPROVED">⚡ PARTIAL APPROVAL</option>
+                <option value="REJECTED">❌ REJECT CLAIM</option>
+              </select>
+            </div>
+
+            @if (processingStatus === 'APPROVED' || processingStatus === 'PARTIAL_APPROVED') {
+              <div class="form-group">
+                <label>Authorized Amount (₹)</label>
+                <div class="amount-input-wrap">
+                  <input type="number" [(ngModel)]="approvedAmount" placeholder="0.00" />
+                  <span class="currency">INR</span>
+                </div>
+                <p class="input-hint">Claimed: ₹{{ selectedClaim.amount | number }}</p>
+              </div>
+            }
+
+            <div class="form-group">
+              <label>Professional Remarks</label>
+              <textarea [(ngModel)]="remarks" rows="4"
+                placeholder="Document the rationale for this adjudication decision..."></textarea>
+            </div>
+
+            <div class="form-footer">
+              <button class="btn-cancel" (click)="selectedClaim = null; aiReport = null">Cancel</button>
+              <button class="btn-adjudicate" (click)="submitProcess()" [disabled]="isProcessing">
+                {{ isProcessing ? '⏳ Adjudicating...' : '✅ Authorize Verdict' }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════ SETTLEMENT MODAL ════════════════════════ -->
+  @if (selectedClaim && showSettlementModal) {
+    <div class="settlement-view fade-in">
+      <div class="inv-header">
+        <button class="back-btn" (click)="selectedClaim = null; showSettlementModal = false">
+          ← Cancel
+        </button>
+        <div class="inv-title">
+          <div class="inv-badge">💰 SETTLEMENT</div>
+          <h1>{{ selectedClaim.claimNumber }}</h1>
+        </div>
+      </div>
+      <div class="settlement-card">
+        <div class="settle-overview">
+          <div class="ov-row">
+            <span>Approved Amount</span>
+            <strong>₹{{ selectedClaim.approvedAmount | number }}</strong>
+          </div>
+          <div class="ov-row">
+            <span>Policy ID</span>
+            <strong>#{{ selectedClaim.userPolicyId }}</strong>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Final Disbursement Amount (₹)</label>
+          <div class="amount-input-wrap green">
+            <input type="number" [(ngModel)]="settlementAmount" />
+            <span class="currency">INR</span>
+          </div>
+          <p class="input-hint">This will be deducted from the policy's remaining coverage.</p>
+        </div>
+        <div class="form-footer">
+          <button class="btn-cancel" (click)="selectedClaim = null; showSettlementModal = false">Cancel</button>
+          <button class="btn-adjudicate settle" (click)="confirmSettlement()" [disabled]="isProcessing">
+            {{ isProcessing ? '⏳ Disbursing...' : '💰 Confirm Disbursal' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (notification && selectedClaim) {
+    <div class="toast-notification" [ngClass]="notification.type">
+      {{ notification.type === 'success' ? '✅' : '❌' }} {{ notification.message }}
     </div>
   }
 </div>

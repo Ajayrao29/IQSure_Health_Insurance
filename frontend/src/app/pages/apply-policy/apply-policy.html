@@ -1,149 +1,190 @@
-<!-- Template for the apply-policy page -->
+<!-- IQsure Policy Application — AI Document Studio -->
 <div class="page fade-in">
+
+  <!-- ═══════════════ PLAN SELECTION VIEW ═══════════════ -->
   @if (step === 'PLANS') {
-    <div class="choose-plan-header">
-      <h1>Choose Your Plan</h1>
-      <p>Select an insurance plan that suits you. Our underwriter will calculate your exact premium after reviewing your details.</p>
+    <div class="plans-header">
+      <div class="ph-left">
+        <span class="ph-eyebrow">🛡️ IQSURE MARKETPLACE</span>
+        <h1>Choose Your Shield</h1>
+        <p>Pick a plan. Our AI will handle the paperwork — generating your personalized health declaration automatically.</p>
+      </div>
     </div>
+
+    <div class="category-filters">
+      @for (cat of ['ALL','HEALTH','LIFE','ACCIDENT']; track cat) {
+        <button class="cat-chip" [class.active]="activeCategory === cat" (click)="filterPlans(cat)">
+          {{ cat === 'ALL' ? '🏷️ All Plans' : cat === 'HEALTH' ? '🏥 Health' : cat === 'LIFE' ? '💛 Life' : '⚡ Accident' }}
+        </button>
+      }
+    </div>
+
     @if (loading) {
-      <div class="loading-box">Loading plans...</div>
+      <div class="plans-loading">
+        <div class="pulse-ring"></div>
+        <p>Loading your shield options...</p>
+      </div>
     } @else {
       <div class="plans-grid">
         @for (p of filteredPlans; track p.policyId) {
-          <div class="plan-card" [class.premium-best]="p.title.includes('Gold')">
-            <span class="type-tag">{{ p.policyType }}</span>
+          <div class="plan-card" [class.plan-gold]="p.title.includes('Gold') || p.title.includes('Premium')">
+            @if (p.title.includes('Gold') || p.title.includes('Premium')) {
+              <div class="popular-badge">MOST POPULAR</div>
+            }
+            <div class="plan-type-tag">{{ p.policyType }}</div>
             <h3>{{ p.title }}</h3>
-            <p class="description">{{ p.description }}</p>
-            <div class="details-grid">
-              <div class="det">
-                <span>MAX COVERAGE</span>
+            <p class="plan-desc">{{ p.description }}</p>
+            <div class="plan-stats">
+              <div class="stat">
+                <span>Max Coverage</span>
                 <strong>₹{{ p.coverageAmount | number }}</strong>
               </div>
-              <div class="det">
-                <span>BASE PREMIUM</span>
+              <div class="stat">
+                <span>Base Premium</span>
                 <strong>₹{{ p.basePremium | number }}/yr</strong>
               </div>
-              <div class="det">
-                <span>AGE RANGE</span>
-                <strong>{{ p.ageRange || '18-65 yrs' }}</strong>
+              <div class="stat">
+                <span>Duration</span>
+                <strong>{{ p.durationMonths }}mo</strong>
               </div>
-              <div class="det">
-                <span>WAITING PERIOD</span>
-                <strong>{{ p.policyId === 1 ? '1 month' : '2 months' }}</strong>
-              </div>
-              <div class="det">
-                <span>DURATION</span>
-                <strong>{{ p.durationMonths }} months</strong>
+              <div class="stat">
+                <span>Age Range</span>
+                <strong>{{ p.ageRange || '18–65 yrs' }}</strong>
               </div>
             </div>
-            <div class="footer-actions">
-              @if (isPlanDisabled(p.policyId)) {
-                <button class="btn-select disabled" disabled>
-                  <span class="icon">✔️</span> Already Applied
-                </button>
-              } @else {
-                <button class="btn-select" (click)="selectPlan(p)">Select Plan</button>
-              }
+            <div class="ai-doc-badge">
+              <span class="ai-icon">🤖</span>
+              <span>AI Declaration Auto-Generated</span>
             </div>
+            @if (isPlanDisabled(p.policyId)) {
+              <button class="btn-select disabled" disabled>✔ Already Applied</button>
+            } @else {
+              <button class="btn-select" (click)="selectPlan(p)">Select Plan →</button>
+            }
           </div>
         }
       </div>
     }
   }
+
+  <!-- ═══════════════ FORM VIEW ═══════════════ -->
   @if (step === 'FORM') {
-    <div class="form-header">
-      <button class="btn-back" (click)="backToPlans()">← Back to Selection</button>
-      <div class="header-main">
-        <span class="plan-pill">{{ selectedPlan?.title }}</span>
-        <h2>Complete Application</h2>
-      </div>
-      <div class="step-stepper">
-        <div class="step-dot" [class.active]="formStep === 1" [class.done]="formStep > 1"><span>1</span><label>Policy Details</label></div>
-        <div class="step-line"></div>
-        <div class="step-dot" [class.active]="formStep === 2" [class.done]="formStep > 2"><span>2</span><label>Insured Members</label></div>
-        <div class="step-line"></div>
-        <div class="step-dot" [class.active]="formStep === 3" [class.done]="formStep > 3"><span>3</span><label>Medical Declaration</label></div>
-        <div class="step-line"></div>
-        <div class="step-dot" [class.active]="formStep === 4" [class.done]="formStep > 4"><span>4</span><label>Savings</label></div>
-        <div class="step-line"></div>
-        <div class="step-dot" [class.active]="formStep === 5" [class.done]="formStep > 5"><span>5</span><label>Review</label></div>
+    <!-- Form Header with back + stepper -->
+    <div class="form-header-bar">
+      <button class="btn-back-form" (click)="backToPlans()">← Plans</button>
+      <div class="selected-plan-pill">
+        <span class="plan-icon">🛡️</span>
+        <span>{{ selectedPlan?.title }}</span>
       </div>
     </div>
-    <div class="app-form-card shadow-premium mt-4">
+
+    <!-- Step Wizard -->
+    <div class="step-wizard">
+      @for (s of [1,2,3,4,5]; track s) {
+        <div class="step-node" [class.active]="formStep === s" [class.done]="formStep > s">
+          <div class="step-circle">
+            @if (formStep > s) {
+              <span>✓</span>
+            } @else {
+              <span>{{ s }}</span>
+            }
+          </div>
+          <label>{{ getStepLabel(s) }}</label>
+        </div>
+        @if (s < 5) {
+          <div class="step-connector" [class.filled]="formStep > s"></div>
+        }
+      }
+    </div>
+
+    <div class="form-body-card">
+
+      <!-- ── STEP 1: Nominee ── -->
       @if (formStep === 1) {
         <section class="form-section fade-in">
-          <h3>Nominee & Support Details</h3>
-          <p>This is the person who will receive the benefits in accordance with policy terms.</p>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label>Nominee Full Name *</label>
-              <input type="text" [(ngModel)]="formData.nomineeName" placeholder="e.g. Priya Sharma">
+          <div class="section-title-row">
+            <div class="section-icon">👤</div>
+            <div>
+              <h3>Nominee Designation</h3>
+              <p>Who should receive the policy benefit on your behalf?</p>
             </div>
-            <div class="form-group">
-              <label>Relationship *</label>
+          </div>
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label>Nominee Full Name <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="formData.nomineeName" placeholder="e.g. Priya Sharma" />
+            </div>
+            <div class="field-group">
+              <label>Relationship to You <span class="req">*</span></label>
               <select [(ngModel)]="formData.nomineeRelationship">
-                <option value="">— Select —</option>
+                <option value="">— Select Relationship —</option>
                 <option value="Spouse">Spouse</option>
                 <option value="Child">Child</option>
                 <option value="Parent">Parent</option>
                 <option value="Sibling">Sibling</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>
-          <hr class="section-divider">
-          <h3>Health Status Proof</h3>
-          <p class="section-hint">Upload a recent full body checkup report or discharge summary (Max 5MB).</p>
-          <div class="upload-box" [class.has-file]="formData.healthReport">
-            <input type="file" id="healthReport" (change)="onFileSelected($event)" hidden>
-            <label for="healthReport" class="upload-label">
-              <span class="icon">📁</span>
-              @if (formData.healthReport) {
-                <span class="file-name">{{ formData.healthReport.name }}</span>
-              } @else {
-                <span>Select Document (PDF/Image)</span>
-              }
-            </label>
+
+          <div class="info-callout mt-lg">
+            <span class="callout-icon">🤖</span>
+            <div>
+              <strong>AI Health Declaration</strong>
+              <p>After you fill your member details and health questions, our AI will automatically generate your personalized Health Declaration document — no file upload needed.</p>
+            </div>
           </div>
         </section>
       }
+
+      <!-- ── STEP 2: Insured Members ── -->
       @if (formStep === 2) {
         <section class="form-section fade-in">
-          <div class="section-header">
-            <h3>Add Insured Parties</h3>
-            <button class="btn-add-member" (click)='addMember()'>+ Add Member</button>
+          <div class="section-title-row">
+            <div class="section-icon">👨‍👩‍👧‍👦</div>
+            <div>
+              <h3>Insured Members</h3>
+              <p>Add yourself and any family members to be covered under this policy.</p>
+            </div>
+            <button class="btn-add-member" (click)="addMember()">+ Add Member</button>
           </div>
-          <p class="section-hint">Insure yourself and your loved ones in one go.</p>
-          <div class="members-dynamic-list">
+
+          <div class="members-list">
             @for (m of formData.members; track $index) {
-              <div class="member-item-card">
-                <div class="member-card-header">
-                  <h4>{{ $index === 0 ? 'Primary Member (You)' : 'Family Member ' + ($index + 1) }}</h4>
+              <div class="member-card">
+                <div class="member-card-head">
+                  <div class="member-avatar">{{ $index === 0 ? '👤' : '👥' }}</div>
+                  <div>
+                    <h4>{{ $index === 0 ? 'Primary Insured (You)' : 'Family Member ' + ($index + 1) }}</h4>
+                    <p>{{ m.fullName || 'Enter details below' }}</p>
+                  </div>
                   @if ($index > 0) {
-                    <button class="link-remove" (click)="removeMember($index)">Remove member</button>
+                    <button class="btn-remove-member" (click)="removeMember($index)">Remove</button>
                   }
                 </div>
-                <div class="form-grid-3">
-                  <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" [(ngModel)]="m.fullName" placeholder="Full name">
+                <div class="field-grid-3">
+                  <div class="field-group">
+                    <label>Full Name <span class="req">*</span></label>
+                    <input type="text" [(ngModel)]="m.fullName" placeholder="Full legal name" />
                   </div>
-                  <div class="form-group">
-                    <label>Relationship *</label>
+                  <div class="field-group">
+                    <label>Relationship <span class="req">*</span></label>
                     <select [(ngModel)]="m.relationship">
                       <option value="Self">Self</option>
                       <option value="Spouse">Spouse</option>
                       <option value="Child">Child</option>
                       <option value="Parent">Parent</option>
+                      <option value="Sibling">Sibling</option>
                     </select>
                   </div>
-                  <div class="form-group">
-                    <label>Date of Birth *</label>
-                    <input type="date" [(ngModel)]="m.dateOfBirth" [max]="today">
+                  <div class="field-group">
+                    <label>Date of Birth <span class="req">*</span></label>
+                    <input type="date" [(ngModel)]="m.dateOfBirth" [max]="today" />
                   </div>
                 </div>
-                <div class="form-grid-2 mt-3">
-                  <div class="form-group">
-                    <label>Gender *</label>
+                <div class="field-grid-2 mt-sm">
+                  <div class="field-group">
+                    <label>Gender <span class="req">*</span></label>
                     <select [(ngModel)]="m.gender">
                       <option value="">— Select —</option>
                       <option value="Male">Male</option>
@@ -151,9 +192,9 @@
                       <option value="Other">Other</option>
                     </select>
                   </div>
-                  <div class="form-group">
+                  <div class="field-group">
                     <label>Pre-existing Conditions</label>
-                    <input type="text" [(ngModel)]="m.preExistingConditions" placeholder="None, or list details...">
+                    <input type="text" [(ngModel)]="m.preExistingConditions" placeholder="None, or describe..." />
                   </div>
                 </div>
               </div>
@@ -161,134 +202,302 @@
           </div>
         </section>
       }
+
+      <!-- ── STEP 3: AI Health Declaration ── -->
       @if (formStep === 3) {
-        <section class="form-section medical-declarations fade-in">
-          <h3>Health & Lifestyle Declarations</h3>
-          <p>Please answer accurately. These declarations are vital for underwriting.</p>
-          <div class="declaration-item">
-            <div class="d-text">
-              <strong>Hospitalization History</strong>
-              <p>Have you or any insured member been hospitalized in the last 12 months?</p>
-            </div>
-            <div class="d-toggle">
-              <button [class.active]="formData.declarations.hospitalizedLastYear" (click)="formData.declarations.hospitalizedLastYear = true">YES</button>
-              <button [class.active]="!formData.declarations.hospitalizedLastYear" (click)="formData.declarations.hospitalizedLastYear = false">NO</button>
+        <section class="form-section fade-in">
+          <div class="section-title-row">
+            <div class="section-icon">🤖</div>
+            <div>
+              <h3>AI Health Declaration Engine</h3>
+              <p>Answer 4 medical questions. Our AI will instantly generate your formal Health Declaration document.</p>
             </div>
           </div>
-          <div class="declaration-item">
-            <div class="d-text">
-              <strong>Chronic Illnesses</strong>
-              <p>Is there any history of Diabetes, Hypertension, Heart issues or Cancer?</p>
+
+          <!-- Declaration Toggles -->
+          <div class="declarations-grid">
+            <div class="decl-card" [class.decl-yes]="formData.declarations.hospitalizedLastYear">
+              <div class="decl-icon">🏥</div>
+              <div class="decl-content">
+                <strong>Hospitalization History</strong>
+                <p>Hospitalized in the last 12 months?</p>
+              </div>
+              <div class="decl-toggle">
+                <button [class.yes-active]="formData.declarations.hospitalizedLastYear"
+                        (click)="formData.declarations.hospitalizedLastYear = true; generateAIDocument()">YES</button>
+                <button [class.no-active]="!formData.declarations.hospitalizedLastYear"
+                        (click)="formData.declarations.hospitalizedLastYear = false; generateAIDocument()">NO</button>
+              </div>
             </div>
-            <div class="d-toggle">
-              <button [class.active]="formData.declarations.chronicConditions" (click)="formData.declarations.chronicConditions = true">YES</button>
-              <button [class.active]="!formData.declarations.chronicConditions" (click)="formData.declarations.chronicConditions = false">NO</button>
+            <div class="decl-card" [class.decl-yes]="formData.declarations.chronicConditions">
+              <div class="decl-icon">💊</div>
+              <div class="decl-content">
+                <strong>Chronic Illness History</strong>
+                <p>Diabetes, Hypertension, Heart disease, or Cancer?</p>
+              </div>
+              <div class="decl-toggle">
+                <button [class.yes-active]="formData.declarations.chronicConditions"
+                        (click)="formData.declarations.chronicConditions = true; generateAIDocument()">YES</button>
+                <button [class.no-active]="!formData.declarations.chronicConditions"
+                        (click)="formData.declarations.chronicConditions = false; generateAIDocument()">NO</button>
+              </div>
+            </div>
+            <div class="decl-card" [class.decl-yes]="formData.declarations.smokeOrAlcohol">
+              <div class="decl-icon">🚬</div>
+              <div class="decl-content">
+                <strong>Lifestyle Declarations</strong>
+                <p>Smoking or regular alcohol consumption?</p>
+              </div>
+              <div class="decl-toggle">
+                <button [class.yes-active]="formData.declarations.smokeOrAlcohol"
+                        (click)="formData.declarations.smokeOrAlcohol = true; generateAIDocument()">YES</button>
+                <button [class.no-active]="!formData.declarations.smokeOrAlcohol"
+                        (click)="formData.declarations.smokeOrAlcohol = false; generateAIDocument()">NO</button>
+              </div>
+            </div>
+            <div class="decl-card" [class.decl-yes]="formData.declarations.surgicalHistory">
+              <div class="decl-icon">🔬</div>
+              <div class="decl-content">
+                <strong>Surgical Procedures</strong>
+                <p>Surgery planned or performed in last 5 years?</p>
+              </div>
+              <div class="decl-toggle">
+                <button [class.yes-active]="formData.declarations.surgicalHistory"
+                        (click)="formData.declarations.surgicalHistory = true; generateAIDocument()">YES</button>
+                <button [class.no-active]="!formData.declarations.surgicalHistory"
+                        (click)="formData.declarations.surgicalHistory = false; generateAIDocument()">NO</button>
+              </div>
             </div>
           </div>
-          <div class="declaration-item">
-            <div class="d-text">
-              <strong>Lifestyle Habits</strong>
-              <p>Do any members smoke or consume alcohol regularly?</p>
+
+          <!-- AI Document Generation Panel -->
+          <div class="ai-doc-panel" [class.generating]="generatingDoc" [class.ready]="!!generatedDocument">
+            <div class="ai-doc-header">
+              <div class="ai-pulse-dot" [class.active]="generatingDoc || !!generatedDocument"></div>
+              <span class="ai-doc-title">🤖 IQsure Document Engine</span>
+              @if (generatedDocument) {
+                <span class="doc-ref-badge">{{ generatedDocument.referenceId }}</span>
+              }
             </div>
-            <div class="d-toggle">
-              <button [class.active]="formData.declarations.smokeOrAlcohol" (click)="formData.declarations.smokeOrAlcohol = true">YES</button>
-              <button [class.active]="!formData.declarations.smokeOrAlcohol" (click)="formData.declarations.smokeOrAlcohol = false">NO</button>
-            </div>
+
+            @if (generatingDoc) {
+              <div class="doc-generating-state">
+                <div class="gen-bars">
+                  <div class="gb gb1"></div>
+                  <div class="gb gb2"></div>
+                  <div class="gb gb3"></div>
+                  <div class="gb gb4"></div>
+                  <div class="gb gb5"></div>
+                </div>
+                <div class="gen-steps">
+                  <span>📋 Analyzing member profiles...</span>
+                  <span>⚖️ Cross-referencing declaration data...</span>
+                  <span>✍️ Drafting personalized health declaration...</span>
+                  <span>🔏 Formatting for underwriting review...</span>
+                </div>
+              </div>
+            }
+
+            @if (generatedDocument && !generatingDoc) {
+              <div class="doc-ready-state slide-up">
+                <div class="doc-summary-bar">
+                  <div class="dsb-icon">📄</div>
+                  <div class="dsb-info">
+                    <strong>{{ generatedDocument.documentTitle }}</strong>
+                    <p>{{ generatedDocument.aiSummary }}</p>
+                  </div>
+                  <div class="dsb-meta">
+                    <span>Generated {{ generatedDocument.generatedAt }}</span>
+                    <button class="btn-toggle-doc" (click)="toggleDocPreview()">
+                      {{ showDocPreview ? '▲ Hide' : '▼ Preview' }}
+                    </button>
+                  </div>
+                </div>
+
+                @if (showDocPreview) {
+                  <div class="doc-text-preview">
+                    <pre>{{ generatedDocument.documentText }}</pre>
+                  </div>
+                }
+
+                <div class="doc-actions">
+                  <button class="btn-regen" (click)="regenerateDocument()">🔄 Regenerate</button>
+                  <div class="doc-status-ok">✅ Document ready for submission</div>
+                </div>
+              </div>
+            }
+
+            @if (!generatingDoc && !generatedDocument) {
+              <div class="doc-idle-state">
+                <p>Fill the medical questions above and the AI will auto-generate your declaration.</p>
+                <button class="btn-gen-now" (click)="generateAIDocument()">⚡ Generate Now</button>
+              </div>
+            }
+
+            @if (docGenerationError) {
+              <div class="doc-error-banner">⚠️ {{ docGenerationError }}</div>
+            }
           </div>
-          <div class="declaration-item">
-            <div class="d-text">
-              <strong>Surgical Procedures</strong>
-              <p>Is there any planned surgery or surgery history in the last 5 years?</p>
-            </div>
-            <div class="d-toggle">
-              <button [class.active]="formData.declarations.surgicalHistory" (click)="formData.declarations.surgicalHistory = true">YES</button>
-              <button [class.active]="!formData.declarations.surgicalHistory" (click)="formData.declarations.surgicalHistory = false">NO</button>
-            </div>
+
+          <!-- Fallback file upload -->
+          <div class="optional-upload mt-md">
+            <details>
+              <summary>📎 Or attach an existing health document (optional)</summary>
+              <div class="upload-drop-zone mt-sm" [class.has-file]="formData.healthReport">
+                <input type="file" id="healthReport" (change)="onFileSelected($event)" hidden />
+                <label for="healthReport" class="upload-label-btn">
+                  <span class="ul-icon">📁</span>
+                  @if (formData.healthReport) {
+                    <span class="file-chosen">{{ formData.healthReport.name }}</span>
+                  } @else {
+                    <span>Select PDF or Image (max 5MB)</span>
+                  }
+                </label>
+              </div>
+            </details>
           </div>
         </section>
       }
+
+      <!-- ── STEP 4: Rewards & Savings ── -->
       @if (formStep === 4) {
-        <section class="form-section rewards-section fade-in">
-          <div class="section-header">
-            <h3>🎁 Rewards & Savings</h3>
+        <section class="form-section fade-in">
+          <div class="section-title-row">
+            <div class="section-icon">🎁</div>
+            <div>
+              <h3>Rewards & Savings</h3>
+              <p>Convert your IQsure learning points and earned coupons into premium discounts.</p>
+            </div>
           </div>
-          <p class="section-hint">Convert your learning achievements into actual savings on this plan.</p>
+
           @if (availableRewards.length > 0) {
-            <div class="rewards-selection-grid">
+            <div class="rewards-grid">
               @for (r of availableRewards; track r.userRewardId) {
-                <div class="reward-mini-card"
-                     [class.selected]="formData.rewardIds.includes(r.userRewardId!)"
+                <div class="reward-card" [class.selected]="formData.rewardIds.includes(r.userRewardId!)"
                      (click)="toggleReward(r.userRewardId!)">
-                  <div class="reward-info">
-                    <span class="type">{{ r.rewardType }}</span>
-                    <span class="value">{{ r.discountValue }}% OFF</span>
-                  </div>
-                  <div class="selection-indicator">
-                    {{ formData.rewardIds.includes(r.userRewardId!) ? '✔️' : '+' }}
+                  <div class="rc-badge">{{ r.discountValue }}% OFF</div>
+                  <div class="rc-type">{{ r.rewardType }}</div>
+                  <div class="rc-exp">Expires {{ r.expiryDate | date:'MMM y' }}</div>
+                  <div class="rc-check">
+                    @if (formData.rewardIds.includes(r.userRewardId!)) { ✅ Applied }
+                    @else { + Apply }
                   </div>
                 </div>
               }
             </div>
           } @else {
-            <div class="empty-rewards">
-              <p>No rewards available. <a routerLink="/quizzes" class="link">Play Quizzes</a> to earn points!</p>
+            <div class="no-rewards-box">
+              <span class="nr-icon">🏆</span>
+              <p>No coupons available yet. <a routerLink="/quizzes">Play quizzes</a> to earn discount rewards!</p>
             </div>
           }
         </section>
       }
+
+      <!-- ── STEP 5: Review & Submit ── -->
       @if (formStep === 5) {
-        <section class="form-section review-summary fade-in">
-          <h3>Final Review & Settlement Estimate</h3>
-          <p>Carefully review your information before final submission.</p>
-          <div class="review-grid">
-            <div class="review-block">
-              <h5>Policy Overview</h5>
-              <p><strong>Plan:</strong> {{ selectedPlan?.title }}</p>
-              <p><strong>Nominee:</strong> {{ formData.nomineeName }} ({{ formData.nomineeRelationship }})</p>
-              <p><strong>Document:</strong> {{ formData.healthReport ? 'Attached' : 'Not Provided' }}</p>
-            </div>
-            <div class="review-block">
-              <h5>Members Insured</h5>
-              <ul>
-                @for (m of formData.members; track $index) {
-                  <li>{{ m.fullName }} ({{ m.relationship }})</li>
-                }
-              </ul>
+        <section class="form-section review-section fade-in">
+          <div class="section-title-row">
+            <div class="section-icon">📋</div>
+            <div>
+              <h3>Application Review</h3>
+              <p>Verify all information before sending to the underwriter.</p>
             </div>
           </div>
-          <hr class="section-divider">
+
+          <div class="review-grid">
+            <div class="review-panel">
+              <h4>🛡️ Policy Details</h4>
+              <div class="rv-row"><span>Plan</span><strong>{{ selectedPlan?.title }}</strong></div>
+              <div class="rv-row"><span>Type</span><strong>{{ selectedPlan?.policyType }}</strong></div>
+              <div class="rv-row"><span>Coverage</span><strong>₹{{ selectedPlan?.coverageAmount | number }}</strong></div>
+              <div class="rv-row"><span>Duration</span><strong>{{ selectedPlan?.durationMonths }} months</strong></div>
+            </div>
+            <div class="review-panel">
+              <h4>👤 Nominee</h4>
+              <div class="rv-row"><span>Name</span><strong>{{ formData.nomineeName }}</strong></div>
+              <div class="rv-row"><span>Relationship</span><strong>{{ formData.nomineeRelationship }}</strong></div>
+            </div>
+            <div class="review-panel">
+              <h4>👥 Insured Members</h4>
+              @for (m of formData.members; track $index) {
+                <div class="rv-member">
+                  <span class="rv-m-icon">{{ $index === 0 ? '👤' : '👥' }}</span>
+                  <div>
+                    <strong>{{ m.fullName }}</strong>
+                    <span>{{ m.relationship }}{{ m.preExistingConditions ? ' · ' + m.preExistingConditions : '' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="review-panel">
+              <h4>📄 Health Document</h4>
+              @if (generatedDocument) {
+                <div class="doc-ref-review">
+                  <div class="drr-icon">🤖</div>
+                  <div>
+                    <strong>AI-Generated Declaration</strong>
+                    <span>Ref: {{ generatedDocument.referenceId }}</span>
+                    <span class="doc-ai-desc">{{ generatedDocument.aiSummary }}</span>
+                  </div>
+                </div>
+              } @else if (formData.healthReport) {
+                <div class="rv-row"><span>File</span><strong>{{ formData.healthReport.name }}</strong></div>
+              } @else {
+                <div class="rv-warn">⚠️ No health document attached</div>
+              }
+            </div>
+          </div>
+
+          @if (loadingPreview) {
+            <div class="premium-loading-bar">
+              <div class="plb-fill"></div>
+            </div>
+          }
+
           @if (preview) {
-            <div class="premium-assessment-card">
-              <div class="p-header">Estimated Annual Premium</div>
-              <div class="p-amount">₹{{ preview.finalPremium | number }}</div>
-              <div class="p-breakdown">
-                @for (d of preview.appliedDiscounts; track $index) {
-                  <div class="d-row"><span>{{ d.ruleName }}</span> <span>-{{ d.discountPercentage }}%</span></div>
-                }
-              </div>
-              <p class="p-notice">Final premium will be approved by Underwriter Alice after reviewing medical declarations.</p>
+            <div class="premium-estimate-card">
+              <div class="pec-label">ESTIMATED ANNUAL PREMIUM</div>
+              <div class="pec-amount">₹{{ preview.finalPremium | number }}</div>
+              @if (preview.appliedDiscounts.length > 0) {
+                <div class="pec-discounts">
+                  @for (d of preview.appliedDiscounts; track $index) {
+                    <div class="pec-d-row">
+                      <span>{{ d.ruleName }}</span>
+                      <span class="discount-val">−{{ d.discountPercentage }}%</span>
+                    </div>
+                  }
+                </div>
+              }
+              <p class="pec-notice">Final premium set by underwriter after reviewing your declaration.</p>
             </div>
           }
         </section>
       }
+
+      <!-- Alerts -->
       @if (errorMessage) {
-        <div class="alert alert-error slide-up">
-          <span class="icon">⚠️</span> {{ errorMessage }}
-        </div>
+        <div class="form-alert error slide-up">⚠️ {{ errorMessage }}</div>
       }
-      <div class="form-wizard-footer">
+      @if (successMessage) {
+        <div class="form-alert success slide-up">✅ {{ successMessage }}</div>
+      }
+
+      <!-- Footer Navigation -->
+      <div class="form-nav">
         @if (formStep > 1) {
-          <button class="btn-prev" (click)="prevFormStep()">Previous Step</button>
+          <button class="btn-prev" (click)="prevFormStep()">← Previous</button>
         } @else {
           <div></div>
         }
         @if (formStep < 5) {
           <button class="btn-next" (click)="nextFormStep()">
-            Next Step: {{ (formStep === 1 ? 'Insured Members' : formStep === 2 ? 'Health Questions' : formStep === 3 ? 'Savings' : 'Final Review') }} →
+            {{ getNextLabel() }} →
           </button>
         } @else {
-          <button class="btn-submit-final" (click)="submitRequest()" [disabled]="loading">
-            <span class="icon">📜</span> Confirm & Submit to Underwriter
+          <button class="btn-submit" (click)="submitRequest()" [disabled]="submitting || loading">
+            @if (submitting) { ⏳ Submitting... }
+            @else { 🚀 Submit to Underwriter }
           </button>
         }
       </div>

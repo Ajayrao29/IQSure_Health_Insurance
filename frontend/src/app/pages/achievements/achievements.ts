@@ -1,12 +1,14 @@
 // Angular component for the achievements page
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-achievements',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, RouterLink],
   templateUrl: './achievements.html',
   styleUrls: ['./achievements.scss']
 })
@@ -38,7 +40,7 @@ export class AchievementsComponent implements OnInit {
     });
   }
   calculateLevel(): void {
-    const pointsPerLevel = 100;
+    const pointsPerLevel = 1000; // 1000 XP per level — aligned with dashboard XP bar
     this.level = Math.floor(this.userPoints / pointsPerLevel) + 1;
     this.nextLevelPoints = this.level * pointsPerLevel;
     this.levelProgress = ((this.userPoints % pointsPerLevel) / pointsPerLevel) * 100;
@@ -62,8 +64,13 @@ export class AchievementsComponent implements OnInit {
       if (badges.length >= 4) this.achievements[7].unlocked = true;
     });
     this.api.getLeaderboard().subscribe(board => {
-      const entry = board.find(e => e.userId === userId);
-      if (entry && entry.rank <= 10) this.achievements[6].unlocked = true;
+      // board is sorted by points; find this user's position
+      const myPos = board.findIndex(e => e.userId === userId);
+      if (myPos !== -1 && myPos < 10) this.achievements[6].unlocked = true;
     });
+  }
+
+  getUnlockedCount(): number {
+    return this.achievements.filter(a => a.unlocked).length;
   }
 }

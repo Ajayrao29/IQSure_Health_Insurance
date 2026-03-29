@@ -34,5 +34,6 @@ public class UserPolicyResponseDTO {
     private String nomineeName;
     private String nomineeRelationship;
     private String healthReportPath;
+    private java.time.LocalDateTime expiryDate;
     private java.util.List<InsuredMemberResponseDTO> insuredMembers;
 }
