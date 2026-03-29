@@ -231,7 +231,7 @@ export class ApiService {
     });
   }
   payPolicy(userId: number, userPolicyId: number): Observable<any> {
-    return this.http.post<any>(`${API}/api/v1/users/${userId}/policies/${userPolicyId}/pay`, {});
+    return this.http.put<any>(`${API}/api/v1/users/${userId}/policies/${userPolicyId}/pay`, {});
   }
   getUnderwriterPoliciesByStatus(underwriterId: number, status?: string): Observable<any[]> {
     const statusParam = status ? `?status=${status}` : '';

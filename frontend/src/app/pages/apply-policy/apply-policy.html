@@ -234,20 +234,6 @@
               <p>No rewards available. <a routerLink="/quizzes" class="link">Play Quizzes</a> to earn points!</p>
             </div>
           }
-          <div class="discount-rules-info mt-4">
-            <h4>Loyalty & Elite Discounts (Auto-Applied)</h4>
-            <div class="rules-list">
-              @for (rule of discountRules; track rule.ruleId) {
-                <div class="rule-item" [class.achieved]="getRuleStatus(rule)">
-                  <span class="status-icon">{{ getRuleStatus(rule) ? '✨' : '🔒' }}</span>
-                  <div class="rule-text">
-                    <span class="rule-name">{{ rule.ruleName }}</span>
-                    <p class="rule-desc">{{ rule.discountPercentage }}% saving applied based on your account status.</p>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
         </section>
       }
       @if (formStep === 5) {

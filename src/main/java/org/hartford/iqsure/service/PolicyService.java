@@ -73,10 +73,14 @@ public class PolicyService {
         policy.setCopayPercentage(dto.getCopayPercentage());
         return toDTO(policyRepository.save(policy));
     }
+    private final org.hartford.iqsure.repository.UserPolicyRepository userPolicyRepository;
     @Transactional
     public void deletePolicy(Long policyId) {
         if (!policyRepository.existsById(policyId)) {
             throw new ResourceNotFoundException("Policy not found with id: " + policyId);
+        }
+        if (userPolicyRepository.existsByPolicy_PolicyId(policyId)) {
+            throw new BadRequestException("Cannot delete policy that has active or historical applications. Consider deactivating it instead.");
         }
         policyRepository.deleteById(policyId);
     }

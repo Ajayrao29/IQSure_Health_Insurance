@@ -19,7 +19,7 @@ export class NotificationService {
       this.zone.run(() => {
         const notification = JSON.parse(event.data);
         this.notificationSubject.next(notification);
-        this.playNotificationSound();
+        // this.playNotificationSound(); // Commented out to prevent 404 for test.mp3
         this.showToast(notification);
       });
     });
@@ -33,8 +33,8 @@ export class NotificationService {
     };
   }
   playNotificationSound() {
-    const audio = new Audio('test.mp3');
-    audio.play().catch(e => console.log('Audio play blocked or unavailable', e));
+    // const audio = new Audio('test.mp3');
+    // audio.play().catch(e => console.log('Audio play blocked or unavailable', e));
   }
   showToast(notification: any) {
     console.log(`New Notification: ${notification.message}`);

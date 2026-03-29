@@ -78,24 +78,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  private loadAdminDashboard(): void {
+  public loadAdminDashboard(): void {
+    console.log('🔄 Syncing Admin Dashboard metrics...');
     forkJoin({
       users: this.api.getAllUsers(),
       quizzes: this.api.getAllQuizzes(),
-      rewards: this.api.getAllRewards()
+      rewards: this.api.getAllRewards(),
+      userPolicies: this.api.getAllUserPoliciesAdmin(),
+      discountRules: this.api.getAllDiscountRules()
     }).pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: ({ users, quizzes, rewards }) => {
+        next: ({ users, quizzes, rewards, userPolicies, discountRules }) => {
+          console.log('✅ Admin Sync Complete:', { 
+            users: users.length, 
+            quizzes: quizzes.length, 
+            policies: userPolicies.length,
+            rewardTypes: rewards.length,
+            rules: discountRules.length
+          });
+          
           this.stats.totalUsers = users.length;
           this.stats.totalAdmins = users.filter(u => u.role === 'ROLE_ADMIN').length;
           this.stats.totalCustomers = users.filter(u => u.role !== 'ROLE_ADMIN').length;
+          
           this.stats.totalQuizzes = quizzes.length;
           this.stats.totalRewards = rewards.length;
+          
+          this.stats.totalPolicies = userPolicies.length;
+          this.stats.activePolicies = userPolicies.filter(p => p.status === 'ACTIVE').length;
+          this.stats.inactivePolicies = userPolicies.filter(p => p.status !== 'ACTIVE').length;
+          
+          this.stats.discountRules = discountRules.length;
+          
           this.recentUsers = [...users].reverse().slice(0, 5);
           this.loading = false;
         },
         error: (err) => {
-          console.error('Failed to load admin stats:', err);
+          console.error('❌ Failed to sync admin stats:', err);
           this.loading = false;
         }
       });

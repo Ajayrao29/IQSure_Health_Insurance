@@ -30,10 +30,10 @@ public class UserPolicyController {
     public ResponseEntity<UserPolicyResponseDTO> purchasePolicy(
             @PathVariable Long userId,
             @Valid @RequestBody UserPolicyRequestDTO dto,
-            @RequestParam(required = false) List<Long> queryRewardIds) {
+            @RequestParam(required = false) List<Long> selectedRewardIds) {
         List<Long> combinedRewards = new ArrayList<>();
         if (dto.getRewardIds() != null) combinedRewards.addAll(dto.getRewardIds());
-        if (queryRewardIds != null) combinedRewards.addAll(queryRewardIds);
+        if (selectedRewardIds != null) combinedRewards.addAll(selectedRewardIds);
         List<Long> finalRewards = combinedRewards.stream().distinct().toList();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userPolicyService.purchasePolicy(userId, dto, finalRewards));

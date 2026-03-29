@@ -56,15 +56,18 @@ public class RewardService {
         int userPoints = user.getUserPoints();
         int badgeCount = userBadgeRepository.findByUser_UserId(userId).size();
         List<DiscountRule> rules = discountRuleRepository.findByIsActiveTrue();
+        
         for (DiscountRule rule : rules) {
             if (rule.getDiscountPercentage() == null) continue;
             boolean qualifies = (rule.getMinUserPoints() <= 0 || userPoints >= rule.getMinUserPoints()) &&
                                (rule.getMinBadgesEarned() <= 0 || badgeCount >= rule.getMinBadgesEarned());
             if (!qualifies) continue;
-            String label = "Discount: " + rule.getRuleName();
+            
+            String label = rule.getRuleName(); // Removed 'Discount: ' prefix to keep it clean
             List<UserReward> currentOwned = userRewardRepository.findByUser_UserId(userId);
             boolean alreadyHas = currentOwned.stream()
                     .anyMatch(ur -> ur.getReward().getRewardType().equals(label));
+            
             if (!alreadyHas) {
                 Reward reward = rewardRepository.save(Reward.builder()
                         .rewardType(label)
@@ -78,6 +81,7 @@ public class RewardService {
                         .build());
             }
         }
+        
         return userRewardRepository.findByUser_UserId(userId)
                 .stream()
                 .map(ur -> UserRewardResponseDTO.builder()
@@ -103,6 +107,12 @@ public class RewardService {
         if (userRewardRepository.existsByUser_UserIdAndReward_RewardId(userId, rewardId)) {
             throw new BadRequestException("You have already redeemed this reward");
         }
+        if (reward.getReqPoints() != null && user.getUserPoints() < reward.getReqPoints()) {
+            throw new BadRequestException("Insufficient points to redeem this reward. Required: " + reward.getReqPoints());
+        }
+        user.setUserPoints(user.getUserPoints() - (reward.getReqPoints() != null ? reward.getReqPoints() : 0));
+        userRepository.save(user);
+
         UserReward userReward = UserReward.builder()
                 .user(user)
                 .reward(reward)
@@ -114,6 +124,9 @@ public class RewardService {
     public void deleteReward(Long rewardId) {
         if (!rewardRepository.existsById(rewardId)) {
             throw new ResourceNotFoundException("Reward not found: " + rewardId);
+        }
+        if (userRewardRepository.existsByReward_RewardId(rewardId)) {
+            throw new BadRequestException("Cannot delete reward that has already been redeemed by users. Consider expiring it instead.");
         }
         rewardRepository.deleteById(rewardId);
     }

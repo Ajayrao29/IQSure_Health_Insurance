@@ -45,60 +45,44 @@ public class PremiumCalculationService {
         double bestQuizScore = 0.0;
         List<PremiumBreakdownDTO.AppliedDiscountDTO> applied = new ArrayList<>();
         // Calculate manually applied reward discounts
-        double totalDiscount = 0.0;
+        double maxDiscountPercentage = 0.0;
         if (selectedRewardIds != null && !selectedRewardIds.isEmpty()) {
-            Set<Long> selectedSet = Set.copyOf(selectedRewardIds);
+            Set<Long> selectedSet = selectedRewardIds.stream().collect(Collectors.toSet());
             List<UserReward> allUserRewards =
                     userRewardRepository.findByUser_UserIdAndUsedFalse(userId);
+            
             for (UserReward ur : allUserRewards) {
                 if (!selectedSet.contains(ur.getId())) {
                     continue;
                 }
                 Reward reward = ur.getReward();
-                boolean notExpired =
-                        !reward.getExpiryDate().isBefore(java.time.LocalDate.now());
+                boolean notExpired = !reward.getExpiryDate().isBefore(java.time.LocalDate.now());
                 if (notExpired) {
-                    applied.add(PremiumBreakdownDTO.AppliedDiscountDTO.builder()
-                            .ruleName(reward.getRewardType())
-                            .discountPercentage(reward.getDiscountValue())
-                            .reason("Coupon applied on purchase")
-                            .build());
-                    totalDiscount += reward.getDiscountValue();
+                    // Update: Only apply the single BEST selected discount to honor 'only one' rule
+                    if (reward.getDiscountValue() > maxDiscountPercentage) {
+                        maxDiscountPercentage = reward.getDiscountValue();
+                        applied.clear();
+                        applied.add(PremiumBreakdownDTO.AppliedDiscountDTO.builder()
+                                .ruleName(reward.getRewardType())
+                                .discountPercentage(reward.getDiscountValue())
+                                .reason("Manually selected reward")
+                                .build());
+                    }
                 }
             }
         }
-        // Calculate automatic rule-based discounts from user achievements
-        final double finalBestQuizScore = bestQuizScore;
-        discountRuleRepository.findByIsActiveTrue().stream()
-                .filter(rule -> {
-                    if (rule.getApplicablePolicyType() != null &&
-                        rule.getApplicablePolicyType() != policy.getPolicyType()) {
-                        return false;
-                    }
-                    return userPoints >= rule.getMinUserPoints() &&
-                           badgeCount >= rule.getMinBadgesEarned() &&
-                           finalBestQuizScore >= rule.getMinQuizScorePercent();
-                })
-                .forEach(rule -> {
-                    applied.add(PremiumBreakdownDTO.AppliedDiscountDTO.builder()
-                            .ruleName(rule.getRuleName())
-                            .discountPercentage(rule.getDiscountPercentage())
-                            .reason("Automatic qualification - Account Status")
-                            .build());
-                });
-        totalDiscount = applied.stream()
-                .mapToDouble(PremiumBreakdownDTO.AppliedDiscountDTO::getDiscountPercentage)
-                .sum();
+        
+        double totalDiscount = maxDiscountPercentage;
+        
         if (totalDiscount > appConfig.getMaxDiscountCap()) {
             totalDiscount = appConfig.getMaxDiscountCap();
         }
+        
         double basePremium = policy.getBasePremium();
-        double discountedAmount =
-                Math.round(basePremium * (totalDiscount / 100.0) * 100.0) / 100.0;
-        double finalPremium =
-                Math.round((basePremium - discountedAmount) * 100.0) / 100.0;
-        double roundedBestScore =
-                Math.round(bestQuizScore * 100.0) / 100.0;
+        double discountedAmount = Math.round(basePremium * (totalDiscount / 100.0) * 100.0) / 100.0;
+        double finalPremium = Math.round((basePremium - discountedAmount) * 100.0) / 100.0;
+        
+        double roundedBestScore = Math.round(bestQuizScore * 100.0) / 100.0;
         String ruleNames = applied.stream()
                 .map(PremiumBreakdownDTO.AppliedDiscountDTO::getRuleName)
                 .collect(Collectors.joining(", "));
