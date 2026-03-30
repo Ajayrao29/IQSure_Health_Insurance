@@ -16,10 +16,12 @@ IQsure is a state-of-the-art, gamified insurance education and management platfo
 
 ### 🎮 Advanced Gamification & Literacy
 - **Interactive Quizzes** - Level up your insurance knowledge across Health, Life, and Motor categories.
-- **Multilingual Learning** - Education content available in **English, Spanish, Hindi, Telugu, and Kannada**.
+- **Multilingual & Audio Learning** - Google Translate integration for 5+ languages and Web Speech API for Text-to-Speech audio narration.
+- **Guardian Ecosystem Dashboard** - A "Digital Fortress" visualization of user risk literacy and insurance proficiency.
 - **Dynamic Leaderboard** - Compete with others and earn your spot on the podium.
 - **Badges & Achievements** - Unlock status symbols like "Quick Learner," "Insurance Pro," and "Claim Hero."
 - **Day Streaks** - Maintain your learning momentum with daily engagement tracking.
+- **Interactive Guided Onboarding** - Step-by-step application-wide onboarding using `driver.js` to highlight key platform features to first-time users.
 
 ### 💰 Smart Discount Engine
 - **Performance-Based Pricing** - Premium discounts automatically calculated based on quiz scores and points.
@@ -31,6 +33,10 @@ IQsure is a state-of-the-art, gamified insurance education and management platfo
 - **Risk Assessment** - Underwriters review applications and documents before approval.
 - **Digital Claims** - File claims with document evidence and track settlement status in real-time.
 - **Notifications** - Stay updated on policy status, quotes, and claim decisions.
+
+### 📈 Risk Simulator Analytics
+- **Monte Carlo Engine** - Actuarial modeling for calculating financial ruin probability.
+- **Peace of Mind Score** - Assess individual risk vs. covered limits dynamically.
 
 ---
 
@@ -145,6 +151,7 @@ Access the interactive Swagger UI at: `http://localhost:8080/swagger-ui/index.ht
 - `GET /api/v1/underwriter/assignments` - List pending applications for underwriters.
 - `POST /api/v1/claims` - File a new claim.
 - `GET /api/v1/claims-officer/pending` - List claims awaiting verification.
+- `POST /api/v1/simulator/monte-carlo` - Run a Monte Carlo risk simulation.
 
 ---
 

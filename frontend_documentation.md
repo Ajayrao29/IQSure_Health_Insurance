@@ -25,6 +25,8 @@ The IQsure frontend is a modern, responsive web application built using **Angula
 - **Quizzes**: Browse and take interactive quizzes on various insurance topics.
 - **Quiz Scoring**: Score points based on correct answers and speed.
 - **Badges & Leveling**: Earn badges for milestones (e.g., "First Quiz", "Perfect Score") and level up as points accumulate.
+- **Guardian Ecosystem / Digital Fortress**: Visualize your performance with a dynamic dashboard, tracking daily streaks and completed missions.
+- **Multilingual Support & TTS**: Translate educational materials into 5+ languages via Google Translate and listen to narration using the Web Speech API.
 - **Leaderboard**: Compete with other users for the top spot on the global leaderboard.
 - **Learning Center**: Access educational articles and videos about insurance concepts.
 
@@ -51,6 +53,9 @@ The IQsure frontend is a modern, responsive web application built using **Angula
 - **Content Management**: CRUD operations for Quizzes, Questions, Policies, and Educational Content.
 - **Rule Engine**: Manage dynamic discount rules and gamification parameters.
 - **Pipeline Monitoring**: Assign tasks to Underwriters and Claims Officers.
+
+### 8. App-Wide Onboarding
+- **Guided Tour**: Step-by-step interactive guidance with `driver.js` highlighting key features for new users across the entire ecosystem.
 
 ---
 
@@ -83,6 +88,7 @@ The IQsure frontend is a modern, responsive web application built using **Angula
 | `MyClaimsComponent` | `/my-claims` | List and status tracking of personal insurance claims. |
 | `LeaderboardComponent` | `/leaderboard` | Top players ranking table. |
 | `RewardsComponent` | `/rewards` | Catalog of redeemable rewards and active discounts. |
+| `RiskSimulatorComponent` | `/risk-simulator` | Monte Carlo powered engine to model potential financial ruin scenarios. |
 
 ### Page Components (Admin)
 | Component | Route | Description |

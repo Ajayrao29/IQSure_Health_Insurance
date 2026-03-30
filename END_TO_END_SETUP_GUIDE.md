@@ -157,12 +157,16 @@ ng serve
 
 ## 🎯 Key Features
 
-### Gamification System:
-- ✅ Quiz-based learning
+### Gamification System & Core Features:
+- ✅ Quiz-based learning (Web Speech API Text-to-Speech enabled)
+- ✅ Multilingual support (via Google Translate API)
+- ✅ Guardian Ecosystem / Digital Fortress (streaks & missions dashboard)
+- ✅ Guided Onboarding Tour (powered by `driver.js`)
 - ✅ Points system (10 pts per correct answer)
 - ✅ Progressive badge unlocking
 - ✅ Leaderboard rankings
 - ✅ Reward redemption
+- ✅ Risk Simulator (Actuarial Monte Carlo Simulation for potential financial ruin evaluation)
 
 ### Dynamic Premium Calculation:
 - ✅ Base premium from policy

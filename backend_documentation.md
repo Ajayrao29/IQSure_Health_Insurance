@@ -34,8 +34,9 @@ The IQsure backend is a robust RESTful API built with **Spring Boot**. It handle
 - **Flexible Policies**: Supports various coverage types (Life, Health, Motor, Travel).
 - **Premium Calculator**: Dynamic calculation engine that applies discounts based on gamification rewards and quiz scores.
 
-### 3. Gamification System
+### 3. Gamification System & Guardian Ecosystem
 - **Quiz Processing**: Validates user answers and calculates score bonuses for speed.
+- **Guardian Dashboard Sync**: Real-time synchronization of mission progression, quiz attempt history, and gamification metrics.
 - **Badge Engine**: Automatically awards badges to users when specific milestones are met.
 - **Reward System**: Tracks points spendable on insurance premium discounts.
 - **Rule Engine**: Allows admins to define and update the logic for premium discounts (e.g., "5% off for Level 5").
@@ -43,6 +44,10 @@ The IQsure backend is a robust RESTful API built with **Spring Boot**. It handle
 ### 4. Claim & Pipeline Management
 - **Claim Workflow**: Tracks claims from filing to officer assignment, verification, and settlement.
 - **Task Pipeline**: Admin controller for orchestrating work between underwriters and claims officers.
+
+### 5. Analytics & Simulation
+- **Monte Carlo Engine**: Simulates thousands of actuarial scenarios to calculate financial ruin odds.
+- **Risk Assessment**: Assesses risk dynamically by calculating the "Peace of Mind" score based on coverage versus real-world potential liabilities.
 
 ---
 
@@ -92,6 +97,11 @@ The IQsure backend is a robust RESTful API built with **Spring Boot**. It handle
 | GET | `/policies` | Master list of all user policy applications. |
 | PUT | `/policies/{id}/assign` | Assign a policy to an Underwriter. |
 | PUT | `/policies/{id}/quote` | (Underwriter) Submit a premium quote for an application. |
+
+### Analytics & Simulation (`/api/v1/simulator`)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| POST | `/monte-carlo` | Create and execute an actuarial simulation. |
 
 ---
 
