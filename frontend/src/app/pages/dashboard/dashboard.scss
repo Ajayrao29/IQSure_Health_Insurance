@@ -2002,3 +2002,30 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 .slide-in-bottom { animation: slide-in-bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+/* --- ADDITIONAL RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 900px) {
+  .gamification-hub { grid-template-columns: 1fr; gap: 1.5rem; }
+  .action-grid-modern { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+}
+@media (max-width: 600px) {
+  .action-grid-modern { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr; }
+  .welcome-banner-simple {
+    padding: 2rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    .banner-text h1 { font-size: 2rem; }
+    .stats-badge-white { width: 100%; min-width: auto; }
+  }
+  .fortress-card, .rank-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    .shield-container { width: 80px; height: 80px; }
+  }
+}

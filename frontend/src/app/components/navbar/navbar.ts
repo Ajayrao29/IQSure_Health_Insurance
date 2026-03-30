@@ -15,9 +15,19 @@ export class NavbarComponent implements OnInit {
   notifications: any[] = [];
   unreadCount = 0;
   showNotifications = false;
+  isMenuOpen = false;
+
   @HostListener('document:click')
   onDocumentClick() {
     this.showNotifications = false;
+  }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
   }
   constructor(
     public auth: AuthService,

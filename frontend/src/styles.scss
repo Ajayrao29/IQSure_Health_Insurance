@@ -259,6 +259,75 @@ select.form-select-sm, select {
     }
   }
 }
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+
+/* Laptops & Tablets (under 1024px) */
+@media screen and (max-width: 1024px) {
+  .page {
+    padding: 2rem 1.5rem 4rem;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    h1 { font-size: 2.2rem; }
+  }
+}
+
+/* Tablets (under 768px) */
+@media screen and (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
+  .main-content {
+    height: auto;
+    min-height: calc(100vh - 75px);
+    overflow-y: visible;
+  }
+  .page {
+    padding: 1.5rem 1rem 3rem;
+  }
+  .page-header {
+    h1 { font-size: 1.8rem; }
+    p { font-size: 0.95rem; }
+  }
+  .glass-card, .card {
+    padding: 1.5rem;
+    border-radius: 18px;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    table {
+      min-width: 700px;
+    }
+  }
+  .btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile Phones (under 480px) */
+@media screen and (max-width: 480px) {
+  .page-header {
+    margin-bottom: 2rem;
+    h1 { font-size: 1.5rem; }
+  }
+  .glass-card, .card {
+    padding: 1.25rem;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-main); }
 ::-webkit-scrollbar-thumb { background: #FFB6C1; border-radius: 10px; }

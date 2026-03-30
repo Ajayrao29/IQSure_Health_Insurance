@@ -1013,3 +1013,34 @@
 @keyframes blinkerScroll {
   50% { opacity: 0.8; transform: scale(1.02); }
 }
+/* --- ADDITIONAL RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+  .education-page { padding: 20px 1rem; }
+  .header-section {
+    padding: 2.5rem 1.5rem;
+    h1 { font-size: 2rem; }
+    p { font-size: 1.1rem; }
+    .academy-stats { gap: 1.5rem; .stat-item .val { font-size: 1.5rem; } }
+  }
+  .journey-path { padding: 40px 0; gap: 40px; &::before { display: none; } }
+  .journey-node {
+    width: 100% !important;
+    max-width: 100%;
+    margin: 0 0 40px 0 !important;
+    .node-content { padding: 1.5rem; gap: 1rem; flex-direction: column; text-align: center; }
+    .node-index { width: 45px; height: 45px; font-size: 1.2rem; }
+    .node-info { padding-right: 0; h3 { font-size: 1.2rem; } }
+    .node-connector { display: none; }
+    .btn-start { width: 100%; padding: 10px; }
+  }
+  .detail-container { padding: 2rem 1.5rem !important; border-radius: 24px !important; }
+  .session-hero h2 { font-size: 1.8rem !important; }
+  .session-actions { flex-direction: column; gap: 1rem; button { width: 100%; } }
+  .session-body-text { padding: 1.5rem !important; font-size: 1.05rem !important; border-left-width: 6px !important; }
+  .ai-quiz-overlay { padding: 1.5rem !important; h3 { font-size: 1.4rem !important; } }
+  .score-main-row { flex-direction: column; gap: 2rem !important; }
+  .score-ring { width: 140px !important; height: 140px !important; .score-number { font-size: 2.2rem !important; } }
+  .scorecard-footer { flex-direction: column; gap: 1rem; .btn-lg { width: 100% !important; padding: 1rem !important; } }
+  .pro-stage { padding: 2.5rem 1.5rem !important; .stage-header h3 { font-size: 1.8rem !important; } }
+  .instruction-grid { grid-template-columns: 1fr; gap: 1.5rem; .instr-item { padding: 2rem 1.5rem !important; } }
+}

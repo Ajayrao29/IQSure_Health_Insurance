@@ -1034,3 +1034,26 @@ $gap-lg: 3rem;
   .step-wizard { overflow-x: auto; padding-bottom: 0.5rem; }
   .form-body-card { padding: 1.5rem; }
 }
+/* --- ADDITIONAL RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 900px) {
+  .page { padding: 4rem 1rem 3rem; }
+  .plans-header h1 { font-size: 2rem; }
+  .plans-grid { grid-template-columns: 1fr; }
+  .step-wizard {
+    gap: 0.5rem;
+    .step-node label { display: none; }
+    .step-node { min-width: auto; }
+  }
+  .form-body-card { padding: 2rem 1.5rem; border-radius: 24px; }
+  .field-grid-2, .field-grid-3 { grid-template-columns: 1fr; gap: 1.25rem; }
+  .member-card { padding: 1.5rem; }
+  .ai-doc-panel .ai-doc-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; .doc-ref-badge { margin-left: 0; } }
+  .dsb-meta { align-items: flex-start !important; margin-top: 1rem; }
+  .doc-summary-bar { flex-direction: column; }
+  .doc-actions { flex-direction: column; align-items: stretch !important; .btn-regen { width: 100%; } }
+}
+@media (max-width: 600px) {
+  .plans-header h1 { font-size: 1.8rem; }
+  .form-header-bar { flex-direction: column; align-items: stretch; .selected-plan-pill { justify-content: center; } }
+  .step-wizard .step-node .step-circle { width: 32px; height: 32px; font-size: 0.8rem; }
+}
