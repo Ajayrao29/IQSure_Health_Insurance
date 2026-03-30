@@ -36,6 +36,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   recentUsers: User[] = [];
   selectedReport: any[] | null = null;
   selectedReportTitle = '';
+  renewalAlerts: any[] = [];
   stats = {
     totalUsers: 0,
     totalAdmins: 0,
@@ -131,8 +132,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       attempts: this.api.getAttemptsByUser(userId),
       policies: this.api.getUserPolicies(userId),
       claims: this.api.getClaimsByUser(userId),
-      quizzes: this.api.getAllQuizzes()
-    }).pipe(takeUntil(this.destroy$))
+      quizzes: this.api.getAllQuizzes(),
+      }).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: ({ profile, badges, attempts, policies, claims, quizzes }) => {
           this.user = profile;
@@ -142,6 +143,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.totalQuizzes = quizzes.length;
           // totalSavings = sum of premium discounts earned, not claim amounts paid out
           this.totalSavings = policies.reduce((sum, p) => sum + (p.savedAmount || 0), 0);
+          this.checkRenewalAlerts(policies);
           this.updateMetrics(policies, claims, attempts);
           this.loading = false;
         },
@@ -151,6 +153,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  private checkRenewalAlerts(policies: UserPolicy[]): void {
+    const today = new Date();
+    this.renewalAlerts = [];
+
+    policies.forEach(p => {
+      if (p.status !== 'ACTIVE' || !p.purchaseDate) return;
+
+      const purchaseDate = new Date(p.purchaseDate);
+      let nextRenewal = new Date(purchaseDate);
+
+      // Increment years until we find the NEXT upcoming anniversary
+      while (nextRenewal <= today) {
+        nextRenewal.setFullYear(nextRenewal.getFullYear() + 1);
+      }
+
+      const diffTime = nextRenewal.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Display alert if renewal is within 30 days
+      if (diffDays <= 30) {
+        this.renewalAlerts.push({
+          policyId: p.id,
+          title: p.policyTitle,
+          dueDate: nextRenewal,
+          daysLeft: diffDays,
+          amount: p.finalPremium
+        });
+      }
+    });
+
+    // Sort by urgency (fewer days left first)
+    this.renewalAlerts.sort((a, b) => a.daysLeft - b.daysLeft);
+  }
+
   private updateMetrics(policies: UserPolicy[], claims: Claim[], attempts: AttemptResponse[] = []): void {
     this.userStats.totalPolicies = policies.length;
     this.userStats.activePolicies = policies.filter(p => p.status === 'ACTIVE').length;

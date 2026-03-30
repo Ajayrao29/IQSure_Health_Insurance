@@ -71,9 +71,9 @@
           </svg>
         </div>
         <div class="m-data">
-        <div class="m-val">{{stats.totalPolicies}}</div>
-        <div class="m-label">APPLICATIONS</div>
-      </div>
+          <div class="m-val">{{stats.totalPolicies}}</div>
+          <div class="m-label">APPLICATIONS</div>
+        </div>
       </div>
       <div class="matrix-card">
         <div class="card-aura aura-purple"></div>
@@ -117,8 +117,9 @@
               <span class="m-subtitle">Policy performance split</span>
             </div>
             <div class="m-split">
-            <span class="hi">{{stats.activePolicies}}</span> Active / <span class="lo">{{stats.inactivePolicies}}</span> Pending/Closed
-          </div>
+              <span class="hi">{{stats.activePolicies}}</span> Active / <span
+                class="lo">{{stats.inactivePolicies}}</span> Pending/Closed
+            </div>
           </div>
           <div class="m-row">
             <div class="m-info">
@@ -251,6 +252,24 @@
       <div class="stats-badge-white">
         <div class="val">{{ user?.userPoints || 0 }}</div>
         <div class="lbl">TOTAL POINTS</div>
+      </div>
+    </div>
+
+    <!-- Renewal Alerts Section -->
+    <div class="renewal-alerts-container fade-in" *ngIf="renewalAlerts.length > 0">
+      <div class="renewal-alert-card" *ngFor="let alert of renewalAlerts">
+        <div class="alert-icon">🔔</div>
+        <div class="alert-content">
+          <div class="alert-tag">PAYMENT DUE SOON</div>
+          <h3>{{ alert.title }}</h3>
+          <p>Your yearly policy anniversary is approaching on <strong>{{ alert.dueDate | date:'mediumDate' }}</strong>.</p>
+        </div>
+        <div class="alert-meta">
+          <div class="days-left" [class.urgent]="alert.daysLeft <= 7">
+            {{ alert.daysLeft }} DAYS LEFT
+          </div>
+          <button routerLink="/payment-history" class="alert-btn">Review & Pay ₹{{ alert.amount | number:'1.0-0' }}</button>
+        </div>
       </div>
     </div>
 
@@ -445,12 +464,15 @@
           <p>Track claim status</p>
         </a>
         <a routerLink="/file-claim" class="action-card-modern">
-        <div class="action-icon-wrapper">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-        </div>
-        <h3>File Claim</h3>
-        <p>Submit a new claim</p>
-      </a>
+          <div class="action-icon-wrapper">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </div>
+          <h3>File Claim</h3>
+          <p>Submit a new claim</p>
+        </a>
       </div>
     </div>
     <div class="two-col mt-4">
@@ -555,7 +577,26 @@
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Payment History Quick Link Banner -->
+    <div class="ph-quick-link-banner fade-in">
+      <div class="ph-ql-left">
+        <div class="ph-ql-icon">💳</div>
+        <div>
+          <strong>Payment &amp; Premium History</strong>
+          <span>View your complete financial trail — quotes, discounts, and payment statuses</span>
+        </div>
+      </div>
+      <a routerLink="/payment-history" class="ph-ql-btn">
+        View Full History
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+        </svg>
+      </a>
+    </div>
+
+  </div>  
+
 
   <!-- REPORT MODAL -->
   <div class="report-overlay fade-in" *ngIf="selectedReport" (click)="closeReport()">

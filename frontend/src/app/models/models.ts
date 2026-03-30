@@ -123,3 +123,17 @@ export interface Claim {
   fraudRiskScore?: number;
   createdAt: string;
 }
+export interface PremiumCalculationLog {
+  logId: number;
+  userId: number;
+  policyId: number;
+  policyTitle: string;
+  basePremium: number;
+  totalDiscountPercent: number;
+  finalPremium: number;
+  userPointsSnapshot: number;
+  badgeCountSnapshot: number;
+  bestQuizScoreSnapshot: number;
+  appliedRuleNames: string;
+  calculatedAt: string;
+}

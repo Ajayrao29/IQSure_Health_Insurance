@@ -12,6 +12,7 @@ import { DashboardComponent }     from './pages/dashboard/dashboard';
 import { PoliciesComponent }      from './pages/policies/policies';
 import { MyPoliciesComponent }    from './pages/my-policies/my-policies';
 import { BadgesComponent }        from './pages/badges/badges';
+import { PaymentHistoryComponent } from './pages/payment-history/payment-history';
 import { RewardsComponent }       from './pages/rewards/rewards';
 import { LeaderboardComponent }   from './pages/leaderboard/leaderboard';
 import { AchievementsComponent }  from './pages/achievements/achievements';
@@ -53,6 +54,7 @@ export const routes: Routes = [
   { path: 'profile',       component: ProfileComponent,     canActivate: [AuthGuard] },
   { path: 'policies',      component: PoliciesComponent,    canActivate: [AuthGuard] },
   { path: 'my-policies',   component: MyPoliciesComponent,  canActivate: [AuthGuard] },
+  { path: 'payment-history', component: PaymentHistoryComponent, canActivate: [AuthGuard] },
   { path: 'badges',        component: BadgesComponent,      canActivate: [AuthGuard] },
   { path: 'rewards',       component: RewardsComponent,     canActivate: [AuthGuard] },
   { path: 'leaderboard',   component: LeaderboardComponent, canActivate: [AuthGuard] },

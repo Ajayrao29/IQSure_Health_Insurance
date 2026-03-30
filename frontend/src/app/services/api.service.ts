@@ -6,7 +6,7 @@ import {
   AuthResponse, User, LeaderboardEntry, Quiz, Question,
   AttemptResponse, Badge, Reward, Policy, UserPolicy,
   PremiumBreakdown, DiscountRule, EducationContent, Claim, UnderwriterStats, UserRewardResponse,
-  RegisterRequest, LoginRequest, ResetPasswordRequest
+  RegisterRequest, LoginRequest, ResetPasswordRequest, PremiumCalculationLog
 } from '../models/models';
 const API = 'http://localhost:8080';
 @Injectable({ providedIn: 'root' })
@@ -150,6 +150,9 @@ export class ApiService {
   }
   getUserPolicies(userId: number): Observable<UserPolicy[]> {
     return this.http.get<UserPolicy[]>(`${API}/api/v1/users/${userId}/policies`);
+  }
+  getPremiumLogs(userId: number): Observable<PremiumCalculationLog[]> {
+    return this.http.get<PremiumCalculationLog[]>(`${API}/api/v1/users/${userId}/premium/logs`);
   }
   getAvailableRewardsForUser(userId: number): Observable<UserRewardResponse[]> {
     return this.http.get<UserRewardResponse[]>(`${API}/api/v1/users/${userId}/premium/available-rewards`);

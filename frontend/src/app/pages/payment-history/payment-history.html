@@ -1,0 +1,160 @@
+
+<div class="payment-history-view fade-in">
+  <!-- Nav Bar Spacer -->
+  <div class="ph-view-header">
+    <div class="ph-hero">
+      <div class="ph-back-link" routerLink="/dashboard">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        Back to Dashboard
+      </div>
+      
+      <div class="ph-hero-flex">
+        <div class="ph-hero-title">
+          <div class="ph-badge">FINANCIAL LEDGER</div>
+          <h1>Payment & Premium History</h1>
+          <p>Complete record of your insurance quotes, applied discounts, and payment lifecycle.</p>
+        </div>
+        
+        <div class="ph-hero-stats">
+          <div class="ph-hero-chip">
+            <span class="ph-hero-val">₹{{ totalPremiumPaid | number:'1.0-0' }}</span>
+            <span class="ph-hero-lbl">TOTAL PAID</span>
+          </div>
+          <div class="ph-hero-chip green">
+            <span class="ph-hero-val">₹{{ totalDiscountSaved | number:'1.0-0' }}</span>
+            <span class="ph-hero-lbl">DISCOUNTS SAVED</span>
+          </div>
+          <div class="ph-hero-chip purple">
+            <span class="ph-hero-val">{{ paymentHistory.length }}</span>
+            <span class="ph-hero-lbl">QUOTES GENERATED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ph-content-wrapper">
+    <!-- Loading State -->
+    <div class="ph-loading" *ngIf="loading">
+      <div class="loader"></div>
+      <p>Fetching your financial ledger...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="ph-empty" *ngIf="!loading && paymentHistory.length === 0">
+      <div class="ph-empty-icon">📂</div>
+      <h3>No Transaction Records Found</h3>
+      <p>Apply for a policy or generate a quote to see your premium logic here.</p>
+      <button routerLink="/apply-policy" class="btn-cta">Browse Plans</button>
+    </div>
+
+    <!-- Ledger Table -->
+    <div class="ph-card" *ngIf="!loading && paymentHistory.length > 0">
+      <div class="ph-ledger-header">
+        <span>Date</span>
+        <span>Policy Detail</span>
+        <span>Market Premium</span>
+        <span>Discount Unlocked</span>
+        <span>Final Quote</span>
+        <span>Status</span>
+      </div>
+
+      <div class="ph-rows">
+        <div class="ph-row slide-in-bottom" *ngFor="let log of visiblePayments; let i = index">
+          <!-- Date -->
+          <div class="ph-col-date">
+            <div class="ph-date-pill">
+              <span class="ph-day">{{ log.calculatedAt | date:'dd' }}</span>
+              <span class="ph-mon">{{ log.calculatedAt | date:'MMM yyyy' }}</span>
+            </div>
+          </div>
+
+          <!-- Policy Info -->
+          <div class="ph-col-info">
+            <div class="ph-policy-title">{{ log.policyTitle }}</div>
+            <div class="ph-policy-id">Ref #{{ log.policyId }}</div>
+          </div>
+
+          <!-- Base Premium -->
+          <div class="ph-col-base">
+             ₹{{ log.basePremium | number:'1.0-0' }}
+          </div>
+
+          <!-- Discount -->
+          <div class="ph-col-discount">
+             <div class="ph-discount-wrap">
+               <span class="ph-discount-val" [class.has]="log.totalDiscountPercent > 0">
+                 -{{ log.totalDiscountPercent | number:'1.1-1' }}%
+               </span>
+               <div class="ph-rule-tags" *ngIf="log.appliedRuleNames">
+                 <span class="ph-tag" *ngFor="let rule of log.appliedRuleNames.split(',')">{{ rule.trim() }}</span>
+               </div>
+             </div>
+          </div>
+
+          <!-- Final Premium -->
+          <div class="ph-col-final">
+            <div class="ph-final-val">₹{{ log.finalPremium | number:'1.0-0' }}</div>
+            <div class="ph-savings">Saved approx. ₹{{ (log.basePremium - log.finalPremium) | number:'1.0-0' }}</div>
+          </div>
+
+          <!-- Status -->
+          <div class="ph-col-status">
+            @switch (getPaymentStatusLabel(log)) {
+              @case ('ACTIVE') {
+                <span class="ph-pill active">PAID & ACTIVE</span>
+              }
+              @case ('QUOTES_SENT') {
+                <span class="ph-pill quoted">QUOTE SENT</span>
+              }
+              @case ('UNDER_EVALUATION') {
+                <span class="ph-pill reviewing">REVIEWING</span>
+              }
+              @case ('PENDING_UNDERWRITING') {
+                <span class="ph-pill pending">PENDING</span>
+              }
+              @case ('REJECTED') {
+                <span class="ph-pill rejected">REJECTED</span>
+              }
+              @case ('EXPIRED') {
+                <span class="ph-pill expired">EXPIRED</span>
+              }
+              @default {
+                <span class="ph-pill quote-only">QUOTE ONLY</span>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Show more button -->
+      <div class="ph-footer" *ngIf="paymentHistory.length > 8">
+        <button class="btn-toggle" (click)="showAllPayments = !showAllPayments">
+          {{ showAllPayments ? 'Show Fewer Records' : 'View Full Ledger (' + paymentHistory.length + ' entries)' }}
+        </button>
+      </div>
+    </div>
+    
+    <!-- Intel / Summary Section -->
+    <div class="ph-sidebar" *ngIf="!loading && paymentHistory.length > 0">
+       <div class="intel-card gold">
+          <div class="intel-icon">🏆</div>
+          <div class="intel-body">
+            <h3>Gamification Impact</h3>
+            <p>Your educational quiz scores & badges have reduced your liability by <strong>₹{{ totalDiscountSaved | number:'1.0-0' }}</strong> overall.</p>
+          </div>
+       </div>
+
+       <div class="intel-card blue">
+          <div class="intel-icon">📚</div>
+          <div class="intel-body">
+            <h3>Boost Your Discount</h3>
+            <p>Complete more certifications in the Learning Center to unlock higher tier discounts on your next premium.</p>
+            <a routerLink="/learning-center/education-center" class="intel-btn">Go to Academy</a>
+          </div>
+       </div>
+    </div>
+  </div>
+</div>
