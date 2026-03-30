@@ -1,0 +1,39 @@
+<div class="tour-overlay fade-in" *ngIf="isVisible" [class.fade-out]="isClosing">
+  <div class="tour-modal slide-up" [class.slide-down]="isClosing" [ngClass]="currentStep.colorClass">
+    
+    <!-- Background Decor -->
+    <div class="decor-circle decor-top"></div>
+    <div class="decor-circle decor-bottom"></div>
+
+    <button class="skip-btn" (click)="finishTour()">Skip Tour ✕</button>
+
+    <div class="tour-content">
+      <div class="tour-icon-wrap bounce-in">
+        <span class="tour-icon">{{ currentStep.icon }}</span>
+      </div>
+      
+      <div class="tour-text anim-fade-up">
+        <div class="tour-subtitle">{{ currentStep.subtitle }}</div>
+        <h2 class="tour-title">{{ currentStep.title }}</h2>
+        <p class="tour-desc">{{ currentStep.description }}</p>
+      </div>
+    </div>
+
+    <div class="tour-footer">
+      <div class="tour-dots">
+        <span class="dot" *ngFor="let step of steps; let i = index" 
+              [class.active]="i === currentStepIndex"
+              [class.completed]="i < currentStepIndex"
+              (click)="jumpToStep(i)">
+        </span>
+      </div>
+
+      <div class="tour-actions">
+        <button class="btn-prev" *ngIf="!isFirstStep" (click)="previousStep()">Back</button>
+        <button class="btn-next" (click)="nextStep()">
+          {{ isLastStep ? 'Get Started 🚀' : 'Next Step →' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

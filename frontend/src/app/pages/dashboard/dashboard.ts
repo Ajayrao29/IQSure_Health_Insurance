@@ -9,10 +9,12 @@ import {
   AttemptResponse, UserPolicy, PremiumBreakdown
 } from '../../models/models';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
+import { GuidedTourComponent } from '../../components/guided-tour/guided-tour';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, GuidedTourComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
